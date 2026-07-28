@@ -255,7 +255,7 @@
         </div>
 
         <h2><i data-lucide="cpu"></i> 4. Лаборатория: "Золотое правило механики"</h2>
-        <p style="color: var(--text-muted);">Слева — неподвижный блок. Справа — подвижный. Потяни за веревку (ползунок "Тянуть веревку") и обрати внимание, с какой скоростью и на какую высоту поднимаются оба груза. Сравни необходимую силу $F$ и совершенную работу $A$.</p>
+        <p style="color: var(--text-muted);">Слева — неподвижный блок. Справа — подвижный. Увеличь высоту подъема грузов (ползунок "Высота подъема") и обрати внимание, сколько веревки ($s$) нужно вытянуть в каждом случае. Сравни необходимую силу $F$ и совершенную работу $A$.</p>
 
         <div class="simulator">
             <div class="sim-controls">
@@ -264,8 +264,8 @@
                     <input type="range" id="sim-pulley-m" min="2" max="20" value="10" step="2">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--accent);">Вытянуть веревку ($s$): <span id="val-pulley-s">0 м</span></label>
-                    <input type="range" id="sim-pulley-s" min="0" max="4" value="0" step="0.1">
+                    <label style="color: var(--accent);">Высота подъема ($h$): <span id="val-pulley-h">0 м</span></label>
+                    <input type="range" id="sim-pulley-h" min="0" max="4" value="0" step="0.1">
                 </div>
             </div>
 
@@ -277,7 +277,21 @@
                         <span>Сила $F_1$:</span> <span id="dash-p1-f">100 Н</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 1.1rem; color: var(--text-muted);">
-                        <span>Высота груза $h_1$:</span> <span id="dash-p1-h">0.0 м</span>
+                        <span>Веревка $s_1$:</span> <span id="dash-p1-s">0.0 м</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 1.1rem; color: #fff; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px;">
+                        <span>Работа $A_1$:</span> <span id="dash-p1-a">0 Дж</span>
+                    </div>
+                </div>
+
+                <!-- Дашборд Подвижного -->
+                <div style="flex: 1; min-width: 250px; background: rgba(76, 175, 80, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(76, 175, 80, 0.2);">
+                    <h4 style="color: var(--accent); margin-top: 0; text-align: center;">Подвижный блок</h4>
+                    <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 1.1rem;">
+                        <span>Сила $F_2$:</span> <span id="dash-p2-f">50 Н</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 1.1rem; color: var(--text-muted);">
+                        <span>Веревка $s_2$:</span> <span id="dash-p2-s">0.0 м</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 1.1rem; color: #fff; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px;">
                         <span>Работа $A_1$:</span> <span id="dash-p1-a">0 Дж</span>
@@ -521,33 +535,33 @@
         const ctxP = canvasP.getContext('2d');
         
         const elPm = document.getElementById('sim-pulley-m');
-        const elPs = document.getElementById('sim-pulley-s');
+        const elPh = document.getElementById('sim-pulley-h');
         
         function drawPulleys() {
             const m = parseFloat(elPm.value);
-            const s = parseFloat(elPs.value); // amount of rope pulled
+            const h = parseFloat(elPh.value); // height lifted
             const g = 10;
             const P = m * g; // Weight
 
             document.getElementById('val-pulley-m').textContent = m + ' кг';
-            document.getElementById('val-pulley-s').textContent = s.toFixed(1) + ' м';
+            document.getElementById('val-pulley-h').textContent = h.toFixed(1) + ' м';
 
             // Fixed Pulley Calculations
             const F1 = P;
-            const h1 = s; // rope pulled = height lifted
-            const A1 = F1 * s;
+            const s1 = h; // rope pulled = height lifted
+            const A1 = F1 * s1;
 
             document.getElementById('dash-p1-f').textContent = F1 + ' Н';
-            document.getElementById('dash-p1-h').textContent = h1.toFixed(1) + ' м';
+            document.getElementById('dash-p1-s').textContent = s1.toFixed(1) + ' м';
             document.getElementById('dash-p1-a').textContent = A1.toFixed(0) + ' Дж';
 
             // Movable Pulley Calculations
             const F2 = P / 2;
-            const h2 = s / 2; // rope pulled = 2 * height lifted
-            const A2 = F2 * s;
+            const s2 = h * 2; // rope pulled = 2 * height lifted
+            const A2 = F2 * s2;
 
             document.getElementById('dash-p2-f').textContent = F2 + ' Н';
-            document.getElementById('dash-p2-h').textContent = h2.toFixed(1) + ' м';
+            document.getElementById('dash-p2-s').textContent = s2.toFixed(1) + ' м';
             document.getElementById('dash-p2-a').textContent = A2.toFixed(0) + ' Дж';
 
             ctxP.clearRect(0, 0, canvasP.width, canvasP.height);
@@ -575,7 +589,7 @@
             ctxP.fillStyle = '#666'; ctxP.beginPath(); ctxP.arc(cx1, cy1, 4, 0, Math.PI*2); ctxP.fill();
 
             // Left Rope & Mass
-            const massY1 = baseFloor - h1 * visualScale;
+            const massY1 = baseFloor - h * visualScale;
             ctxP.strokeStyle = '#aaa'; ctxP.lineWidth = 2;
             ctxP.beginPath(); ctxP.moveTo(cx1 - r, cy1); ctxP.lineTo(cx1 - r, massY1); ctxP.stroke();
             
@@ -586,7 +600,7 @@
             ctxP.fillText(m+'кг', cx1 - r, massY1 + 25);
 
             // Right Rope (Pulled)
-            const handY1 = cy1 + 100 + s * visualScale;
+            const handY1 = cy1 + 100 + s1 * visualScale;
             ctxP.beginPath(); ctxP.moveTo(cx1 + r, cy1); ctxP.lineTo(cx1 + r, handY1); ctxP.stroke();
 
             // Force Vector F1
@@ -607,7 +621,7 @@
             ctxP.fillStyle = '#222'; ctxP.fill(); ctxP.stroke();
 
             // Movable Wheel Center
-            const movCy = baseFloor - 40 - h2 * visualScale;
+            const movCy = baseFloor - 40 - h * visualScale;
             
             // Left Rope (Fixed to ceiling, goes down to movable)
             ctxP.strokeStyle = '#aaa'; ctxP.lineWidth = 2;
@@ -632,7 +646,7 @@
             ctxP.lineTo(cx2 + r, fixCy2); // up to helper wheel left edge
             ctxP.stroke();
 
-            const handY2 = fixCy2 + 100 + s * visualScale; // Hand moves same distance s
+            const handY2 = fixCy2 + 100 + s2 * visualScale; // Hand moves distance s2
             ctxP.beginPath();
             ctxP.moveTo(cx2 + r*3, fixCy2); // from helper right edge
             ctxP.lineTo(cx2 + r*3, handY2); // down to hand
