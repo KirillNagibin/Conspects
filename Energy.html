@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Энергия, Работа, Мощность</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        /* Кнопки и шаги решений */
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Энергия, работа, мощность</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="zap" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое энергия в механике?</strong><br>
+                <span style="color: var(--text-muted);">Механическая энергия – это мера способности тела совершать работу. Главное правило вселенной: она <b>не исчезает и не появляется из ниоткуда</b>, а только переходит из одной формы в другую.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="battery-charging"></i> 1. Формы механической энергии</h2>
+        <div class="card table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Вид энергии</th>
+                        <th>Формула</th>
+                        <th>Когда применяется?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: #3B82F6;">Кинетическая ($E_k$)</strong></td>
+                        <td>$$E_k = \frac{mv^2}{2}$$</td>
+                        <td>Тело <b>движется</b> (имеет скорость).</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--accent);">Потенциальная тяжести ($E_p$)</strong></td>
+                        <td>$$E_p = mgh$$</td>
+                        <td>Тело находится <b>на высоте</b> над выбранным нулём.</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #FFC107;">Потенциальная упругости ($E_p$)</strong></td>
+                        <td>$$E_p = \frac{kx^2}{2}$$</td>
+                        <td>Тело растягивает или сжимает <b>пружину</b>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i data-lucide="scale"></i> 2. Закон сохранения механической энергии</h2>
+        <div class="card">
+            <p style="color: var(--text-muted);">Полная энергия в замкнутой системе (без трения и внешних сил) остаётся постоянной.</p>
+            <div class="formula-box">
+                $$E_{нач} = E_{кон} \quad \text{или} \quad E_k + E_p = \text{const}$$
+                $$E_{k1} + E_{p1} = E_{k2} + E_{p2}$$
+            </div>
+            
+            <p><strong>Как это понимать:</strong></p>
+            <ul>
+                <li>При падении тело теряет потенциальную энергию (высота падает), но строго в таком же объеме набирает кинетическую (скорость растет).</li>
+                <li>Если тело падало <i>без начальной скорости</i>, формула упрощается до: $\frac{mv^2}{2} = mgh$.</li>
+            </ul>
+
+            <div class="alert-box alert-warning" style="margin-top: 20px;">
+                <div class="icon-box"><i data-lucide="flame" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">А если есть трение?</strong><br>
+                    <span style="color: var(--text-muted);">Если система не идеальна, часть энергии "съедается" трением и уходит в тепло. Тогда полная механическая энергия уменьшается ровно на модуль работы силы трения:<br> 
+                    $$E_{k1} + E_{p1} = E_{k2} + E_{p2} + |A_{тр}|$$</span>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="hammer"></i> 3. Работа и Мощность</h2>
+        <div class="card">
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Механическая Работа ($A$)</div>
+                    $$A = F \cdot s \cdot \cos\alpha$$
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Мощность ($P$ или $N$)</div>
+                    $$P = \frac{A}{t} = F \cdot v \cdot \cos\alpha$$
+                </div>
+            </div>
+            
+            <p><strong>Анализ угла $\alpha$ (между силой и перемещением):</strong></p>
+            <ul>
+                <li>Если $\alpha < 90^\circ$ — работа <b>положительная</b> (сила "помогает" движению).</li>
+                <li>Если $\alpha > 90^\circ$ — работа <b>отрицательная</b> (сила мешает движению, например, сила трения).</li>
+                <li>Если $\alpha = 90^\circ$ — работа <b>равна нулю</b> (например, сила нормальной реакции опоры $N$ или сила тяжести при езде по горизонтали работу не совершают).</li>
+            </ul>
+            <p style="color: var(--text-muted); margin-top: 15px;"><i>Связь работы и энергии (Теорема о кинетической энергии): Работа равнодействующей силы равна изменению кинетической энергии тела: $A = \Delta E_k = E_{k2} - E_{k1}$.</i></p>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 4. Лаборатория: Перетекание энергий</h2>
+        <p style="color: var(--text-muted);">Отклони маятник и отпусти. Следи за столбчатой диаграммой: обрати внимание, как общая энергия (Механическая + Тепло) всегда остается неизменной. Включи трение воздуха, чтобы увидеть работу диссипативных сил.</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Нач. угол ($\alpha$): <span id="sim-angle-val">60°</span></label>
+                    <input type="range" id="sim-angle" min="10" max="90" value="60" step="5">
+                </div>
+                <div class="control-group">
+                    <label>Масса ($m$): <span id="sim-mass-val">1 кг</span></label>
+                    <input type="range" id="sim-mass" min="1" max="10" value="1" step="1">
+                </div>
+                <div class="control-group">
+                    <label>Трение воздуха: <span id="sim-fric-val">Выкл</span></label>
+                    <input type="range" id="sim-fric" min="0" max="10" value="0" step="1">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn" id="btn-reset" onclick="resetPendulum()"><i data-lucide="rotate-ccw" style="width:16px;"></i> Перезапуск</button>
+            </div>
+
+            <div class="canvas-container">
+                <!-- Холст для самого маятника -->
+                <canvas id="canvas-pendulum" width="400" height="300" style="flex: 2; min-width: 250px;"></canvas>
+                <!-- Холст для диаграммы энергий -->
+                <canvas id="canvas-energy" width="200" height="300" style="flex: 1; min-width: 150px;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 5. Лайфхаки и типичные ошибки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Секреты решения
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Масса часто сокращается.</strong> В уравнениях вида $\frac{mv^2}{2} = mgh$ массу можно зачеркнуть. Не спеши подставлять числа.</li>
+                    <li>Если по условию энергия <b>теряется</b>, ищи работу сил трения, сопротивления воздуха или неупругий удар.</li>
+                    <li><strong>Для пружины:</strong> при максимальном растяжении/сжатии скорость $v = 0$ (максимальна $E_p$), а при прохождении положения равновесия растяжение $x = 0$ (максимальна $E_k$).</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Ловушки ОГЭ/ЕГЭ
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Путаница максимумов:</strong> Думают, что наверху максимальна скорость. Нет: наверху максимальна $E_p$, а внизу перед ударом — $E_k$.</li>
+                    <li><strong>Забытый $\cos\alpha$:</strong> В формуле работы $A = Fs\cos\alpha$ забывают про угол. Сила трения <i>всегда</i> делает отрицательную работу ($\cos 180^\circ = -1$).</li>
+                    <li><strong>Относительность высоты:</strong> Подставляют в $mgh$ высоту не относительно выбранного нуля энергии (земли), а случайные числа из задачи.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Свободное падение</h3>
+            <p>Камень массой $0,5~кг$ падает с высоты $10~м$ без начальной скорости. Найдите скорость при ударе о землю (без учёта сопротивления воздуха). Принять $g = 9,8~м/с^2$.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Используй Закон сохранения механической энергии. Наверху у камня есть только потенциальная энергия ($E_p = mgh$), а в самом низу, прямо перед ударом, вся эта энергия перейдет в кинетическую ($E_k = \frac{mv^2}{2}$). Приравняй их. Масса сократится!
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. По закону сохранения энергии полная энергия в верхней точке равна полной энергии в нижней точке: <br>
+                $$E_{нач} = E_{кон} \Rightarrow mgh = \frac{mv^2}{2}$$</p>
+                
+                <p>2. Масса $m$ есть в обеих частях уравнения, сокращаем её: <br>
+                $$gh = \frac{v^2}{2}$$</p>
+                
+                <p>3. Выражаем искомую скорость $v$: <br>
+                $$v^2 = 2gh \Rightarrow v = \sqrt{2gh}$$</p>
+
+                <p>4. Подставляем числа: <br>
+                $$v = \sqrt{2 \cdot 9,8 \cdot 10} = \sqrt{196} \approx 14~м/с$$</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 14 м/с</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Мощность автомобиля</h3>
+            <p>Автомобиль массой $1000~кг$ разгоняется с места ($0~м/с$) до $20~м/с$ за $10~с$. Найди среднюю мощность, развиваемую двигателем, если сопротивлением воздуха пренебречь.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> Вспомни теорему о кинетической энергии. Работа двигателя $A$ полностью ушла на изменение кинетической энергии автомобиля ($A = \Delta E_k$). Найди эту работу, а затем подели на время, чтобы получить мощность ($P = \frac{A}{t}$).
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдем совершенную работу. Она равна изменению кинетической энергии (начальная скорость равна нулю, поэтому начальная энергия $0$):<br>
+                $$A = \Delta E_k = \frac{mv^2}{2} - 0$$</p>
+                
+                <p>2. Подставляем числа: <br>
+                $$A = \frac{1000 \cdot 20^2}{2} = \frac{1000 \cdot 400}{2} = 200~000~Дж$$</p>
+                
+                <p>3. Вычисляем среднюю мощность ($P$ или $N$): <br>
+                $$P = \frac{A}{t} = \frac{200~000}{10} = 20~000~Вт = 20~кВт$$</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 20 кВт</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Safe MathJax rendering
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => { if (MathJax.typesetPromise) MathJax.typesetPromise(); };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (stepId.startsWith('sol')) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        // --- Pendulum Physics Engine ---
+        const canvasP = document.getElementById('canvas-pendulum');
+        const ctxP = canvasP.getContext('2d');
+        const canvasE = document.getElementById('canvas-energy');
+        const ctxE = canvasE.getContext('2d');
+
+        const slAngle = document.getElementById('sim-angle');
+        const slMass = document.getElementById('sim-mass');
+        const slFric = document.getElementById('sim-fric');
+        
+        const valAngle = document.getElementById('sim-angle-val');
+        const valMass = document.getElementById('sim-mass-val');
+        const valFric = document.getElementById('sim-fric-val');
+
+        // Physics variables
+        let L = 180; // Length of pendulum
+        let g = 9.81;
+        let originX = canvasP.width / 2;
+        let originY = 20;
+        
+        let m = 1;
+        let angle = 60 * Math.PI / 180;
+        let angularVelocity = 0;
+        let frictionCoeff = 0;
+        
+        // Energy tracking
+        let initialMechEnergy = 0;
+        let currentHeat = 0;
+
+        let lastTime = 0;
+        let animationId;
+
+        function initSimulation() {
+            m = parseFloat(slMass.value);
+            let angleDeg = parseFloat(slAngle.value);
+            angle = angleDeg * Math.PI / 180;
+            
+            let fricVal = parseFloat(slFric.value);
+            frictionCoeff = fricVal * 0.1; // Scale down for physics
+
+            valAngle.textContent = angleDeg + '°';
+            valMass.textContent = m + ' кг';
+            valFric.textContent = fricVal === 0 ? 'Выкл' : (fricVal === 10 ? 'Макс' : fricVal);
+
+            angularVelocity = 0;
+            currentHeat = 0;
+            
+            // Calculate absolute initial energy
+            // E_p max = m * g * L * (1 - cos(theta_max))
+            initialMechEnergy = m * g * L * (1 - Math.cos(angle));
+        }
+
+        function resetPendulum() {
+            initSimulation();
+        }
+
+        slAngle.addEventListener('input', initSimulation);
+        slMass.addEventListener('input', initSimulation);
+        slFric.addEventListener('input', () => {
+            let fricVal = parseFloat(slFric.value);
+            frictionCoeff = fricVal * 0.1;
+            valFric.textContent = fricVal === 0 ? 'Выкл' : (fricVal === 10 ? 'Макс' : fricVal);
+        });
+
+        function drawPendulum(x, y, radius) {
+            ctxP.clearRect(0, 0, canvasP.width, canvasP.height);
+            
+            // Ceiling
+            ctxP.fillStyle = '#333';
+            ctxP.fillRect(originX - 50, 0, 100, 20);
+            
+            // String
+            ctxP.beginPath();
+            ctxP.moveTo(originX, originY);
+            ctxP.lineTo(x, y);
+            ctxP.strokeStyle = '#888';
+            ctxP.lineWidth = 2;
+            ctxP.stroke();
+
+            // Bob (Mass)
+            ctxP.beginPath();
+            ctxP.arc(x, y, radius, 0, Math.PI * 2);
+            ctxP.fillStyle = '#fff';
+            ctxP.fill();
+            ctxP.strokeStyle = '#555';
+            ctxP.lineWidth = 2;
+            ctxP.stroke();
+
+            // Velocity Vector (optional visual)
+            if (Math.abs(angularVelocity) > 0.05) {
+                let vScale = 15; // visual multiplier
+                let vx = Math.cos(angle) * angularVelocity * vScale;
+                let vy = Math.sin(angle) * angularVelocity * vScale;
+                
+                ctxP.beginPath();
+                ctxP.moveTo(x, y);
+                ctxP.lineTo(x + vx, y + vy);
+                ctxP.strokeStyle = '#3B82F6';
+                ctxP.lineWidth = 3;
+                
+                // Arrow head
+                const headlen = 8;
+                const vAngle = Math.atan2(vy, vx);
+                ctxP.lineTo(x + vx - headlen * Math.cos(vAngle - Math.PI / 6), y + vy - headlen * Math.sin(vAngle - Math.PI / 6));
+                ctxP.moveTo(x + vx, y + vy);
+                ctxP.lineTo(x + vx - headlen * Math.cos(vAngle + Math.PI / 6), y + vy - headlen * Math.sin(vAngle + Math.PI / 6));
+                ctxP.stroke();
+            }
+        }
+
+        function drawEnergyBars(Ep, Ek, Q) {
+            ctxE.clearRect(0, 0, canvasE.width, canvasE.height);
+            
+            const maxBarHeight = 220;
+            const barWidth = 35;
+            const gap = 25;
+            const startX = 25;
+            const startY = 260;
+
+            // Normalize energies against initial max energy to keep bars within canvas
+            let scale = maxBarHeight / (initialMechEnergy || 1); 
+
+            let hEp = Ep * scale;
+            let hEk = Ek * scale;
+            let hQ = Q * scale;
+            let hTotal = (Ep + Ek + Q) * scale;
+
+            function drawBar(x, h, color, label, val) {
+                // Background track
+                ctxE.fillStyle = 'rgba(255,255,255,0.05)';
+                ctxE.fillRect(x, startY - maxBarHeight, barWidth, maxBarHeight);
+                
+                // Actual bar
+                ctxE.fillStyle = color;
+                ctxE.fillRect(x, startY - h, barWidth, h);
+                
+                // Label
+                ctxE.fillStyle = '#aaa';
+                ctxE.font = '12px sans-serif';
+                ctxE.textAlign = 'center';
+                ctxE.fillText(label, x + barWidth/2, startY + 15);
+            }
+
+            drawBar(startX, hEp, '#4CAF50', 'Ep');
+            drawBar(startX + barWidth + gap, hEk, '#3B82F6', 'Ek');
+            
+            // Draw Heat/Lost only if friction is ON
+            if (parseFloat(slFric.value) > 0) {
+                drawBar(startX + (barWidth + gap) * 2, hQ, '#EF4444', 'Тепло');
+            } else {
+                // Otherwise draw Total Mech Energy
+                drawBar(startX + (barWidth + gap) * 2, hEp + hEk, '#FFC107', 'Полная');
+            }
+        }
+
+        function animate(time) {
+            if(!lastTime) lastTime = time;
+            let dt = (time - lastTime) / 1000;
+            lastTime = time;
+            
+            // Limit dt to prevent physics blowup on tab switch
+            if (dt > 0.1) dt = 0.016; 
+
+            // Physics Step (Euler integration)
+            let angularAcc = -(g / L) * 100 * Math.sin(angle) - frictionCoeff * angularVelocity;
+            angularVelocity += angularAcc * dt;
+            angle += angularVelocity * dt;
+
+            // Calculate instantaneous energies
+            let currentEp = m * g * L * (1 - Math.cos(angle));
+            let currentEk = 0.5 * m * Math.pow(L * angularVelocity, 2) / 100; // Scaled down for sane numbers
+            
+            // Calculate Heat (Q = Initial - Current Mech)
+            let currentMech = currentEp + currentEk;
+            
+            // If friction is on, accumulate heat. (Clamp to avoid minor floating point glitches)
+            if (frictionCoeff > 0) {
+                currentHeat = Math.max(0, initialMechEnergy - currentMech);
+            } else {
+                // If no friction, force perfect conservation (correct minor integration errors visually)
+                let total = currentEp + currentEk;
+                if (total !== initialMechEnergy && initialMechEnergy > 0) {
+                    let correction = initialMechEnergy / total;
+                    currentEp *= correction;
+                    currentEk *= correction;
+                }
+                currentHeat = 0;
+            }
+
+            // Kinematics to Cartesian
+            let x = originX + L * Math.sin(angle);
+            let y = originY + L * Math.cos(angle);
+            
+            let radius = 10 + m * 2; // Visually change mass size
+
+            drawPendulum(x, y, radius);
+            drawEnergyBars(currentEp, currentEk, currentHeat);
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        initSimulation();
+        requestAnimationFrame(animate);
+
+    </script>
+</body>
+</html>
