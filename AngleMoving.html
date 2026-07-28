@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Движение под углом к горизонту</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: rgba(255, 193, 7, 0.1); border-left: 4px solid #FFC107; }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .svg-illustration {
+            width: 100%; max-width: 500px; display: block; margin: 20px auto;
+            background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px dashed var(--border);
+        }
+
+        .formula-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+
+        mjx-container[display="true"] {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+        }
+
+        .data-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px;
+        }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td {
+            border: 1px solid var(--border); padding: 10px; text-align: left;
+        }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .simulator {
+            background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0;
+            overflow: hidden;
+        }
+        .sim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; overflow-x: auto; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 10px; }
+            .control-group[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Движение под углом к горизонту</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Суть явления</strong><br>
+                <span style="color: var(--text-muted);">Тело бросают с начальной скоростью $v_0$ под углом $\alpha$ к горизонту. Главный секрет: это движение складывается из двух <b>независимых</b> движений. По горизонтали тело летит равномерно (его ничто не тормозит), а по вертикали — ускоренно падает под действием гравитации $g$. Траектория — всегда парабола.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="split-square-horizontal"></i> 1. Разложение скорости (Проекции)</h2>
+        <div class="card">
+            <p style="color: var(--text-muted);">Вектор начальной скорости $\vec{v_0}$ всегда нужно разбить на две составляющие с помощью тригонометрии. Это Шаг №1 в любой задаче.</p>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                <div style="flex: 1; min-width: 250px;">
+                    <div class="formula-box" style="margin-top: 0;">
+                        $$v_{0x} = v_0 \cos\alpha$$
+                        $$v_{0y} = v_0 \sin\alpha$$
+                    </div>
+                    <ul>
+                        <li><strong style="color: #3B82F6;">$v_{0x}$ (Ось X)</strong> — скорость постоянная, ускорения нет. Тело просто летит вперед.</li>
+                        <li><strong style="color: #EF4444;">$v_{0y}$ (Ось Y)</strong> — скорость меняется. Сначала тело тормозит, летя вверх, останавливается в верхней точке, а затем разгоняется вниз.</li>
+                    </ul>
+                </div>
+                
+                <!-- SVG Visualization of Projections -->
+                <svg class="svg-illustration" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6" />
+                        </marker>
+                        <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#EF4444" />
+                        </marker>
+                        <marker id="arrow-white" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff" />
+                        </marker>
+                    </defs>
+                    
+                    <!-- Axes -->
+                    <line x1="20" y1="180" x2="280" y2="180" stroke="#555" stroke-width="2" />
+                    <line x1="20" y1="180" x2="20" y2="20" stroke="#555" stroke-width="2" />
+                    <text x="270" y="195" fill="#555" font-family="sans-serif" font-size="14">X</text>
+                    <text x="5" y="30" fill="#555" font-family="sans-serif" font-size="14">Y</text>
+                    
+                    <!-- Trajectory Path -->
+                    <path d="M 20 180 Q 100 20 220 180" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5,5" />
+                    
+                    <!-- Projections -->
+                    <line x1="20" y1="180" x2="120" y2="180" stroke="#3B82F6" stroke-width="3" marker-end="url(#arrow-blue)" />
+                    <text x="60" y="195" fill="#3B82F6" font-family="sans-serif" font-size="14">v₀x</text>
+                    
+                    <line x1="20" y1="180" x2="20" y2="80" stroke="#EF4444" stroke-width="3" marker-end="url(#arrow-red)" />
+                    <text x="25" y="130" fill="#EF4444" font-family="sans-serif" font-size="14">v₀y</text>
+                    
+                    <!-- Initial Velocity Vector -->
+                    <line x1="20" y1="180" x2="120" y2="80" stroke="#ffffff" stroke-width="3" marker-end="url(#arrow-white)" />
+                    <text x="75" y="115" fill="#ffffff" font-family="sans-serif" font-size="14">v₀</text>
+                    
+                    <!-- Angle Arc -->
+                    <path d="M 60 180 A 40 40 0 0 0 50 150" fill="none" stroke="#FFC107" stroke-width="2" />
+                    <text x="65" y="165" fill="#FFC107" font-family="sans-serif" font-size="14">α</text>
+                    
+                    <!-- Dashed lines closing the rectangle -->
+                    <line x1="120" y1="180" x2="120" y2="80" stroke="#555" stroke-width="1" stroke-dasharray="3,3" />
+                    <line x1="20" y1="80" x2="120" y2="80" stroke="#555" stroke-width="1" stroke-dasharray="3,3" />
+                </svg>
+            </div>
+        </div>
+
+        <h2><i data-lucide="function-square"></i> 2. Уравнения движения</h2>
+        <div class="card">
+            <p style="color: var(--text-muted);">Записываем базовые уравнения кинематики отдельно для каждой оси.</p>
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: #3B82F6; margin-bottom: 5px;">Ось X (Равномерное)</div>
+                    $$v_x = v_0 \cos\alpha$$
+                    $$x(t) = v_0 \cos\alpha \cdot t$$
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: #EF4444; margin-bottom: 5px;">Ось Y (Равноускоренное, $g$ вниз)</div>
+                    $$v_y = v_0 \sin\alpha - gt$$
+                    $$y(t) = v_0 \sin\alpha \cdot t - \frac{gt^2}{2}$$
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="book-open"></i> 3. Формулы, которые выводятся (НЕ учим наизусть!)</h2>
+        <div class="card table-container">
+            <p style="color: var(--text-muted);">Эти формулы можно вывести прямо на экзамене, если понимать логику. Заучивать их опасно, так как они работают только если тело бросают с земли на землю (а не с обрыва).</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Величина</th>
+                        <th>Формула</th>
+                        <th>Логика вывода (Что это значит?)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Время подъёма ($t_{под}$)</strong></td>
+                        <td>$$t_{под} = \frac{v_0 \sin\alpha}{g}$$</td>
+                        <td>Момент, когда тело достигло верха и его вертикальная скорость обнулилась: $v_y = 0$. <br>Из уравнения скорости: $0 = v_0 \sin\alpha - gt$.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Полное время полёта ($T$)</strong></td>
+                        <td>$$T = \frac{2v_0 \sin\alpha}{g}$$</td>
+                        <td>Тело падает обратно на землю, значит $y(T) = 0$. Или проще: время подъема равно времени падения, $T = 2 \cdot t_{под}$.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Максимальная высота ($H_{max}$)</strong></td>
+                        <td>$$H_{max} = \frac{v_0^2 \sin^2\alpha}{2g}$$</td>
+                        <td>Подставляем время подъема $t_{под}$ в уравнение координаты $y(t)$, либо используем "формулу без времени": $0 - v_{0y}^2 = -2gH$.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Дальность полёта ($L$)</strong></td>
+                        <td>$$L = \frac{v_0^2 \sin(2\alpha)}{g}$$</td>
+                        <td>Расстояние по горизонтали. Подставляем полное время полета $T$ в уравнение координаты $x(t)$.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i data-lucide="crosshair"></i> 4. Лаборатория: Баллистика</h2>
+        <p style="color: var(--text-muted);">Поэкспериментируй с углом броска и начальной скоростью. Следи за векторами: зеленая стрелка (скорость $v$) — это сумма синей ($v_x$, постоянная) и красной ($v_y$, меняется).</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Нач. скорость ($v_0$): <span id="sim-v0-val">25 м/с</span></label>
+                    <input type="range" id="sim-v0" min="10" max="40" value="25" step="1">
+                </div>
+                <div class="control-group">
+                    <label>Угол броска ($\alpha$): <span id="sim-angle-val">45°</span></label>
+                    <input type="range" id="sim-angle" min="15" max="85" value="45" step="5">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border); text-align: center;">
+                <div><span style="color: var(--text-muted); font-size: 0.85rem;">Дальность $L$</span><br><strong id="calc-l" style="color: var(--accent);">0.0 м</strong></div>
+                <div><span style="color: var(--text-muted); font-size: 0.85rem;">Высота $H_{max}$</span><br><strong id="calc-h" style="color: #FFC107;">0.0 м</strong></div>
+                <div><span style="color: var(--text-muted); font-size: 0.85rem;">Время полёта $T$</span><br><strong id="calc-t" style="color: #3B82F6;">0.0 с</strong></div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-ballistics" width="600" height="300"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 5. Лайфхаки и ловушки ОГЭ/ЕГЭ</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: #FFC107; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Секреты решения
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Угол $45^\circ$:</strong> Это оптимальный угол для достижения <i>максимальной дальности</i> полета при заданной скорости.</li>
+                    <li><strong>Дальность одинакова:</strong> Для углов, дающих в сумме $90^\circ$ (например, $\alpha$ и $90^\circ - \alpha$, или $30^\circ$ и $60^\circ$), дальность полета $L$ будет абсолютно <b>одинаковой</b>. Разной будет только высота.</li>
+                    <li><strong>Симметрия параболы:</strong> На половине пути вверх и вниз (на одной высоте) скорость тела по модулю одинакова, меняется только направление вектора $v_y$.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Скорость в верхней точке:</strong> Многие думают, что в высшей точке $v = 0$. Это ошибка! Равна нулю только вертикальная скорость $v_y = 0$, но тело продолжает лететь вперед с горизонтальной скоростью $v_x = v_0 \cos\alpha$.</li>
+                    <li><strong>Потеря проекций:</strong> Использование полного вектора скорости $v_0$ в формулах координаты $y$ вместо $v_0 \sin\alpha$.</li>
+                    <li><strong>Знак ускорения:</strong> Подстановка $g$ с плюсом в уравнение для $y$. Ось Y смотрит вверх, гравитация тянет вниз, поэтому всегда $-gt^2/2$.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        <div class="card">
+            <p><strong>Задача:</strong> Тело брошено под углом $30^\circ$ к горизонту со скоростью $20~м/с$. Найдите высоту подъема и дальность полета. ($g = 10~м/с^2$, $\sin 30^\circ = 0.5$, $\cos 30^\circ = \sqrt{3}/2 \approx 0.866$)</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn" id="btn-hint" onclick="showStep('step1')"><i data-lucide="help-circle" style="width: 16px;"></i> Шаг 1: Разложить скорость</button>
+                <button class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);" onclick="showStep('step2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать полное решение</button>
+            </div>
+            
+            <div class="step-content" id="step1">
+                <strong>💡 Подсказка:</strong> Первым делом всегда находи проекции начальной скорости!<br>
+                Ось X: $v_{0x} = v_0 \cos 30^\circ$<br>
+                Ось Y: $v_{0y} = v_0 \sin 30^\circ$<br>
+                Посчитай их, а затем найди время, когда вертикальная скорость станет нулем ($v_y = v_{0y} - gt = 0$).
+            </div>
+
+            <div class="step-content" id="step2">
+                <p><strong>Полное решение:</strong></p>
+                <p>1. Раскладываем скорость:<br>
+                $v_{0x} = 20 \cdot \frac{\sqrt{3}}{2} = 10\sqrt{3} \approx 17.32~м/с$<br>
+                $v_{0y} = 20 \cdot 0.5 = 10~м/с$</p>
+                
+                <p>2. Высота подъема ($H$). В верхней точке $v_y = 0$. Формула без времени для оси Y:<br>
+                $0 - v_{0y}^2 = -2gH$<br>
+                $H = \frac{v_{0y}^2}{2g} = \frac{10^2}{2 \cdot 10} = \frac{100}{20} = 5~м$</p>
+
+                <p>3. Время подъема и полное время полета ($T$).<br>
+                $v_y = v_{0y} - gt \Rightarrow 0 = 10 - 10t \Rightarrow t_{под} = 1~с$<br>
+                Полное время $T = 2 \cdot t_{под} = 2~с$</p>
+
+                <p>4. Дальность полета ($L$). Движение по оси X равномерное.<br>
+                $L = v_{0x} \cdot T = 10\sqrt{3} \cdot 2 = 20\sqrt{3} \approx 34.6~м$</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: H = 5 м, L ≈ 34.6 м</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => {
+                if (MathJax.typesetPromise) MathJax.typesetPromise();
+            };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        function showStep(stepId) {
+            document.getElementById(stepId).classList.add('active');
+            if(stepId === 'step2') {
+                document.getElementById('btn-hint').style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(stepId)]).catch(err => console.error(err));
+            }
+        }
+
+        const canvas = document.getElementById('canvas-ballistics');
+        const ctx = canvas.getContext('2d');
+        
+        const inputV0 = document.getElementById('sim-v0');
+        const inputAngle = document.getElementById('sim-angle');
+        const valV0 = document.getElementById('sim-v0-val');
+        const valAngle = document.getElementById('sim-angle-val');
+        
+        const calcL = document.getElementById('calc-l');
+        const calcH = document.getElementById('calc-h');
+        const calcT = document.getElementById('calc-t');
+
+        let animationId;
+        let startTime;
+        let projectile = { x: 0, y: 0, t: 0 };
+        const g = 9.81;
+        
+        // Scale physics meters to canvas pixels
+        const scale = 5; 
+        const originX = 30;
+        const originY = 270;
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            
+            for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
+            for(let i=0; i<canvas.height; i+=50) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke(); }
+            
+            // Ground
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+            
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('0', originX - 15, originY + 15);
+            ctx.fillText('X (м)', canvas.width - 30, originY - 10);
+            ctx.fillText('Y (м)', originX + 10, 20);
+        }
+
+        function drawArrow(fromx, fromy, tox, toy, color, text) {
+            if(Math.abs(tox - fromx) < 1 && Math.abs(toy - fromy) < 1) return;
+            const headlen = 8; 
+            const dx = tox - fromx;
+            const dy = toy - fromy;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+
+            if(text) {
+                ctx.font = '12px sans-serif';
+                ctx.fillText(text, tox + 5, toy - 5);
+            }
+        }
+
+        function simulate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const v0 = parseFloat(inputV0.value);
+            const angleDeg = parseFloat(inputAngle.value);
+            const angleRad = angleDeg * Math.PI / 180;
+            
+            const v0x = v0 * Math.cos(angleRad);
+            const v0y = v0 * Math.sin(angleRad);
+            
+            const T = (2 * v0y) / g;
+            const Hmax = (v0y * v0y) / (2 * g);
+            const L = v0x * T;
+
+            // Slow down time for visualization
+            let simTime = (timestamp - startTime) / 1000 * 2; 
+            
+            if (simTime > T) {
+                // Reset loop
+                startTime = timestamp;
+                simTime = 0;
+            }
+
+            // Calculate current position
+            const currentX = v0x * simTime;
+            const currentY = v0y * simTime - 0.5 * g * simTime * simTime;
+            
+            // Calculate current velocities
+            const vx = v0x;
+            const vy = v0y - g * simTime;
+
+            // Update DOM Dashboard
+            valV0.textContent = v0 + ' м/с';
+            valAngle.textContent = angleDeg + '°';
+            calcL.textContent = L.toFixed(1) + ' м';
+            calcH.textContent = Hmax.toFixed(1) + ' м';
+            calcT.textContent = T.toFixed(2) + ' с';
+
+            drawGrid();
+
+            // Draw full trajectory (dashed)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            for (let t = 0; t <= T; t += 0.1) {
+                const px = originX + (v0x * t) * scale;
+                const py = originY - (v0y * t - 0.5 * g * t * t) * scale;
+                if (t === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Map to canvas coordinates
+            const canvasX = originX + currentX * scale;
+            const canvasY = originY - currentY * scale;
+
+            // Draw velocity vectors
+            const vecScale = 2; // Make vectors visible
+            drawArrow(canvasX, canvasY, canvasX + vx * vecScale, canvasY, '#3B82F6', 'vx');
+            drawArrow(canvasX, canvasY, canvasX, canvasY - vy * vecScale, '#EF4444', 'vy');
+            drawArrow(canvasX, canvasY, canvasX + vx * vecScale, canvasY - vy * vecScale, '#4CAF50', 'v');
+
+            // Draw projectile
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(canvasX, canvasY, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            animationId = requestAnimationFrame(simulate);
+        }
+
+        // Restart simulation on input change
+        function resetSim() {
+            startTime = null;
+        }
+
+        inputV0.addEventListener('input', resetSim);
+        inputAngle.addEventListener('input', resetSim);
+
+        // Start
+        requestAnimationFrame(simulate);
+
+    </script>
+</body>
+</html>
