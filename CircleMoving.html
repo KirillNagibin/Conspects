@@ -158,18 +158,47 @@
             <p style="color: var(--text-muted);"><i>Полезно помнить: $g_h = g_0 \left(\frac{R}{R+h}\right)^2$. При удалении от Земли $g$ уменьшается с квадратом расстояния.</i></p>
         </div>
 
-        <h2><i data-lucide="refresh-cw"></i> 3. Движение по окружности</h2>
+        <h2><i data-lucide="refresh-cw"></i> 3. Движение по окружности: Линейная и Угловая скорость</h2>
         <div class="card">
             <p style="color: var(--text-muted);">При равномерном движении по окружности скорость по модулю постоянна, но ее <b>направление постоянно меняется</b>. Если меняется вектор скорости, значит, есть ускорение!</p>
             
-            <div class="formula-box">
-                $$a_ц = \frac{v^2}{r}$$
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 15px;">
+                <div style="background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <h4 style="color: var(--brand-blue); margin-top: 0; margin-bottom: 5px;">Линейная скорость ($v$)</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 10px;">Показывает, сколько <b>метров</b> тело проходит за секунду по дуге.</p>
+                    $$v = \frac{2\pi r}{T}$$
+                </div>
+                <div style="background: rgba(139, 92, 246, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h4 style="color: var(--brand-purple); margin-top: 0; margin-bottom: 5px;">Угловая скорость ($\omega$)</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 10px;">Показывает, на какой <b>угол (в радианах)</b> поворачивается радиус за секунду.</p>
+                    $$\omega = \frac{2\pi}{T}$$
+                </div>
             </div>
-            <p>Оно всегда направлено к центру окружности, поэтому называется <b>центростремительным</b>.</p>
 
-            <h3 style="color: var(--info-text); margin-top: 20px;">Центростремительная сила ($F_ц$)</h3>
-            <p>Из второго закона Ньютона: $F_ц = m a_ц = m \frac{v^2}{r}$.<br>
-            <b>Важно:</b> Это не какая-то новая, отдельная сила в природе. Это просто <i>роль</i>, которую играет уже существующая сила, заставляющая тело поворачивать:</p>
+            <div class="alert-box alert-info" style="margin-top: 20px;">
+                <div class="icon-box"><i data-lucide="lightbulb" color="var(--info-text)"></i></div>
+                <div>
+                    <strong style="color: var(--info-text);">Как это представить? (Аналогия с каруселью)</strong><br>
+                    <span style="color: var(--text-muted);">Представь вращающийся диск (или карусель). Все точки диска делают один полный оборот за одно и то же время. Значит, их <b>угловая скорость $\omega$ одинакова</b>. Но точка на самом краю диска пролетает огромный круг, а точка ближе к центру — маленький. Значит, их <b>линейные скорости $v$ разные!</b></span>
+                </div>
+            </div>
+
+            <h3 style="color: var(--accent); text-align: center; margin-top: 20px;">Формула-мост: $\quad v = \omega \cdot r$</h3>
+
+            <h3 style="color: var(--info-text); margin-top: 30px;">Центростремительное ускорение и Сила ($F_ц$)</h3>
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Через линейную скорость</div>
+                    $$a_ц = \frac{v^2}{r}$$
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Через угловую скорость</div>
+                    $$a_ц = \omega^2 r$$
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px;">Из второго закона Ньютона: $F_ц = m a_ц$. Оно всегда направлено к центру окружности.</p>
+            <p><b>Важно:</b> $F_ц$ — это не какая-то новая, отдельная сила в природе. Это просто <i>роль</i>, которую играет уже существующая сила:</p>
             <ul>
                 <li>Камень вращается на веревке ➔ $F_ц$ создает <b>сила натяжения нити ($T$)</b>.</li>
                 <li>Машина входит в поворот ➔ $F_ц$ создает <b>сила трения шин ($F_{тр}$)</b>.</li>
@@ -201,6 +230,10 @@
                     <div class="dashboard-label">Период обращения ($T$)</div>
                     <div class="dashboard-value" id="dash-t" style="color: #FFC107;">0.0 мин</div>
                 </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Угловая скорость ($\omega$)</div>
+                    <div class="dashboard-value" id="dash-w" style="color: var(--brand-purple);">0.0 рад/с</div>
+                </div>
             </div>
 
             <div class="canvas-container">
@@ -221,7 +254,7 @@
                 </strong>
                 <ul style="margin: 10px 0 0 0; padding-left: 15px;">
                     <li><strong>Масса спутника не важна:</strong> В задачах с орбитой масса самого спутника $m$ всегда сокращается. Орбитальная скорость зависит только от массы планеты $M$ и радиуса орбиты $r$.</li>
-                    <li><strong>Связь $v$ и $T$:</strong> При равномерном движении по окружности скорость — это длина всей окружности, поделенная на время одного оборота: $v = \frac{2\pi r}{T}$. Отсюда легко выразить период $T$.</li>
+                    <li><strong>Жесткий диск vs Ремень:</strong> Если две шестеренки связаны <i>ремнем</i> (или цепью велосипеда) — у них <b>одинаковая линейная скорость $v$</b> (иначе ремень порвется). Если две точки находятся на <i>одном вращающемся диске</i> — у них <b>одинаковая угловая скорость $\omega$</b>.</li>
                     <li><strong>Вес $\neq$ Сила тяжести:</strong> Вес $P$ (или $N$) — это сила давления на опору. В лифте, летящем вверх с ускорением, $P = m(g+a)$ (перегрузка), а при свободном падении $P = 0$ (невесомость).</li>
                 </ul>
             </div>
@@ -231,8 +264,8 @@
                     <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
                 </strong>
                 <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Ловушка с «об/мин»:</strong> Часто частоту вращения дают в оборотах в минуту (например, $60\text{ об/мин}$). В формулы нужно подставлять радианы в секунду (СИ)! $1\text{ об} = 2\pi\text{ рад}$, а минута = $60\text{ с}$. Значит, $60\text{ об/мин} = \frac{60 \cdot 2\pi}{60} = 2\pi\text{ рад/с}$.</li>
                     <li><strong>"Центробежная сила":</strong> Ищут и рисуют мифическую силу, выталкивающую тело наружу. При решении задач в инерциальных системах отсчета <b>центробежной силы не существует</b>!</li>
-                    <li><strong>Ускорение $g$ на орбите:</strong> Подставляют $g = 9.8$ вместо $a_ц = \frac{v^2}{r}$ для спутника. Помни, что на высоте орбиты ускорение свободного падения гораздо меньше земного.</li>
                     <li><strong>Радиус vs Высота:</strong> В формулу тяготения подставляют высоту над Землей $h$ вместо полного расстояния от центра Земли $r = R + h$.</li>
                 </ul>
             </div>
@@ -241,7 +274,7 @@
         <h2><i data-lucide="target"></i> 6. Практика</h2>
         
         <div class="card">
-            <h3 style="color: var(--accent); margin-top:0;">Задача: Скорость спутника</h3>
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Скорость спутника</h3>
             <p>Найдите скорость спутника на круговой орбите радиусом $7000\text{ км}$ (расстояние от центра), если масса Земли $6 \cdot 10^{24}\text{ кг}$, а гравитационная постоянная $G \approx 6.67 \cdot 10^{-11}\text{ Н}\cdot\text{м}^2/\text{кг}^2$.</p>
             
             <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
@@ -267,6 +300,37 @@
                 $$v = \sqrt{\frac{6.67 \cdot 10^{-11} \cdot 6 \cdot 10^{24}}{7 \cdot 10^6}} \approx \sqrt{\frac{40 \cdot 10^{13}}{7 \cdot 10^6}} \approx \sqrt{57 \cdot 10^6} \approx 7.5 \cdot 10^3 \text{ м/с}$$</p>
 
                 <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 7.5 км/с (или 7500 м/с)</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Ускорение на карусели</h3>
+            <p>Два мальчика катаются на вращающейся карусели. Первый сидит на расстоянии $1\text{ м}$ от центра, а второй (старший) сел на самый край карусели — на расстоянии $3\text{ м}$ от центра. Во сколько раз центростремительное ускорение второго мальчика больше, чем у первого?</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> Вспомни лайфхак! Поскольку они сидят на одной карусели, время одного полного круга (период $T$) у них одинаковое. А значит, одинакова и их <b>угловая скорость $\omega$</b>. Какую из двух формул для центростремительного ускорения лучше применить: с $v$ или с $\omega$?
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Так как мальчики находятся на одном вращающемся диске, их угловые скорости равны: $\omega_1 = \omega_2 = \omega$.</p>
+                
+                <p>2. Запишем формулы центростремительного ускорения через угловую скорость для каждого:<br>
+                $$a_1 = \omega^2 \cdot r_1$$
+                $$a_2 = \omega^2 \cdot r_2$$</p>
+                
+                <p>3. Найдем отношение их ускорений:<br>
+                $$\frac{a_2}{a_1} = \frac{\omega^2 \cdot r_2}{\omega^2 \cdot r_1} = \frac{r_2}{r_1}$$</p>
+
+                <p>4. Подставляем числа:<br>
+                $$\frac{a_2}{a_1} = \frac{3}{1} = 3$$</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: В 3 раза больше</div>
             </div>
         </div>
 
@@ -309,6 +373,7 @@
         
         const dashV = document.getElementById('dash-v');
         const dashT = document.getElementById('dash-t');
+        const dashW = document.getElementById('dash-w');
 
         // Physics parameters (scaled for visualization)
         const G_sim = 1000; 
@@ -359,9 +424,11 @@
             // Update UI Dashboards (Adding some fake realistic units for immersion)
             const real_v = Math.sqrt(mass / radiusMult) * 7.9; // 7.9 km/s is roughly 1st cosmic velocity
             const real_T = (2 * Math.PI * radiusMult * 6371) / real_v / 60; // Period in minutes
+            const real_w = (2 * Math.PI) / (real_T * 60); // Angular velocity in rad/s
             
             dashV.textContent = real_v.toFixed(1) + ' км/с';
             dashT.textContent = real_T.toFixed(0) + ' мин';
+            dashW.textContent = real_w.toFixed(4) + ' рад/с';
 
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
