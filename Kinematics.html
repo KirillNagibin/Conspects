@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Защита от поисковиков, чтобы конспекты были доступны только вашим ученикам по прямой ссылке -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Кинематика (Интерактивный)</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+        }
+
+        /* Глобальный сброс для предотвращения поломки верстки на мобильных */
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden; /* Защита от горизонтального скролла всей страницы */
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: rgba(255, 193, 7, 0.1); border-left: 4px solid #FFC107; }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .svg-illustration {
+            width: 100%; max-width: 400px; display: block; margin: 20px auto;
+            background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px dashed var(--border);
+        }
+
+        .formula-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+            margin: 20px 0;
+        }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            /* Исправление для мобильных: горизонтальный скролл формулы */
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+
+        /* Исправление для блочных формул MathJax */
+        mjx-container[display="true"] {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0; /* Отступ, чтобы скроллбар не перекрывал формулу */
+        }
+
+        .simulator {
+            background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0;
+            overflow: hidden; /* Защита от вылезания canvas */
+        }
+        .sim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; width: 100%; overflow: hidden; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; overflow-x: auto; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Мобильные оптимизации для симулятора */
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 10px; }
+            .card { padding: 15px; }
+            .canvas-container { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Кинематика</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Кинематика описывает, <b>как</b> движется тело, но не объясняет, <b>почему</b> (этим займется Динамика). Наша главная цель — уметь предсказывать, где окажется тело через $t$ секунд.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="book-open"></i> 1. Ключевые понятия</h2>
+        <div class="card">
+            <h3>Материальная точка</h3>
+            <p style="color: var(--text-muted);">Физическая модель. Если размер тела не важен для задачи, мы сжимаем его до точки. <i>Например: поезд едет из Москвы во Владивосток (поезд — точка). Но если поезд проезжает мост и важна его длина — это уже не точка.</i></p>
+            
+            <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+
+            <h3>Путь vs Перемещение</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                <div style="flex: 1; min-width: 250px;">
+                    <ul>
+                        <li><strong style="color: #FFB74D;">Путь ($s$)</strong> — длина самой траектории (следы на снегу). Скаляр (только число).</li>
+                        <li><strong style="color: #4CAF50;">Перемещение ($\Delta \vec{x}$)</strong> — направленный отрезок (вектор) от старта до финиша.</li>
+                        <li><strong>Координата ($x$)</strong> — показывает положение на оси: $x = x_0 + \Delta x$.</li>
+                    </ul>
+                </div>
+                <!-- Visualizing path vs displacement -->
+                <svg class="svg-illustration" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Grid -->
+                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#333" stroke-width="0.5"/>
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    <!-- Path (curved) -->
+                    <path d="M 30 100 C 80 20, 150 140, 260 40" fill="none" stroke="#FFB74D" stroke-width="3" stroke-dasharray="5,5" />
+                    <!-- Displacement (straight) -->
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#4CAF50" />
+                        </marker>
+                    </defs>
+                    <line x1="30" y1="100" x2="255" y2="44" stroke="#4CAF50" stroke-width="3" marker-end="url(#arrow)" />
+                    
+                    <!-- Points -->
+                    <circle cx="30" cy="100" r="5" fill="#fff" />
+                    <text x="15" y="120" fill="#fff" font-family="sans-serif" font-size="12">Старт</text>
+                    <circle cx="260" cy="40" r="5" fill="#fff" />
+                    <text x="245" y="30" fill="#fff" font-family="sans-serif" font-size="12">Финиш</text>
+                    
+                    <text x="130" y="30" fill="#FFB74D" font-family="sans-serif" font-size="12" font-weight="bold">Путь</text>
+                    <text x="120" y="95" fill="#4CAF50" font-family="sans-serif" font-size="12" font-weight="bold">Перемещение</text>
+                </svg>
+            </div>
+        </div>
+
+        <h2><i data-lucide="function-square"></i> 2. Базовые формулы</h2>
+        <div class="card">
+            <h3>Прямолинейное равномерное движение ($v = const$)</h3>
+            <div class="formula-box">$$x = x_0 + v_x t$$</div>
+            <p style="color: var(--text-muted); margin-top: -5px; margin-bottom: 20px;">При равномерном движении ускорение $a = 0$. За равные промежутки времени тело проходит равные расстояния.</p>
+            
+            <h3 style="margin-top: 30px;">Равноускоренное движение ($a = const$)</h3>
+            <p style="color: var(--text-muted);">Три кита кинематики. Выучи их, и ты решишь любую задачу школьного курса.</p>
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Уравнение скорости</div>
+                    $$v_x = v_{0x} + a_x t$$
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Уравнение координаты</div>
+                    $$x = x_0 + v_{0x}t + \frac{a_x t^2}{2}$$
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Формула без времени</div>
+                    $$S_x = \frac{v_x^2 - v_{0x}^2}{2a_x}$$
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #7fcfff;"><i data-lucide="arrow-down" style="width: 20px; display: inline-block; vertical-align: middle;"></i> Свободное падение (Частый гость в ОГЭ/ЕГЭ)</h3>
+            <p style="color: var(--text-muted);">Это просто частный случай равноускоренного движения. Ускорение всегда направлено строго вниз и равно $g \approx 10~м/с^2$. Формулы те же самые, просто меняем ось $x$ на $y$, а ускорение $a$ на $g$ (со знаком минус, если ось $Y$ направлена вверх).</p>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 3. Лаборатория: Графики движения</h2>
+        <p style="color: var(--text-muted);">Подвигай ползунки начальной скорости и ускорения, чтобы понять, как они влияют на графики. <i>(Обрати внимание, как отрицательное ускорение выгибает параболу вниз)</i>.</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button class="btn" style="padding: 6px 12px; font-size: 0.85rem; background-color: rgba(255,255,255,0.1); border: 1px solid var(--border);" onclick="setPreset(3, 0)">Равномерное (a=0)</button>
+            <button class="btn" style="padding: 6px 12px; font-size: 0.85rem; background-color: rgba(255,255,255,0.1); border: 1px solid var(--border);" onclick="setPreset(0, 1.5)">Разгон из покоя</button>
+            <button class="btn" style="padding: 6px 12px; font-size: 0.85rem; background-color: rgba(255,255,255,0.1); border: 1px solid var(--border);" onclick="setPreset(8, -1.5)">Торможение</button>
+        </div>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Нач. скорость ($v_0$): <span id="v0-val">0 м/с</span></label>
+                    <input type="range" id="v0-slider" min="-10" max="10" value="2" step="1">
+                </div>
+                <div class="control-group">
+                    <label>Ускорение ($a$): <span id="a-val">1 м/с²</span></label>
+                    <input type="range" id="a-slider" min="-5" max="5" value="1" step="0.5">
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <div>
+                    <div style="text-align: center; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9rem;">График скорости v(t)</div>
+                    <canvas id="canvas-v" width="300" height="200"></canvas>
+                </div>
+                <div>
+                    <div style="text-align: center; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9rem;">График координаты x(t)</div>
+                    <canvas id="canvas-x" width="300" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 4. Лайфхаки и частые ошибки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: #FFC107; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Секреты решения
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li>Слово <strong>«останавливается»</strong> в задаче означает, что конечная $v = 0$. Слово <strong>«трогается»</strong> — $v_0 = 0$.</li>
+                    <li>Скорость — это производная координаты, а ускорение — производная скорости: <br> <span style="color:#fff; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">$v = x'$</span> &nbsp; <span style="color:#fff; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">$a = v'$</span></li>
+                    <li>Если тела едут <b>навстречу</b>, скорость сближения: $v_1 + v_2$. Если <b>вдогонку</b>: $v_1 - v_2$.</li>
+                    <li>Площадь фигуры под графиком $v(t)$ всегда равна пройденному пути!</li>
+                    <li style="color: #fff;">Чем круче (под бóльшим углом) идет график $x(t)$, тем <b>больше скорость</b> тела.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Ловушки ОГЭ и ЕГЭ
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Средняя скорость:</strong> Это НЕ среднее арифметическое (нельзя просто сложить скорости и поделить на два)! Считать надо строго: <span style="color:#fff; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">$v_{ср} = \frac{S_{весь}}{t_{весь}}$</span>.</li>
+                    <li><strong>Потеря знаков:</strong> Если тело тормозит, вектор ускорения направлен против оси, значит в формуле пишем минус: $v = v_0 \mathbf{-} at$.</li>
+                    <li><strong>Путаница осей:</strong> На графике $x(t)$ горизонтальная линия означает <i>покой</i>. На графике $v(t)$ горизонтальная линия означает <i>равномерное движение</i>!</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 5. Практика</h2>
+        <div class="card">
+            <p><strong>Задача:</strong> Два тела начинают двигаться навстречу друг другу с точек, расстояние между которыми 200 м. Первое тело движется со скоростью $3~м/с$, второе $5~м/с$. Через какое время они встретятся?</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn" id="btn-hint" onclick="showStep('step1')"><i data-lucide="help-circle" style="width: 16px;"></i> Нужна подсказка</button>
+                <button class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);" onclick="showStep('step2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать полное решение</button>
+            </div>
+            
+            <div class="step-content" id="step1">
+                <strong>💡 Подсказка:</strong> Тела движутся навстречу друг другу. Вспомни лайфхак про "скорость сближения". Как быстро сокращается расстояние между ними каждую секунду?
+            </div>
+
+            <div class="step-content" id="step2">
+                <p><strong>Рeшение:</strong></p>
+                <p>1. Так как тела движутся навстречу, общая скорость их сближения равна сумме их скоростей: <br>
+                $$v_{сбл} = 3 + 5 = 8~м/с$$</p>
+                <p>2. Чтобы найти время, нужно общее расстояние поделить на скорость сближения: <br>
+                $$t = \frac{S}{v_{сбл}} = \frac{200}{8} = 25~с$$</p>
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 25 с</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Принудительная загрузка MathJax для сред предпросмотра
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => {
+                if (MathJax.typesetPromise) MathJax.typesetPromise();
+            };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        // Reveal Task Steps Logic
+        function showStep(stepId) {
+            document.getElementById(stepId).classList.add('active');
+            if(stepId === 'step2') {
+                document.getElementById('btn-hint').style.display = 'none';
+            }
+            // Обязательно рендерим формулы в открывшемся скрытом блоке
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(stepId)]).catch(err => console.error(err));
+            }
+        }
+
+        // --- Kinematics Simulator Logic ---
+        const canvasV = document.getElementById('canvas-v');
+        const ctxV = canvasV.getContext('2d');
+        const canvasX = document.getElementById('canvas-x');
+        const ctxX = canvasX.getContext('2d');
+        
+        const sliderV0 = document.getElementById('v0-slider');
+        const sliderA = document.getElementById('a-slider');
+        const valV0 = document.getElementById('v0-val');
+        const valA = document.getElementById('a-val');
+
+        // Draw grid and axes
+        function drawGrid(ctx, width, height, originY) {
+            ctx.clearRect(0, 0, width, height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            
+            // Grid lines
+            for(let i=0; i<width; i+=20) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke(); }
+            for(let i=0; i<height; i+=20) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(width, i); ctx.stroke(); }
+            
+            // Axes
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(width, originY); ctx.stroke(); // X axis (time)
+            ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(20, height); ctx.stroke(); // Y axis
+            
+            // Arrow heads
+            ctx.beginPath(); ctx.moveTo(width, originY); ctx.lineTo(width-8, originY-4); ctx.lineTo(width-8, originY+4); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(16, 8); ctx.lineTo(24, 8); ctx.fill();
+            
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('0', 5, originY + 15);
+            ctx.fillText('t', width - 15, originY + 15);
+        }
+
+        function drawGraphs() {
+            const v0 = parseFloat(sliderV0.value);
+            const a = parseFloat(sliderA.value);
+            
+            valV0.textContent = v0 + ' м/с';
+            valA.textContent = a + ' м/с²';
+
+            const w = canvasV.width;
+            const h = canvasV.height;
+            const originY_V = h / 2; // V graph origin in middle
+            const originY_X = h - 30; // X graph origin at bottom
+
+            // 1. Draw V(t) Graph
+            drawGrid(ctxV, w, h, originY_V);
+            ctxV.fillStyle = '#888'; ctxV.fillText('v', 5, 10);
+            
+            ctxV.strokeStyle = '#4CAF50';
+            ctxV.lineWidth = 3;
+            ctxV.beginPath();
+            for (let t = 0; t <= 10; t += 0.5) {
+                const v = v0 + a * t;
+                // Scale values for display: t*25 to stretch X, v*5 to scale Y
+                const plotX = 20 + t * 25; 
+                const plotY = originY_V - (v * 5); 
+                
+                if (t === 0) ctxV.moveTo(plotX, plotY);
+                else ctxV.lineTo(plotX, plotY);
+            }
+            ctxV.stroke();
+
+            // 2. Draw X(t) Graph
+            drawGrid(ctxX, w, h, originY_X);
+            ctxX.fillStyle = '#888'; ctxX.fillText('x', 5, 10);
+            
+            ctxX.strokeStyle = '#FFB74D';
+            ctxX.lineWidth = 3;
+            ctxX.beginPath();
+            for (let t = 0; t <= 10; t += 0.2) {
+                const x = v0 * t + 0.5 * a * t * t;
+                // Scale: t*25 for X, x*1.5 for Y to fit curve
+                const plotX = 20 + t * 25;
+                const plotY = originY_X - (x * 1.5);
+                
+                if (t === 0) ctxX.moveTo(plotX, plotY);
+                else ctxX.lineTo(plotX, plotY);
+            }
+            ctxX.stroke();
+        }
+
+        // Event Listeners for sliders
+        sliderV0.addEventListener('input', drawGraphs);
+        sliderA.addEventListener('input', drawGraphs);
+        
+        // Initial draw
+        drawGraphs();
+
+        // Simulator Preset Function
+        function setPreset(v, a) {
+            sliderV0.value = v;
+            sliderA.value = a;
+            drawGraphs();
+        }
+    </script>
+</body>
+</html>
