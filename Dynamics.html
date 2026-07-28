@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Защита от поисковиков, чтобы конспекты были доступны только вашим ученикам по прямой ссылке -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Динамика (Интерактивный)</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+        }
+
+        /* Глобальный сброс для предотвращения поломки верстки на мобильных */
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden; /* Защита от горизонтального скролла всей страницы */
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: rgba(255, 193, 7, 0.1); border-left: 4px solid #FFC107; }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .formula-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            /* Исправление для мобильных: горизонтальный скролл формулы */
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+
+        /* Исправление для блочных формул MathJax */
+        mjx-container[display="true"] {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0; /* Отступ, чтобы скроллбар не перекрывал формулу */
+        }
+
+        .data-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid var(--border); padding: 10px; text-align: left;
+        }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .simulator {
+            background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0;
+            overflow: hidden; /* Защита от вылезания canvas */
+        }
+        .sim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; overflow-x: auto; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Мобильные оптимизации для симулятора */
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 10px; }
+            .control-group[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Динамика</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Если Кинематика описывает, <b>как</b> движется тело, то Динамика объясняет, <b>почему</b> оно движется. Главное правило раздела: любое изменение движения (ускорение) всегда связано с действием <b>сил</b>.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="scale"></i> 1. Три закона Ньютона</h2>
+        <div class="card">
+            <h3>I закон (Закон инерции)</h3>
+            <p style="color: var(--text-muted);">Тела "хотят" сохранять свое состояние. В инерциальных системах отсчета (ИСО), если на тело не действуют силы или их сумма равна нулю ($\sum \vec{F} = 0$), тело:</p>
+            <ul>
+                <li>Находится в состоянии <b>покоя</b> ($v = 0$).</li>
+                <li>Или движется <b>равномерно и прямолинейно</b> ($v = const$).</li>
+            </ul>
+            <p style="color: var(--text-muted); font-style: italic;">Вывод: Если скорость меняется (появилось ускорение), значит, появилась нескомпенсированная сила.</p>
+            
+            <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+
+            <h3>II закон (Главный закон динамики)</h3>
+            <div class="formula-box">$$\sum \vec{F} = m\vec{a}$$</div>
+            <p style="color: var(--text-muted);">Ускорение тела прямо пропорционально равнодействующей всех сил и обратно пропорционально массе тела. <br>
+            <b>Важно:</b> Вектор ускорения $\vec{a}$ всегда направлен туда же, куда и равнодействующая сила $\sum \vec{F}$. Чем больше масса $m$, тем труднее разогнать тело (мера инертности).</p>
+
+            <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+
+            <h3>III закон (Действие равно противодействию)</h3>
+            <div class="formula-box">$$\vec{F}_{12} = -\vec{F}_{21}$$</div>
+            <p style="color: var(--text-muted);">Силы взаимодействия двух тел равны по модулю и противоположны по направлению. Они возникают парами и приложены к <b>разным</b> телам (поэтому они не могут скомпенсировать друг друга!). <br>
+            <i>Например: Ты давишь на стену, а стена давит на тебя с точно такой же силой.</i></p>
+        </div>
+
+        <h2><i data-lucide="magnet"></i> 2. Основные силы</h2>
+        <div class="card" style="overflow-x: auto;">
+            <table class="data-table" style="min-width: 500px;">
+                <thead>
+                    <tr>
+                        <th>Сила</th>
+                        <th>Формула</th>
+                        <th>Куда направлена?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Сила тяжести ($F_т$)</strong></td>
+                        <td>$F_т = mg$</td>
+                        <td>Строго вертикально <b>вниз</b> (к центру Земли)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Реакция опоры ($N$)</strong></td>
+                        <td>Из проекций (часто $N = mg$)</td>
+                        <td><b>Перпендикулярно</b> поверхности, от нее</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Сила трения ($F_{тр}$)</strong></td>
+                        <td>$F_{тр} = \mu N$ (скольжения)</td>
+                        <td><b>Против</b> направления (или возможного направления) движения</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Сила упругости ($F_{упр}$)</strong></td>
+                        <td>$F_{упр} = k|x|$ (Закон Гука)</td>
+                        <td><b>Противоположно</b> растяжению/сжатию</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
+                * <b>Центростремительная сила</b> — это не отдельный вид силы в природе. Это просто равнодействующая (или ее компонента), которая заставляет тело двигаться по окружности ($F_ц = m\frac{v^2}{R}$).
+            </p>
+        </div>
+
+        <h2><i data-lucide="play-circle"></i> 3. Лаборатория: Тянем брусок</h2>
+        <p style="color: var(--text-muted);">Попробуй сдвинуть брусок. Если сила тяги меньше максимальной силы трения покоя, он не сдвинется ($a=0$). Как только сила тяги превысит трение, появится ускорение.</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Сила тяги ($F$): <span id="f-pull-val">10 Н</span></label>
+                    <input type="range" id="f-pull-slider" min="0" max="50" value="10" step="1">
+                </div>
+                <div class="control-group">
+                    <label>Масса бруска ($m$): <span id="m-val">2 кг</span></label>
+                    <input type="range" id="m-slider" min="1" max="10" value="2" step="0.5">
+                </div>
+                <div class="control-group" style="grid-column: span 2;">
+                    <label>Коэф. трения ($\mu$): <span id="mu-val">0.3</span></label>
+                    <input type="range" id="mu-slider" min="0" max="0.8" value="0.3" step="0.05">
+                </div>
+            </div>
+            
+            <!-- Живой дашборд расчетов -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="color: var(--text-muted);">$N$ = <span id="calc-n" style="color: #fff;">20.0</span> Н</div>
+                <div style="color: var(--text-muted);">$F_{тр.max}$ = <span id="calc-fmax" style="color: #fff;">6.0</span> Н</div>
+                <div style="color: var(--text-muted);">$F_{тр.факт}$ = <span id="calc-freal" style="color: #fff;">6.0</span> Н</div>
+                <div style="color: var(--accent); font-weight: bold;">$a$ = <span id="calc-a">0.00</span> м/с²</div>
+            </div>
+            
+            <!-- Индикатор состояния -->
+            <div id="sim-status" style="margin-bottom: 15px; font-weight: bold; padding-left: 10px; border-left: 4px solid #FFC107; color: #FFC107; transition: 0.3s;">ПОКОИТСЯ (Трение покоя)</div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-dyn" width="600" height="200"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 4. Алгоритм решения и ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-info" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--info-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="list-ordered" style="width: 18px;"></i> Универсальный алгоритм
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li>Нарисуй тело и <b>расставь все силы</b> (от центра тела).</li>
+                    <li>Выбери оси координат (ось X удобно направить по ускорению).</li>
+                    <li>Спроецируй силы на оси (вспомни синусы/косинусы для наклонной).</li>
+                    <li>Напиши II закон Ньютона для каждой оси:<br>
+                        Ось X: $\sum F_x = ma_x$<br>
+                        Ось Y: $\sum F_y = ma_y$ (часто $a_y = 0$).
+                    </li>
+                    <li>Реши полученную систему уравнений.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Вес $\neq$ Масса.</strong> Масса ($m$) измеряется в кг. Вес ($P$) — это <b>сила</b> (в Ньютонах), с которой тело давит на опору. В покое $P = mg$, но при ускорении по вертикали вес меняется (перегрузка/невесомость).</li>
+                    <li><strong>Забытые силы.</strong> Не нарисовал силу на чертеже — потерял ее в уравнении. Всегда проверяй $mg$, $N$ и $F_{тр}$.</li>
+                    <li><strong>Направление трения.</strong> Сила трения <i>скольжения</i> всегда против вектора скорости, а не против "тянущей" силы!</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 5. Практика</h2>
+        <div class="card">
+            <p><strong>Задача:</strong> Брусок массой 2 кг тянут по горизонтальной поверхности силой 10 Н. Коэффициент трения равен 0,2. Найдите ускорение бруска ($g = 10~м/с^2$).</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn" id="btn-hint" onclick="showStep('step1')"><i data-lucide="help-circle" style="width: 16px;"></i> Шаг 1: Силы по вертикали</button>
+                <button class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);" onclick="showStep('step2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать полное решение</button>
+            </div>
+            
+            <div class="step-content" id="step1">
+                <strong>💡 Подсказка (Ось Y):</strong> По вертикали брусок не двигается ($a_y = 0$). Сила тяжести уравновешена реакцией опоры: $N = mg$. <br>
+                Значит, сила трения скольжения: $F_{тр} = \mu N = \mu mg$. Вычисли ее!
+            </div>
+
+            <div class="step-content" id="step2">
+                <p><strong>Полное решение:</strong></p>
+                <p>1. Найдем силу трения: <br>
+                $$F_{тр} = \mu N = \mu mg = 0,2 \cdot 2 \cdot 10 = 4~Н$$</p>
+                <p>2. Запишем II закон Ньютона для горизонтальной оси (Ось X направлена по силе тяги): <br>
+                $$F_{тяги} - F_{тр} = ma$$</p>
+                <p>3. Выразим и посчитаем ускорение: <br>
+                $$a = \frac{F_{тяги} - F_{тр}}{m} = \frac{10 - 4}{2} = \frac{6}{2} = 3~м/с^2$$</p>
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 3 м/с²</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Принудительная загрузка MathJax для сред предпросмотра
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => {
+                if (MathJax.typesetPromise) MathJax.typesetPromise();
+            };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        function showStep(stepId) {
+            document.getElementById(stepId).classList.add('active');
+            if(stepId === 'step2') {
+                document.getElementById('btn-hint').style.display = 'none';
+            }
+            // Обязательно рендерим формулы в открывшемся скрытом блоке
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(stepId)]).catch(err => console.error(err));
+            }
+        }
+
+        // --- Dynamics Simulator Logic ---
+        const canvas = document.getElementById('canvas-dyn');
+        const ctx = canvas.getContext('2d');
+        
+        const sliderF = document.getElementById('f-pull-slider');
+        const sliderM = document.getElementById('m-slider');
+        const sliderMu = document.getElementById('mu-slider');
+        
+        const valF = document.getElementById('f-pull-val');
+        const valM = document.getElementById('m-val');
+        const valMu = document.getElementById('mu-val');
+        
+        // Calculation output elements
+        const calcN = document.getElementById('calc-n');
+        const calcFmax = document.getElementById('calc-fmax');
+        const calcFreal = document.getElementById('calc-freal');
+        const calcA = document.getElementById('calc-a');
+        const simStatus = document.getElementById('sim-status');
+
+        const g = 10; 
+        let boxX = 100;
+        let velocity = 0; // Честная скорость тела
+        let lastTime = 0;
+
+        function updateDashboard(N, F_fric_max, F_fric_actual, F_pull, a, currentVelocity) {
+            if(calcN) calcN.textContent = N.toFixed(1);
+            if(calcFmax) calcFmax.textContent = F_fric_max.toFixed(1);
+            if(calcFreal) calcFreal.textContent = F_fric_actual.toFixed(1);
+            if(calcA) calcA.textContent = a.toFixed(2);
+
+            if(simStatus) {
+                // Если тело в движении
+                if (currentVelocity > 0.1) {
+                    if (a > 0.05) {
+                        simStatus.textContent = "РАЗГОН (Ускорение a > 0)";
+                        simStatus.style.color = "#4CAF50";
+                        simStatus.style.borderLeftColor = "#4CAF50";
+                    } else if (a < -0.05) {
+                        simStatus.textContent = "ТОРМОЖЕНИЕ (Ускорение a < 0)";
+                        simStatus.style.color = "#EF4444";
+                        simStatus.style.borderLeftColor = "#EF4444";
+                    } else {
+                        simStatus.textContent = "РАВНОМЕРНОЕ ДВИЖЕНИЕ (a = 0, v = const)";
+                        simStatus.style.color = "#3B82F6"; // Синий
+                        simStatus.style.borderLeftColor = "#3B82F6";
+                    }
+                } else {
+                    // Если тело покоится
+                    if (F_pull > F_fric_max) {
+                        simStatus.textContent = "НАЧИНАЕТ ДВИЖЕНИЕ";
+                        simStatus.style.color = "#4CAF50";
+                        simStatus.style.borderLeftColor = "#4CAF50";
+                    } else {
+                        simStatus.textContent = "ПОКОИТСЯ (Трение покоя)";
+                        simStatus.style.color = "#FFC107";
+                        simStatus.style.borderLeftColor = "#FFC107";
+                    }
+                }
+            }
+        }
+
+        function drawScene(m, F_pull, F_fric_actual, N) {
+            const rect = canvas.getBoundingClientRect();
+            if(canvas.width !== rect.width) {
+                canvas.width = rect.width;
+                boxX = 100; 
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Ground
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 150, canvas.width, 50);
+            
+            // Draw Box
+            const boxWidth = 50 + m * 8; 
+            const boxHeight = 50;
+            
+            if(boxX > canvas.width + 50) boxX = -boxWidth;
+
+            // Box shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(boxX + 5, 150, boxWidth, 5);
+
+            ctx.fillStyle = '#FFB74D';
+            ctx.fillRect(boxX, 150 - boxHeight, boxWidth, boxHeight);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, 150 - boxHeight, boxWidth, boxHeight);
+            
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(m + ' кг', boxX + boxWidth/2, 150 - boxHeight/2 + 5);
+
+            const centerX = boxX + boxWidth/2;
+            const centerY = 150 - boxHeight/2;
+
+            function drawArrow(fromx, fromy, tox, toy, color, text, isNetForce = false) {
+                if(Math.abs(tox - fromx) < 1 && Math.abs(toy - fromy) < 1) return;
+                const headlen = 10; 
+                const dx = tox - fromx;
+                const dy = toy - fromy;
+                const angle = Math.atan2(dy, dx);
+                
+                ctx.strokeStyle = color;
+                ctx.lineWidth = isNetForce ? 5 : 3;
+                ctx.beginPath();
+                ctx.moveTo(fromx, fromy);
+                ctx.lineTo(tox, toy);
+                ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+                ctx.moveTo(tox, toy);
+                ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+                ctx.stroke();
+
+                if(text) {
+                    ctx.fillStyle = color;
+                    ctx.font = isNetForce ? 'bold 14px sans-serif' : '14px sans-serif';
+                    if(dx > 0) ctx.fillText(text, tox + 15, toy + 5);
+                    else if (dx < 0) ctx.fillText(text, tox - 20, toy + 5);
+                    else if (dy < 0) ctx.fillText(text, tox, toy - 15);
+                    else ctx.fillText(text, tox, toy + 20);
+                }
+            }
+
+            // Forces
+            if(F_pull > 0) {
+                const fLen = F_pull * 2; 
+                drawArrow(boxX + boxWidth, centerY, boxX + boxWidth + fLen, centerY, '#4CAF50', 'F');
+            }
+
+            if(F_fric_actual > 0) {
+                const fricLen = F_fric_actual * 2;
+                drawArrow(boxX, 150, boxX - fricLen, 150, '#EF4444', 'Fтр');
+            }
+            
+            const nLen = N * 1.5;
+            drawArrow(centerX, centerY, centerX, centerY + Math.min(nLen, 40), '#888'); // mg
+            drawArrow(centerX, centerY, centerX, centerY - Math.min(nLen, 40), '#888'); // N
+
+            // Net Force (Равнодействующая)
+            const F_net = F_pull - F_fric_actual;
+            if (Math.abs(F_net) > 0.1) {
+                const netLen = F_net * 2;
+                drawArrow(centerX, centerY - boxHeight/2 - 15, centerX + netLen, centerY - boxHeight/2 - 15, '#fff', '∑F', true);
+            }
+            
+            // Вектор скорости (Показываем движение даже без равнодействующей силы)
+            if (velocity > 0.1) {
+                // Масштабируем длину вектора скорости для красоты
+                const vLen = 20 + Math.min(velocity, 40); 
+                drawArrow(centerX, centerY - boxHeight/2 - 40, centerX + vLen, centerY - boxHeight/2 - 40, '#3B82F6', 'v');
+            }
+        }
+
+        function animate(time) {
+            if(!lastTime) lastTime = time;
+            const deltaTime = (time - lastTime) / 1000; 
+            lastTime = time;
+
+            const F_pull = parseFloat(sliderF.value);
+            const m = parseFloat(sliderM.value);
+            const mu = parseFloat(sliderMu.value);
+            
+            valF.textContent = F_pull + ' Н';
+            valM.textContent = m + ' кг';
+            valMu.textContent = mu.toFixed(2);
+
+            const N = m * g;
+            const F_fric_max = mu * N;
+            
+            let a = 0;
+            let F_fric_actual = 0;
+
+            // --- ОБНОВЛЕННЫЙ ФИЗИЧЕСКИЙ ДВИЖОК ---
+            if (velocity > 0.1) {
+                // Брусок УЖЕ движется по инерции. Работает трение скольжения.
+                F_fric_actual = F_fric_max;
+                a = (F_pull - F_fric_actual) / m;
+            } else {
+                // Брусок покоится
+                velocity = 0; // Строго фиксируем ноль, чтобы не было дрожания
+                if (F_pull > F_fric_max) {
+                    F_fric_actual = F_fric_max; // Тяги хватило для срыва
+                    a = (F_pull - F_fric_actual) / m;
+                } else {
+                    F_fric_actual = F_pull; // Трение покоя компенсирует тягу
+                    a = 0;
+                }
+            }
+            
+            updateDashboard(N, F_fric_max, F_fric_actual, F_pull, a, velocity);
+
+            // Интегрируем ускорение в скорость (Euler integration)
+            velocity += a * deltaTime * 15; // 15 - множитель для визуала
+            
+            // Если мы тормозили (a < 0) и скорость упала ниже нуля, брусок останавливается. 
+            // Он не поедет назад, так как трение покоя его удержит.
+            if (velocity < 0) {
+                velocity = 0;
+            }
+
+            // Интегрируем скорость в координату
+            boxX += velocity * deltaTime;
+
+            drawScene(m, F_pull, F_fric_actual, N);
+
+            requestAnimationFrame(animate);
+        }
+
+        // Listeners
+        sliderF.addEventListener('input', () => {});
+        sliderM.addEventListener('input', () => {});
+        sliderMu.addEventListener('input', () => {});
+
+        // Start animation loop automatically
+        requestAnimationFrame(animate);
+
+    </script>
+</body>
+</html>
