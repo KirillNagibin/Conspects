@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Гидростатика</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Гидростатика</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Гидростатика — это раздел механики, который изучает жидкости в покое и силы, действующие в них и на них. Главное здесь — это <b>давление</b> и <b>выталкивающая сила</b>.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 1. Давление твердых тел и жидкостей</h2>
+        <div class="card">
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Давление твердого тела</div>
+                    $$p = \frac{F}{S}$$
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">1 Па = 1 Н/м²</div>
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Давление жидкости (на глубине)</div>
+                    $$p = \rho g h$$
+                </div>
+            </div>
+            <ul>
+                <li>$F$ — сила, действующая перпендикулярно поверхности, $S$ — площадь.</li>
+                <li>$\rho$ — плотность жидкости, $h$ — глубина.</li>
+            </ul>
+            <p>Чем глубже, тем больше давление. Важно: <b>Оно одинаково во всех направлениях на одной глубине.</b> Даже давление воды на дно подводной лодки снизу можно посчитать таким образом.</p>
+            
+            <h3 style="margin-top: 20px;">Полное давление</h3>
+            <p style="color: var(--text-muted);">Если сверху действует атмосферное давление $p_0$:</p>
+            <div class="formula-box">
+                $$p_{полн} = p_0 + \rho g h$$
+            </div>
+        </div>
+
+        <h2><i data-lucide="arrow-down-to-line"></i> 2. Закон Паскаля</h2>
+        <div class="card">
+            <p><b>Давление, производимое на жидкость или газ, передается в любую точку без изменений во всех направлениях.</b></p>
+            <p style="color: var(--text-muted);">Это основа работы гидравлического пресса, тормозов и домкратов.</p>
+            <div class="formula-box">
+                $$\frac{F_1}{S_1} = \frac{F_2}{S_2}$$
+            </div>
+            <p>Выигрыш в силе можно получить, если увеличить площадь поршня.</p>
+        </div>
+
+        <h2><i data-lucide="anchor"></i> 3. Закон Архимеда</h2>
+        <div class="card">
+            <p>На тело, погружённое в жидкость (или газ), действует выталкивающая сила, направленная вертикально вверх и равная весу вытесненной жидкости:</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$F_A = \rho_{ж} g V_{погр}$$
+            </div>
+            <ul>
+                <li>$\rho_{ж}$ — плотность <b>жидкости</b>.</li>
+                <li>$V_{погр}$ — объём <b>погружённой части</b> тела.</li>
+            </ul>
+            <p style="color: var(--warn-text);">Эта сила не зависит от формы тела, плотности самого тела или глубины (если тело полностью погружено), только от объёма погружения и плотности жидкости.</p>
+
+            <h3 style="margin-top: 25px;">Условие плавания тел</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Состояние</th>
+                            <th>Условие (Плотности)</th>
+                            <th>Условие (Силы)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Тело тонет</strong></td>
+                            <td>$\rho_{тела} > \rho_{ж}$</td>
+                            <td>$mg > F_A$</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Тело плавает внутри</strong></td>
+                            <td>$\rho_{тела} = \rho_{ж}$</td>
+                            <td>$mg = F_A$</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Тело всплывает (на поверхность)</strong></td>
+                            <td>$\rho_{тела} < \rho_{ж}$</td>
+                            <td>$mg = F_A$ (в покое на поверхности)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h2><i data-lucide="waves"></i> 4. Лаборатория: Условия плавания</h2>
+        <p style="color: var(--text-muted);">Изменяй плотность тела и жидкости, чтобы увидеть, как это влияет на силу Архимеда и положение тела. Обрати внимание на долю погруженного объема.</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: #FFC107;">Плотность тела ($\rho_{тела}$): <span id="val-rho-obj">800 кг/м³</span></label>
+                    <input type="range" id="sim-rho-obj" min="100" max="2000" value="800" step="50" style="accent-color: #FFC107;">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);">Плотность жидкости ($\rho_{ж}$): <span id="val-rho-liq">1000 кг/м³</span></label>
+                    <input type="range" id="sim-rho-liq" min="500" max="1500" value="1000" step="50">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Сила тяжести ($mg$)</div>
+                    <div class="dashboard-value" id="dash-mg" style="color: #FFC107;">0.0 Н</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Сила Архимеда ($F_A$)</div>
+                    <div class="dashboard-value" id="dash-fa" style="color: var(--brand-blue);">0.0 Н</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Доля погружения ($V_{погр}/V$)</div>
+                    <div class="dashboard-value" id="dash-vol" style="color: var(--accent);">0%</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-buoyancy" width="600" height="250"></canvas>
+            </div>
+            <div id="buoyancy-status" style="text-align: center; margin-top: 10px; font-weight: bold; padding: 10px; border-radius: 6px;"></div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 5. Лайфхаки и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Архимедова сила не зависит от массы тела.</strong> Только от объема погружения и плотности жидкости.</li>
+                    <li>Если тело частично плавает, то выталкивающая сила строго равна весу тела ($F_A = mg$).</li>
+                    <li><strong>Доля погружения:</strong> Уровень погружения показывает, какая доля объема компенсирует вес: <span style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px;">$\frac{V_{погр}}{V_{всего}} = \frac{\rho_{тела}}{\rho_{жидкости}}$</span>. Например, лед ($\rho=900$) в воде ($\rho=1000$) погружен на 90%.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Направление:</strong> Забываешь, что $F_A$ всегда действует <b>вверх</b>.</li>
+                    <li><strong>Плотности:</strong> Путаешь плотность жидкости ($\rho_ж$) и плотность тела ($\rho_т$) в формуле силы Архимеда. Нужна именно плотность среды!</li>
+                    <li><strong>Объем:</strong> Подставляешь полный объем тела $V$, хотя оно погружено лишь частично. Формула требует $V_{погр}$!</li>
+                    <li><strong>Полное давление:</strong> При расчете давления на дно водоема забываешь прибавить атмосферное давление $p_0$.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Выталкивающая сила</h3>
+            <p>Найдите выталкивающую силу, действующую на куб со стороной $0.2\text{ м}$, который полностью погружен в пресную воду ($\rho_ж = 1000\text{ кг/м}^3$). Считайте $g = 9.8\text{ Н/кг}$.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Сначала нужно найти объем куба, используя формулу $V = a^3$. Поскольку куб погружен полностью, $V_{погр} = V$. Затем примени формулу силы Архимеда.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдем объем куба: <br>
+                $$V = a^3 = 0.2^3 = 0.008\text{ м}^3$$</p>
+                
+                <p>2. Применим закон Архимеда (тело погружено полностью, поэтому $V_{погр} = V$): <br>
+                $$F_A = \rho_ж g V$$</p>
+                
+                <p>3. Вычисляем прикладываемую силу: <br>
+                $$F_A = 1000 \cdot 9.8 \cdot 0.008 = 78.4\text{ Н}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 78.4 Н</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Безопасный рендеринг MathJax без дублирования загрузки
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (stepId.startsWith('sol')) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        // --- BUOYANCY SIMULATOR ---
+        const canvas = document.getElementById('canvas-buoyancy');
+        const ctx = canvas.getContext('2d');
+        const elRhoObj = document.getElementById('sim-rho-obj');
+        const elRhoLiq = document.getElementById('sim-rho-liq');
+        const valRhoObj = document.getElementById('val-rho-obj');
+        const valRhoLiq = document.getElementById('val-rho-liq');
+        const dashMg = document.getElementById('dash-mg');
+        const dashFa = document.getElementById('dash-fa');
+        const dashVol = document.getElementById('dash-vol');
+        const statBuoyancy = document.getElementById('buoyancy-status');
+
+        const V_obj = 0.001; // Фиксированный объем 1 литр = 0.001 м^3 для расчетов
+        const g = 10;
+
+        let yPos = 100; // Визуальная позиция по Y
+        let targetYPos = 100;
+
+        function updatePhysics() {
+            const rho_obj = parseFloat(elRhoObj.value);
+            const rho_liq = parseFloat(elRhoLiq.value);
+            
+            valRhoObj.textContent = rho_obj + ' кг/м³';
+            valRhoLiq.textContent = rho_liq + ' кг/м³';
+
+            const mg = rho_obj * V_obj * g;
+            
+            let fraction = rho_obj / rho_liq;
+            let statusText = "";
+            let statusColor = "";
+            let statusBg = "";
+            
+            const waterLevelY = 120; // Уровень воды на холсте
+            const boxSize = 60; // Размер блока в пикселях
+
+            if (rho_obj > rho_liq) {
+                // Тонет
+                fraction = 1;
+                statusText = "ТЕЛО ТОНЕТ (ρ_т > ρ_ж)";
+                statusColor = "#EF4444";
+                statusBg = "rgba(239, 68, 68, 0.2)";
+                targetYPos = canvas.height - boxSize / 2 - 10; // На дно
+            } else if (rho_obj === rho_liq) {
+                // Плавает внутри
+                fraction = 1;
+                statusText = "ПЛАВАЕТ ВНУТРИ (ρ_т = ρ_ж)";
+                statusColor = "#3B82F6";
+                statusBg = "rgba(59, 130, 246, 0.2)";
+                targetYPos = canvas.height / 2 + 20; // Посредине
+            } else {
+                // Всплывает
+                statusText = "ПЛАВАЕТ НА ПОВЕРХНОСТИ (ρ_т < ρ_ж)";
+                statusColor = "#4CAF50";
+                statusBg = "rgba(76, 175, 80, 0.2)";
+                // Глубина погружения пропорциональна доле
+                targetYPos = waterLevelY - boxSize/2 + boxSize * fraction;
+            }
+
+            const fa = fraction * V_obj * rho_liq * g;
+
+            dashMg.textContent = mg.toFixed(1) + ' Н';
+            dashFa.textContent = fa.toFixed(1) + ' Н';
+            dashVol.textContent = (fraction * 100).toFixed(0) + '%';
+            
+            statBuoyancy.textContent = statusText;
+            statBuoyancy.style.backgroundColor = statusBg;
+            statBuoyancy.style.color = statusColor;
+        }
+
+        function drawArrow(fromX, fromY, toX, toY, color, label) {
+            if (Math.abs(toX - fromX) < 1 && Math.abs(toY - fromY) < 1) return;
+            const headlen = 8;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - Math.sin(angle + Math.PI / 6) * headlen);
+            ctx.stroke();
+
+            if (label) {
+                ctx.fillStyle = color;
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText(label, toX + 10, toY + (dy > 0 ? 10 : -5));
+            }
+        }
+
+        function animate() {
+            updatePhysics();
+            
+            // Плавное движение блока
+            yPos += (targetYPos - yPos) * 0.1;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const waterLevelY = 120;
+            const cx = canvas.width / 2;
+            const boxSize = 60;
+            
+            // Вода
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+            ctx.fillRect(0, waterLevelY, canvas.width, canvas.height - waterLevelY);
+            
+            // Линия воды
+            ctx.beginPath();
+            ctx.moveTo(0, waterLevelY);
+            ctx.lineTo(canvas.width, waterLevelY);
+            ctx.strokeStyle = '#3B82F6';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Дно
+            ctx.fillStyle = '#444';
+            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+
+            // Блок
+            ctx.fillStyle = '#FFC107'; // Желтый блок
+            ctx.fillRect(cx - boxSize/2, yPos - boxSize/2, boxSize, boxSize);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(cx - boxSize/2, yPos - boxSize/2, boxSize, boxSize);
+            
+            // Силы (векторы)
+            const rho_obj = parseFloat(elRhoObj.value);
+            const rho_liq = parseFloat(elRhoLiq.value);
+            const fraction = rho_obj > rho_liq ? 1 : rho_obj / rho_liq;
+            
+            // Масштабируем векторы для видимости
+            const mgScale = rho_obj / 20; 
+            const faScale = (fraction * rho_liq) / 20;
+
+            // Вектор mg (вниз)
+            drawArrow(cx, yPos, cx, yPos + mgScale, '#FFC107', 'mg');
+            
+            // Вектор F_A (вверх)
+            if (faScale > 0) {
+                drawArrow(cx - 10, yPos, cx - 10, yPos - faScale, '#3B82F6', 'F_A');
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        elRhoObj.addEventListener('input', updatePhysics);
+        elRhoLiq.addEventListener('input', updatePhysics);
+        
+        // Start loop
+        requestAnimationFrame(animate);
+
+    </script>
+</body>
+</html>
