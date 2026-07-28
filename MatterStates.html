@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Тепловые явления</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Simulator */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--brand-red); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Тепловые явления и состояния вещества</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Этот раздел изучает, как тела нагреваются, остывают и меняют свое агрегатное состояние (тают, кипят). Главное понятие здесь — <b>Количество теплоты ($Q$)</b> — это та энергия, которую тело получает или отдает.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="thermometer"></i> 1. Нагревание и охлаждение</h2>
+        <div class="card">
+            <div class="formula-box" style="border-color: var(--brand-red);">
+                $$Q = cm\Delta T$$
+            </div>
+            <ul>
+                <li>$Q$ — количество теплоты (Дж). $Q > 0$, если тело нагревается, и $Q < 0$, если остывает.</li>
+                <li>$c$ — удельная теплоемкость (Дж/(кг·°C)). Показывает, <b>как трудно</b> нагреть вещество.</li>
+                <li>$m$ — масса (кг).</li>
+                <li>$\Delta T = T_{кон} - T_{нач}$ — изменение температуры. Можно подставлять и Кельвины, и градусы Цельсия, так как их шаг одинаков!</li>
+            </ul>
+            <p style="color: var(--text-muted);">Например, у воды огромная теплоемкость ($c = 4200$). Вода долго нагревается и долго остывает. У железа $c = 460$, оно нагревается моментально.</p>
+        </div>
+
+        <h2><i data-lucide="snowflake"></i> 2. Агрегатные состояния и фазовые переходы</h2>
+        <div class="card table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Процесс</th>
+                        <th>Что происходит</th>
+                        <th>Формула</th>
+                        <th>Условие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Плавление</strong></td>
+                        <td>Твердое $\rightarrow$ Жидкое</td>
+                        <td style="color: var(--brand-red); font-weight: bold;">$Q = \lambda m$</td>
+                        <td>Строго при температуре плавления ($T = const$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Кристаллизация</strong></td>
+                        <td>Жидкое $\rightarrow$ Твердое</td>
+                        <td style="color: var(--brand-blue); font-weight: bold;">$Q = -\lambda m$</td>
+                        <td>Выделяет тепло!</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Парообразование</strong></td>
+                        <td>Жидкое $\rightarrow$ Газ</td>
+                        <td style="color: var(--brand-red); font-weight: bold;">$Q = rm$ (или $Lm$)</td>
+                        <td>При кипении $T = const$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Конденсация</strong></td>
+                        <td>Газ $\rightarrow$ Жидкое</td>
+                        <td style="color: var(--brand-blue); font-weight: bold;">$Q = -rm$</td>
+                        <td>Выделяет тепло!</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Сгорание топлива</strong></td>
+                        <td>Топливо превращается в тепло</td>
+                        <td style="color: var(--brand-orange); font-weight: bold;">$Q = qm$</td>
+                        <td>Тепло всегда выделяется</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert-box alert-warning" style="margin-top: 20px;">
+                <div class="icon-box"><i data-lucide="droplets" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">Испарение vs Кипение</strong><br>
+                    <span style="color: var(--text-muted);">Парообразование бывает двух видов: <b>Испарение</b> происходит только с поверхности и при <i>любой</i> температуре (лужи высыхают). <b>Кипение</b> происходит по всему объему (с пузырьками) и только при <i>температуре кипения</i>.</span>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="flame"></i> 3. Лаборатория: График нагревания</h2>
+        <p style="color: var(--text-muted);">Включи горелку и наблюдай, как температура льда ($-20^\circ C$) меняется с течением времени при постоянном подводе тепла. Обрати внимание на горизонтальные участки!</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);">Мощность горелки ($P$): <span id="val-power">1000 Вт</span></label>
+                    <input type="range" id="sim-power" min="500" max="3000" value="1000" step="100">
+                </div>
+                <div class="control-group" style="justify-content: center; align-items: center;">
+                    <button class="btn" id="btn-heat" onclick="toggleHeating()" style="width: 100%;"><i data-lucide="flame" style="width: 16px;"></i> <span id="btn-heat-text">Включить нагрев</span></button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Состояние</div>
+                    <div class="dashboard-value" id="dash-state" style="color: var(--brand-blue);">Лед</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Температура ($T$)</div>
+                    <div class="dashboard-value" id="dash-temp" style="color: #fff;">-20 °C</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Получено тепла ($\sum Q$)</div>
+                    <div class="dashboard-value" id="dash-q" style="color: var(--brand-red);">0 кДж</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-heating" width="700" height="300"></canvas>
+            </div>
+            <button class="btn btn-outline" onclick="resetSim()" style="margin-top: 15px; width: 100%;"><i data-lucide="rotate-ccw" style="width: 16px;"></i> Сбросить</button>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 4. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Уравнение теплового баланса:</strong> Сколько тепла отдало горячее тело, столько же тепла получило холодное (если нет потерь). $Q_{отд} = Q_{получ}$.</li>
+                    <li><strong>Горизонтальные линии на графике:</strong> Если график $T(t)$ идет горизонтально, значит температура не меняется. Это всегда <b>фазовый переход</b> (плавление или кипение).</li>
+                    <li>Если в задаче нужно растопить лед, который находится при $-10^\circ C$, его <b>сначала нужно нагреть</b> до $0^\circ C$ (формула $cm\Delta T$), и только потом плавить (формула $\lambda m$). Складывай эти $Q$ поэтапно!</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Одна формула на все:</strong> Пытаются плавить лед формулой $Q=cm\Delta T$. Для фазовых переходов есть свои формулы без температуры!</li>
+                    <li><strong>Путают $\lambda$, $r$ и $q$:</strong> $\lambda$ (лямбда) — для льда/металла (плавление). $r$ (или $L$) — для воды (кипение). $q$ — для дров/бензина (сгорание).</li>
+                    <li>Забывают, что при остывании или конденсации тепло <b>выделяется</b> (нужно ставить знак минус, если пишешь общее уравнение).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 5. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Многоэтапный нагрев</h3>
+            <p>Какое количество теплоты потребуется, чтобы превратить $2\text{ кг}$ льда, взятого при $0^\circ\text{C}$, в воду и нагреть эту воду до $50^\circ\text{C}$? <br>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">(Дано: $\lambda_{льда} = 3.3 \cdot 10^5\text{ Дж/кг}$, $c_{воды} = 4200\text{ Дж/(кг}\cdot^\circ\text{C)}$)</span></p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Задача состоит из двух этапов. 1. Расплавить лед (он уже при нуле, поэтому сразу плавим формулой $Q_1 = \lambda m$). 2. Полученную воду (теперь она при нуле) нагреть до 50 градусов формулой $Q_2 = cm\Delta T$. Итоговое тепло — это их сумма.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Общее тепло равно сумме тепла на плавление и на нагрев полученной воды: <br>
+                $$Q_{общ} = Q_1 + Q_2$$</p>
+                
+                <p>2. Тепло на плавление льда ($m = 2\text{ кг}$): <br>
+                $$Q_1 = \lambda m = 3.3 \cdot 10^5 \cdot 2 = 6.6 \cdot 10^5\text{ Дж}$$</p>
+
+                <p>3. Тепло на нагрев воды от $0^\circ\text{C}$ до $50^\circ\text{C}$ ($\Delta T = 50^\circ\text{C}$): <br>
+                $$Q_2 = c_{воды} m \Delta T = 4200 \cdot 2 \cdot 50 = 420000\text{ Дж} = 4.2 \cdot 10^5\text{ Дж}$$</p>
+                
+                <p>4. Складываем: <br>
+                $$Q_{общ} = 6.6 \cdot 10^5 + 4.2 \cdot 10^5 = 10.8 \cdot 10^5\text{ Дж}$$
+                Это равно $1.08 \cdot 10^6\text{ Дж}$, или $1.08\text{ МДж}$.</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 1.08 МДж</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Безопасный рендеринг MathJax
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (stepId.startsWith('sol')) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        // --- HEATING CURVE SIMULATOR ---
+        const canvas = document.getElementById('canvas-heating');
+        const ctx = canvas.getContext('2d');
+        const elPower = document.getElementById('sim-power');
+        const valPower = document.getElementById('val-power');
+        
+        const dashState = document.getElementById('dash-state');
+        const dashTemp = document.getElementById('dash-temp');
+        const dashQ = document.getElementById('dash-q');
+        const btnHeat = document.getElementById('btn-heat');
+        const btnHeatText = document.getElementById('btn-heat-text');
+
+        // Physics constants for 1kg of H2O (simplified for visual speed)
+        const mass = 1; // kg
+        const c_ice = 2100;
+        const lambda = 330000;
+        const c_water = 4200;
+        const r_vapor = 2300000; // Not going to fully boil in this short sim usually
+        
+        let isHeating = false;
+        let time = 0; // seconds simulation time
+        let totalQ = 0; // Joules
+        let currentTemp = -20;
+        let currentState = 0; // 0: ice, 1: melting, 2: water, 3: boiling
+        let phaseProgress = 0; // 0 to 1 for phase changes
+        
+        let history = [{t: 0, temp: -20}];
+        const timeScale = 10; // 1 real second = 10 sim seconds
+
+        let lastTimestamp = 0;
+        let reqId;
+
+        function toggleHeating() {
+            isHeating = !isHeating;
+            if (isHeating) {
+                btnHeat.classList.replace('btn', 'btn-outline');
+                btnHeat.style.borderColor = "var(--brand-red)";
+                btnHeat.style.color = "var(--brand-red)";
+                btnHeatText.textContent = "Остановить нагрев";
+                lastTimestamp = performance.now();
+                reqId = requestAnimationFrame(simulate);
+            } else {
+                btnHeat.classList.replace('btn-outline', 'btn');
+                btnHeat.style.borderColor = "";
+                btnHeat.style.color = "";
+                btnHeatText.textContent = "Включить нагрев";
+                cancelAnimationFrame(reqId);
+            }
+        }
+
+        function resetSim() {
+            isHeating = false;
+            time = 0;
+            totalQ = 0;
+            currentTemp = -20;
+            currentState = 0;
+            phaseProgress = 0;
+            history = [{t: 0, temp: -20}];
+            
+            btnHeat.classList.replace('btn-outline', 'btn');
+            btnHeat.style.borderColor = "";
+            btnHeat.style.color = "";
+            btnHeatText.textContent = "Включить нагрев";
+            cancelAnimationFrame(reqId);
+            
+            updateDashboards();
+            drawGraph();
+        }
+
+        function updateDashboards() {
+            valPower.textContent = elPower.value + ' Вт';
+            dashTemp.textContent = currentTemp.toFixed(1) + ' °C';
+            dashQ.textContent = (totalQ / 1000).toFixed(1) + ' кДж';
+
+            let stateText = "";
+            let stateColor = "";
+            if (currentState === 0) { stateText = "Лёд (Нагрев)"; stateColor = "#60A5FA"; } // Blue
+            else if (currentState === 1) { stateText = `Плавление (${(phaseProgress*100).toFixed(0)}%)`; stateColor = "#A78BFA"; } // Purple
+            else if (currentState === 2) { stateText = "Вода (Нагрев)"; stateColor = "#34D399"; } // Green
+            else if (currentState === 3) { stateText = `Кипение (${(phaseProgress*100).toFixed(0)}%)`; stateColor = "#F87171"; } // Red
+            
+            dashState.textContent = stateText;
+            dashState.style.color = stateColor;
+        }
+
+        function simulate(timestamp) {
+            if (!isHeating) return;
+            
+            const dt = (timestamp - lastTimestamp) / 1000; // real seconds passed
+            lastTimestamp = timestamp;
+            
+            const power = parseFloat(elPower.value); // Joules per real second
+            const qAdded = power * dt * timeScale; // Scaled heat added this frame
+            totalQ += qAdded;
+            time += dt * timeScale;
+
+            // State Machine
+            if (currentState === 0) {
+                // Heating ice
+                currentTemp += qAdded / (c_ice * mass);
+                if (currentTemp >= 0) {
+                    currentTemp = 0;
+                    currentState = 1;
+                    phaseProgress = 0;
+                }
+            } else if (currentState === 1) {
+                // Melting
+                const totalMeltingQ = lambda * mass;
+                phaseProgress += qAdded / totalMeltingQ;
+                if (phaseProgress >= 1) {
+                    phaseProgress = 1;
+                    currentState = 2;
+                }
+            } else if (currentState === 2) {
+                // Heating water
+                currentTemp += qAdded / (c_water * mass);
+                if (currentTemp >= 100) {
+                    currentTemp = 100;
+                    currentState = 3;
+                    phaseProgress = 0;
+                }
+            } else if (currentState === 3) {
+                // Boiling
+                const totalBoilingQ = r_vapor * mass;
+                phaseProgress += qAdded / totalBoilingQ;
+                if (phaseProgress >= 1) {
+                    phaseProgress = 1;
+                    // Stop sim when fully boiled for visual simplicity
+                    toggleHeating(); 
+                }
+            }
+
+            // Record history for graph (throttle recording slightly)
+            if (history.length === 0 || time - history[history.length-1].t > 2) {
+                history.push({t: time, temp: currentTemp});
+            }
+
+            updateDashboards();
+            drawGraph();
+
+            if (isHeating) {
+                reqId = requestAnimationFrame(simulate);
+            }
+        }
+
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const margin = {top: 20, right: 20, bottom: 30, left: 50};
+            const w = canvas.width - margin.left - margin.right;
+            const h = canvas.height - margin.top - margin.bottom;
+
+            // Scales
+            const maxTime = Math.max(800, time + 50); // Minimum 800s x-axis
+            const minTemp = -30;
+            const maxTemp = 120;
+            
+            const getX = (t) => margin.left + (t / maxTime) * w;
+            const getY = (temp) => margin.top + h - ((temp - minTemp) / (maxTemp - minTemp)) * h;
+
+            // Draw Axes
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // Y axis
+            ctx.moveTo(margin.left, margin.top);
+            ctx.lineTo(margin.left, margin.top + h);
+            // X axis
+            ctx.moveTo(margin.left, margin.top + h);
+            ctx.lineTo(margin.left + w, margin.top + h);
+            ctx.stroke();
+
+            // Zero degree line
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(margin.left, getY(0));
+            ctx.lineTo(margin.left + w, getY(0));
+            ctx.stroke();
+
+            // 100 degree line
+            ctx.beginPath();
+            ctx.moveTo(margin.left, getY(100));
+            ctx.lineTo(margin.left + w, getY(100));
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Labels
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('100°C', margin.left - 5, getY(100) + 4);
+            ctx.fillText('0°C', margin.left - 5, getY(0) + 4);
+            ctx.fillText('-20°C', margin.left - 5, getY(-20) + 4);
+            ctx.textAlign = 'center';
+            ctx.fillText('Время (с)', margin.left + w / 2, margin.top + h + 20);
+
+            // Draw Data Line
+            if (history.length > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#EF4444'; // Red line
+                ctx.lineWidth = 3;
+                ctx.lineJoin = 'round';
+                
+                ctx.moveTo(getX(history[0].t), getY(history[0].temp));
+                for (let i = 1; i < history.length; i++) {
+                    ctx.lineTo(getX(history[i].t), getY(history[i].temp));
+                }
+                ctx.stroke();
+
+                // Draw glowing dot at current position
+                const currentX = getX(time);
+                const currentY = getY(currentTemp);
+                
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#EF4444';
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.shadowBlur = 0; // reset
+            }
+        }
+
+        // Event listeners for inputs to update dashboard values instantly
+        elPower.addEventListener('input', updateDashboards);
+
+        // Initial draw
+        updateDashboards();
+        drawGraph();
+
+    </script>
+</body>
+</html>
