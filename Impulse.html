@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Закон сохранения импульса и удары</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Закон сохранения импульса и удары</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое импульс?</strong><br>
+                <span style="color: var(--text-muted);">Импульс тела — это количественная «мера его движения». В отличие от энергии, это <b>векторная</b> величина, то есть она имеет направление. Главное правило: в замкнутой системе сумма импульсов всех тел остается неизменной, как бы они ни сталкивались или взрывались.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="zap"></i> 1. Импульс и Сила</h2>
+        <div class="card">
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Импульс тела ($\vec{p}$)</div>
+                    $$\vec{p} = m\vec{v}$$
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Измеряется в кг·м/с</div>
+                </div>
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">II закон Ньютона в импульсном виде</div>
+                    $$\vec{F} \Delta t = \Delta \vec{p}$$
+                </div>
+            </div>
+            <p>Любая сила $\vec{F}$, действующая на тело в течение времени $\Delta t$, изменяет его импульс. Выражение $\vec{F} \Delta t$ называют <b>импульсом силы</b>. Чем дольше и сильнее мы толкаем тело, тем сильнее изменится его скорость.</p>
+        </div>
+
+        <h2><i data-lucide="scale-3d"></i> 2. Закон сохранения импульса (ЗСИ)</h2>
+        <div class="card">
+            <p style="color: var(--text-muted);">Если внешние силы отсутствуют (или их равнодействующая равна нулю), то суммарный импульс замкнутой системы тел сохраняется при любых взаимодействиях (столкновения, взрывы, выстрелы).</p>
+            <div class="formula-box">
+                $$\vec{p}_1 + \vec{p}_2 = \vec{p}_1' + \vec{p}_2'$$
+                $$m_1\vec{v}_1 + m_2\vec{v}_2 = m_1\vec{v}_1' + m_2\vec{v}_2'$$
+            </div>
+            <p><strong>Алгоритм решения задач:</strong></p>
+            <ol style="color: var(--text-muted); padding-left: 20px;">
+                <li>Определи систему тел (всё, что взаимодействует).</li>
+                <li>Запиши ЗСИ в <b>векторном</b> виде.</li>
+                <li>Выбери ось координат (например, ось $X$) и распиши проекции. <i>Помни: если вектор скорости смотрит против оси, его проекция идет с минусом!</i></li>
+                <li>Реши полученное уравнение относительно неизвестной.</li>
+            </ol>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 3. Виды ударов</h2>
+        <div class="card table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Вид удара</th>
+                        <th>Что происходит?</th>
+                        <th>Сохранение</th>
+                        <th>Формула ЗСИ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Абсолютно упругий</strong></td>
+                        <td>Тела упруго деформируются и "отскакивают" друг от друга.</td>
+                        <td>Импульс <b>И</b><br>Кинетическая энергия</td>
+                        <td>$m_1\vec{v}_1 + m_2\vec{v}_2 = m_1\vec{v}_1' + m_2\vec{v}_2'$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Абсолютно неупругий</strong></td>
+                        <td>Тела слипаются, деформируются и движутся <b>вместе</b> с общей скоростью.</td>
+                        <td><b>ТОЛЬКО</b> импульс!<br>Часть энергии уходит в тепло.</td>
+                        <td>$m_1\vec{v}_1 + m_2\vec{v}_2 = (m_1 + m_2)\vec{u}$</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i data-lucide="swords"></i> 4. Лаборатория: Соударения</h2>
+        <p style="color: var(--text-muted);">Задай массы и скорости двух тел (синего и красного). Обрати внимание, что импульс системы $P_{sys}$ сохраняется всегда, а вот кинетическая энергия $E_k$ при неупругом ударе резко падает (уходит в тепло).</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);">Масса 1 ($m_1$): <span id="val-m1">2 кг</span></label>
+                    <input type="range" id="sim-m1" min="1" max="5" value="2" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);">Скорость 1 ($v_1$): <span id="val-v1">4 м/с</span></label>
+                    <input type="range" id="sim-v1" min="-5" max="10" value="4" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-red);">Масса 2 ($m_2$): <span id="val-m2">3 кг</span></label>
+                    <input type="range" id="sim-m2" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-red);">Скорость 2 ($v_2$): <span id="val-v2">-2 м/с</span></label>
+                    <input type="range" id="sim-v2" min="-10" max="5" value="-2" step="1">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <input type="radio" name="sim-type" value="elastic" checked> Упругий
+                    </label>
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <input type="radio" name="sim-type" value="inelastic"> Неупругий (Слипание)
+                    </label>
+                </div>
+                <button class="btn" id="btn-play" onclick="simPlay()" style="margin-left: auto;"><i data-lucide="play" style="width:16px;"></i> Запуск / Рестарт</button>
+            </div>
+
+            <!-- Live Dashboard -->
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Импульс Системы ($P_{sys}$)</div>
+                    <div class="dashboard-value" id="dash-p" style="color: var(--accent);">0 кг·м/с</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Энергия Системы ($E_k$)</div>
+                    <div class="dashboard-value" id="dash-e" style="color: #FFC107;">0 Дж</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-sim" width="700" height="150"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 5. Связь с энергией и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Связь $p$ и $E_k$:</strong> Очень полезная формула, если в задаче дан импульс, а нужна энергия: <span style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px;">$E_k = \frac{p^2}{2m}$</span></li>
+                    <li><strong>Готовая формула:</strong> Скорость тел после абсолютно неупругого удара (слипания): $u = \frac{m_1v_1 + m_2v_2}{m_1 + m_2}$ (только помни про знаки!).</li>
+                    <li><strong>Магия равных масс:</strong> При упругом ударе двух тел с <i>одинаковыми массами</i> они просто обмениваются своими скоростями!</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Забытые векторы:</strong> Пишут ЗСИ просто складывая числа $m_1v_1 + m_2v_2$, забывая, что если тела едут навстречу, одна из скоростей отрицательная!</li>
+                    <li><strong>Неупругий удар и Энергия:</strong> Грубейшая ошибка — применять закон сохранения кинетической энергии к телам, которые слиплись. При неупругом ударе энергия ТЕРЯЕТСЯ (уходит в тепло и деформацию).</li>
+                    <li><strong>Путаница величин:</strong> Путают импульс ($p=mv$) и кинетическую энергию ($E_k=mv^2/2$).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Абсолютно неупругий удар</h3>
+            <p>Пуля массой $0,01~кг$ летит со скоростью $400~м/с$ и застревает в деревянном блоке массой $0,99~кг$, который покоился на гладком столе. Найди скорость блока с пулей после соударения.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Это абсолютно неупругий удар (пуля "застревает"). До удара импульс был только у пули. После удара блок и пуля движутся как единое целое с общей массой $(m_1 + m_2)$. Примени формулу $m_1v_1 + 0 = (m_1 + m_2)u$.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Запишем ЗСИ для неупругого удара: <br>
+                $$m_1v_1 + m_2v_2 = (m_1 + m_2)u$$</p>
+                
+                <p>2. Так как блок до удара покоился ($v_2 = 0$), импульс второго тела равен нулю: <br>
+                $$m_1v_1 = (m_1 + m_2)u$$</p>
+                
+                <p>3. Выразим общую скорость $u$: <br>
+                $$u = \frac{m_1v_1}{m_1 + m_2}$$</p>
+
+                <p>4. Подставляем числа: <br>
+                $$u = \frac{0,01 \cdot 400}{0,01 + 0,99} = \frac{4}{1} = 4~м/с$$</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 4 м/с</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Отдача при выстреле (Разделение)</h3>
+            <p>Пушка массой $1000~кг$ стреляет ядром массой $10~кг$ в горизонтальном направлении со скоростью $200~м/с$. Найди проекцию скорости отдачи пушки сразу после выстрела.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> До выстрела и пушка, и ядро покоились, значит начальный суммарный импульс равен нулю. После выстрела их суммарный импульс тоже должен остаться нулем! $0 = m_1v_1 + m_2v_2$. Учти направления.
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. До выстрела система покоилась, $P_{нач} = 0$. После выстрела ядро летит в одну сторону, а пушка откатывается в другую.<br>
+                $$0 = m_{пушки}v_{пушки} + m_{ядра}v_{ядра}$$</p>
+                
+                <p>2. Подставляем числа в векторное уравнение (или в проекциях на ось полета ядра): <br>
+                $$0 = 1000 \cdot v_{пушки} + 10 \cdot 200$$</p>
+                
+                <p>3. Вычисляем скорость пушки: <br>
+                $$1000 \cdot v_{пушки} = -2000$$
+                $$v_{пушки} = -2~м/с$$</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;"><i>Знак минус показывает, что пушка движется в направлении, противоположном вылету ядра (отдача).</i></p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: -2 м/с</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Safe MathJax rendering
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => { if (MathJax.typesetPromise) MathJax.typesetPromise(); };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (stepId.startsWith('sol')) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        // --- Physics Simulator Engine ---
+        const canvas = document.getElementById('canvas-sim');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Elements
+        const elM1 = document.getElementById('sim-m1');
+        const elV1 = document.getElementById('sim-v1');
+        const elM2 = document.getElementById('sim-m2');
+        const elV2 = document.getElementById('sim-v2');
+        
+        const valM1 = document.getElementById('val-m1');
+        const valV1 = document.getElementById('val-v1');
+        const valM2 = document.getElementById('val-m2');
+        const valV2 = document.getElementById('val-v2');
+        
+        const dashP = document.getElementById('dash-p');
+        const dashE = document.getElementById('dash-e');
+
+        // State
+        let isPlaying = false;
+        let animationId = null;
+        let hasCollided = false;
+
+        // Objects
+        let obj1 = { x: 50, w: 60, m: 2, v: 4, color: '#3B82F6' };
+        let obj2 = { x: 550, w: 60, m: 3, v: -2, color: '#EF4444' };
+        let simType = 'elastic'; // or 'inelastic'
+
+        // Scale factors
+        const pixelsPerMeter = 20;
+        const cy = 100; // Center Y
+
+        function readInputs() {
+            obj1.m = parseFloat(elM1.value);
+            obj1.v = parseFloat(elV1.value);
+            obj2.m = parseFloat(elM2.value);
+            obj2.v = parseFloat(elV2.value);
+            
+            // Adjust visual size slightly based on mass
+            obj1.w = 40 + obj1.m * 10;
+            obj2.w = 40 + obj2.m * 10;
+            
+            valM1.textContent = obj1.m + ' кг';
+            valV1.textContent = obj1.v + ' м/с';
+            valM2.textContent = obj2.m + ' кг';
+            valV2.textContent = obj2.v + ' м/с';
+
+            const radios = document.getElementsByName('sim-type');
+            for(let r of radios) {
+                if(r.checked) {
+                    simType = r.value;
+                    break;
+                }
+            }
+        }
+
+        function resetSim() {
+            isPlaying = false;
+            if(animationId) cancelAnimationFrame(animationId);
+            hasCollided = false;
+            
+            readInputs();
+            
+            // Start positions based on velocities to ensure they hit in the middle
+            if (obj1.v >= 0 && obj2.v <= 0) {
+                obj1.x = 50;
+                obj2.x = 550;
+            } else if (obj1.v > 0 && obj2.v > 0) {
+                obj1.x = 50;
+                obj2.x = 250;
+            } else if (obj1.v < 0 && obj2.v < 0) {
+                obj1.x = 450;
+                obj2.x = 550;
+            } else {
+                obj1.x = 250;
+                obj2.x = 50; // Swap if going away
+            }
+
+            updateDashboard();
+            draw();
+        }
+
+        function simPlay() {
+            if (isPlaying) {
+                resetSim(); // Acts as a restart if already playing
+            } else {
+                resetSim();
+                isPlaying = true;
+                lastTime = performance.now();
+                animate(lastTime);
+            }
+        }
+
+        // Add listeners to update visual instantly when sliders move (while paused)
+        [elM1, elV1, elM2, elV2].forEach(el => {
+            el.addEventListener('input', () => {
+                if (!isPlaying) resetSim();
+            });
+        });
+        document.querySelectorAll('input[name="sim-type"]').forEach(el => {
+            el.addEventListener('change', () => {
+                if (!isPlaying) resetSim();
+            });
+        });
+
+        function updateDashboard() {
+            // Calculate Momentum P = m1v1 + m2v2
+            const p = obj1.m * obj1.v + obj2.m * obj2.v;
+            // Calculate Kinetic Energy Ek = mv^2 / 2
+            const ek = (obj1.m * Math.pow(obj1.v, 2) / 2) + (obj2.m * Math.pow(obj2.v, 2) / 2);
+            
+            dashP.textContent = p.toFixed(1) + ' кг·м/с';
+            dashE.textContent = ek.toFixed(1) + ' Дж';
+        }
+
+        function drawArrow(x, y, dx, color, label) {
+            if (Math.abs(dx) < 0.1) return;
+            
+            const pxLength = dx * 10; // visual scaling
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + pxLength, y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            
+            // Arrowhead
+            const headLen = 8;
+            const dir = dx > 0 ? 1 : -1;
+            ctx.lineTo(x + pxLength - dir * headLen, y - headLen/2);
+            ctx.moveTo(x + pxLength, y);
+            ctx.lineTo(x + pxLength - dir * headLen, y + headLen/2);
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = color;
+            ctx.font = '14px sans-serif';
+            ctx.fillText(label, x + pxLength/2, y - 10);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Floor
+            ctx.beginPath();
+            ctx.moveTo(0, cy + 30);
+            ctx.lineTo(canvas.width, cy + 30);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Obj1
+            ctx.fillStyle = obj1.color;
+            ctx.fillRect(obj1.x, cy - 30, obj1.w, 60);
+            ctx.strokeStyle = '#fff';
+            ctx.strokeRect(obj1.x, cy - 30, obj1.w, 60);
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${obj1.m} кг`, obj1.x + obj1.w/2, cy);
+
+            // Draw Obj2
+            ctx.fillStyle = obj2.color;
+            ctx.fillRect(obj2.x, cy - 30, obj2.w, 60);
+            ctx.strokeStyle = '#fff';
+            ctx.strokeRect(obj2.x, cy - 30, obj2.w, 60);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(`${obj2.m} кг`, obj2.x + obj2.w/2, cy);
+
+            // Draw Velocity Vectors
+            drawArrow(obj1.x + obj1.w/2, cy - 40, obj1.v, '#fff', 'v');
+            if (simType !== 'inelastic' || !hasCollided) {
+                drawArrow(obj2.x + obj2.w/2, cy - 40, obj2.v, '#fff', 'v');
+            }
+        }
+
+        let lastTime = 0;
+        function animate(time) {
+            if (!isPlaying) return;
+            
+            const dt = (time - lastTime) / 1000; // seconds
+            lastTime = time;
+
+            // Update positions
+            obj1.x += obj1.v * pixelsPerMeter * dt;
+            obj2.x += obj2.v * pixelsPerMeter * dt;
+
+            // Collision Detection (1D AABB)
+            if (!hasCollided && (obj1.x + obj1.w >= obj2.x)) {
+                hasCollided = true;
+                
+                // Align them perfectly
+                const overlap = (obj1.x + obj1.w) - obj2.x;
+                obj1.x -= overlap / 2;
+                obj2.x += overlap / 2;
+
+                // Resolve Physics
+                const m1 = obj1.m; const v1 = obj1.v;
+                const m2 = obj2.m; const v2 = obj2.v;
+
+                if (simType === 'elastic') {
+                    // v1_final = ((m1-m2)v1 + 2m2v2) / (m1+m2)
+                    // v2_final = ((m2-m1)v2 + 2m1v1) / (m1+m2)
+                    obj1.v = ((m1 - m2)*v1 + 2*m2*v2) / (m1 + m2);
+                    obj2.v = ((m2 - m1)*v2 + 2*m1*v1) / (m1 + m2);
+                } else {
+                    // Inelastic: stick together
+                    const vFinal = (m1*v1 + m2*v2) / (m1 + m2);
+                    obj1.v = vFinal;
+                    obj2.v = vFinal;
+                    
+                    // Visually merge colors or indicate stickiness
+                    obj1.color = '#8B5CF6'; // purple-ish
+                    obj2.color = '#8B5CF6';
+                }
+                
+                // Update dashboard to show Energy drop (or conservation)
+                updateDashboard();
+            }
+
+            draw();
+
+            // Stop condition (if off screen)
+            if (obj1.x > canvas.width + 100 || obj2.x < -100 - obj2.w) {
+                isPlaying = false;
+            } else {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        // Initial setup
+        resetSim();
+
+    </script>
+</body>
+</html>
