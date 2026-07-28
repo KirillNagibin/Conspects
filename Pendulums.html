@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Колебания и Волны</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; gap: 10px; flex-wrap: wrap;}
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Колебательное движение и Волны</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Суть явления</strong><br>
+                <span style="color: var(--text-muted);">Колебательное движение – это движение, при котором тело повторяет одни и те же действия через равные промежутки времени (качается маятник, вибрирует струна). Волна — это процесс распространения этих колебаний в пространстве с течением времени.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 1. Основные характеристики</h2>
+        <div class="card table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Величина</th>
+                        <th>Обозначение</th>
+                        <th>Определение</th>
+                        <th>Единица</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Амплитуда</strong></td>
+                        <td>$A$</td>
+                        <td>Максимальное отклонение от положения равновесия</td>
+                        <td>м (метры)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Период</strong></td>
+                        <td>$T$</td>
+                        <td>Время одного полного колебания (туда и обратно)</td>
+                        <td>с (секунды)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Частота</strong></td>
+                        <td>$\nu$ (ню)</td>
+                        <td>Число полных колебаний за 1 секунду. $\nu = \frac{1}{T}$</td>
+                        <td>Гц (Герц)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: var(--text-muted); margin-top: 15px;"><i>Математическое описание: $x = A \cos(\omega t + \varphi)$, где $\omega = 2\pi\nu = \frac{2\pi}{T}$ — циклическая частота.</i></p>
+        </div>
+
+        <h2><i data-lucide="clock"></i> 2. Два главных маятника</h2>
+        <div class="card">
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px; font-weight: bold;">Пружинный маятник</div>
+                    $$T = 2\pi\sqrt{\frac{m}{k}}$$
+                    <ul style="text-align: left; font-size: 0.9rem; margin-top: 10px;">
+                        <li>$m$ — масса груза</li>
+                        <li>$k$ — жесткость пружины</li>
+                        <li><b>Зависит от массы!</b></li>
+                    </ul>
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-purple);">
+                    <div style="font-size: 0.9rem; color: var(--brand-purple); margin-bottom: 5px; font-weight: bold;">Математический маятник</div>
+                    $$T = 2\pi\sqrt{\frac{l}{g}}$$
+                    <ul style="text-align: left; font-size: 0.9rem; margin-top: 10px;">
+                        <li>$l$ — длина нити</li>
+                        <li>$g$ — ускорение своб. падения</li>
+                        <li><b>НЕ зависит от массы!</b></li>
+                    </ul>
+                </div>
+            </div>
+            <p style="color: var(--warn-text); text-align: center; font-weight: bold;">Амплитуда $A$ не влияет на период $T$ ни в одном из маятников (при малых колебаниях)!</p>
+        </div>
+
+        <h2><i data-lucide="zap"></i> 3. Энергия колебаний</h2>
+        <div class="card">
+            <p>Полная механическая энергия сохраняется (если нет трения): $E = E_k + E_p = \text{const}$.</p>
+            <ul>
+                <li><strong>В крайних точках ($x = \pm A$):</strong> Скорость $v=0 \Rightarrow E_k=0$. Энергия полностью потенциальная ($E = E_{p\_max}$).</li>
+                <li><strong>В положении равновесия ($x = 0$):</strong> Пружина не растянута (или высота минимальна) $\Rightarrow E_p=0$. Скорость максимальна, энергия полностью кинетическая ($E = E_{k\_max}$).</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="waves"></i> 4. Лаборатория: От колебаний к волне</h2>
+        <p style="color: var(--text-muted);">Наблюдай, как колебания математического маятника порождают волну, разворачивающуюся во времени. Обрати внимание, как энергия перетекает из кинетической (зеленый) в потенциальную (синий).</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Длина нити ($l$): <span id="val-len">1.0 м</span></label>
+                    <input type="range" id="sim-len" min="0.2" max="2.0" value="1.0" step="0.1">
+                </div>
+                <div class="control-group">
+                    <label>Гравитация ($g$): <span id="val-g">9.8 м/с²</span></label>
+                    <input type="range" id="sim-g" min="1.6" max="25" value="9.8" step="0.1">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Период ($T$)</div>
+                    <div class="dashboard-value" id="dash-t" style="color: var(--accent);">0.0 с</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Частота ($\nu$)</div>
+                    <div class="dashboard-value" id="dash-f" style="color: #FFC107;">0.0 Гц</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas-pendulum" width="300" height="250"></canvas>
+                <canvas id="canvas-wave" width="450" height="250"></canvas>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px; font-size: 0.85rem;">
+                <span style="color: #4CAF50;">■ Кинетическая $E_k$ (скорость)</span>
+                <span style="color: #3B82F6;">■ Потенциальная $E_p$ (высота)</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="radio"></i> 5. Звуковые волны</h2>
+        <div class="card">
+            <p>Звук – это <b>продольная механическая волна</b>. В вакууме звука нет (нужны частицы среды).</p>
+            
+            <div class="formula-box">
+                $$v = \lambda \cdot \nu = \frac{\lambda}{T}$$
+            </div>
+            
+            <table class="data-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>Параметр волны</th>
+                        <th>От чего зависит?</th>
+                        <th>Как воспринимается ухом?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Частота ($\nu$)</strong></td>
+                        <td>Только от источника колебаний</td>
+                        <td>Высота звука (писк vs бас)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Амплитуда ($A$)</strong></td>
+                        <td>От энергии колебаний</td>
+                        <td>Громкость</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Скорость ($v$)</strong></td>
+                        <td>От плотности и упругости среды</td>
+                        <td>Скорость распространения</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p style="color: var(--warn-text); font-weight: bold; margin-top: 15px; text-align: center;">При переходе звука из одной среды в другую (например, из воздуха в воду) ЧАСТОТА НЕ МЕНЯЕТСЯ ($\nu = \text{const}$)! Меняются скорость $v$ и длина волны $\lambda$.</p>
+        </div>
+
+        <h2><i data-lucide="lightbulb"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Узнавай маятник:</strong> Пружинный – "масса на пружине", зависит от $m, k$. Математический – "шарик на нити", зависит от $l, g$.</li>
+                    <li><strong>Графики:</strong> За один полный период $T$ тело проходит путь, равный **$4A$** (от 0 до $A$, обратно к 0, до $-A$, и обратно к 0).</li>
+                    <li><strong>Резонанс:</strong> Резкое увеличение амплитуды, если частота внешней силы совпадает с собственной частотой маятника.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="alert-triangle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Звук в космосе:</strong> Звук не распространяется в вакууме. Взрывы в "Звездных войнах" должны быть беззвучными.</li>
+                    <li><strong>Влияние массы на нить:</strong> Увеличение массы математического маятника НЕ меняет его период. Увеличишь массу в 100 раз — он будет качаться так же.</li>
+                    <li><strong>Сантиметры:</strong> Забывают переводить длину нити $l$ или длину волны $\lambda$ из сантиметров в метры (СИ).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Период пружинного маятника</h3>
+            <p>Найдите период колебаний груза массой $0,4\text{ кг}$ на пружине жёсткостью $100\text{ Н/м}$. Возьмите $\pi \approx 3,14$.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Используй формулу для пружинного маятника: $T = 2\pi\sqrt{\frac{m}{k}}$. Подставь массу и жесткость.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Запишем формулу: <br>
+                $$T = 2\pi\sqrt{\frac{m}{k}}$$</p>
+                
+                <p>2. Подставляем числа: <br>
+                $$T = 2 \cdot 3,14 \cdot \sqrt{\frac{0,4}{100}} = 6,28 \cdot \sqrt{0,004} \approx 6,28 \cdot 0,0632 \approx 0,4\text{ с}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 0,4 с</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Длина звуковой волны</h3>
+            <p>Волна проходит расстояние $600\text{ м}$ за $2\text{ с}$. Частота колебаний источника $50\text{ Гц}$. Найдите длину волны.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> Сначала найди скорость волны, как при обычном равномерном движении ($v = \frac{s}{t}$). Затем используй формулу связи длины волны и частоты: $v = \lambda \cdot \nu$.
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдём скорость распространения волны: <br>
+                $$v = \frac{s}{t} = \frac{600}{2} = 300\text{ м/с}$$</p>
+                
+                <p>2. Из формулы скорости волны $v = \lambda \nu$ выразим длину волны $\lambda$: <br>
+                $$\lambda = \frac{v}{\nu}$$</p>
+
+                <p>3. Подставляем числа: <br>
+                $$\lambda = \frac{300}{50} = 6\text{ м}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 6 м</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Safe MathJax rendering
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => { if (MathJax.typesetPromise) MathJax.typesetPromise(); };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (stepId.startsWith('sol')) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        // --- Wave & Pendulum Simulator Engine ---
+        const canvasP = document.getElementById('canvas-pendulum');
+        const ctxP = canvasP.getContext('2d');
+        const canvasW = document.getElementById('canvas-wave');
+        const ctxW = canvasW.getContext('2d');
+        
+        const elLen = document.getElementById('sim-len');
+        const elG = document.getElementById('sim-g');
+        const valLen = document.getElementById('val-len');
+        const valG = document.getElementById('val-g');
+        
+        const dashT = document.getElementById('dash-t');
+        const dashF = document.getElementById('dash-f');
+
+        let time = 0;
+        let waveHistory = [];
+        const maxWavePoints = 150;
+
+        function renderSim(timestamp) {
+            // Read values
+            const l = parseFloat(elLen.value);
+            const g = parseFloat(elG.value);
+            
+            valLen.textContent = l.toFixed(1) + ' м';
+            valG.textContent = g.toFixed(1) + ' м/с²';
+
+            // Calculate Period and Freq
+            const T = 2 * Math.PI * Math.sqrt(l / g);
+            const freq = 1 / T;
+            
+            dashT.textContent = T.toFixed(2) + ' с';
+            dashF.textContent = freq.toFixed(2) + ' Гц';
+
+            // Visual scaling
+            const dt = 0.016; // fixed roughly 60fps dt for stable wave drawing
+            time += dt;
+            
+            const omega = (2 * Math.PI) / T;
+            const amplitude = 0.4; // Max angle in radians
+            const currentAngle = amplitude * Math.cos(omega * time);
+            
+            // --- DRAW PENDULUM ---
+            ctxP.clearRect(0, 0, canvasP.width, canvasP.height);
+            const originX = canvasP.width / 2;
+            const originY = 20;
+            const visualLen = 40 + (l * 80); // Scale length for drawing
+
+            const bobX = originX + visualLen * Math.sin(currentAngle);
+            const bobY = originY + visualLen * Math.cos(currentAngle);
+
+            // Ceiling
+            ctxP.fillStyle = '#333';
+            ctxP.fillRect(originX - 40, 0, 80, 20);
+
+            // String
+            ctxP.beginPath();
+            ctxP.moveTo(originX, originY);
+            ctxP.lineTo(bobX, bobY);
+            ctxP.strokeStyle = '#888';
+            ctxP.lineWidth = 2;
+            ctxP.stroke();
+
+            // Bob
+            ctxP.beginPath();
+            ctxP.arc(bobX, bobY, 12, 0, Math.PI * 2);
+            
+            // Color based on energy: 
+            // Max speed at center (Kinetic - Green), Max height at edges (Potential - Blue)
+            // Energy ~ v^2. v is derivative of pos: -A*w*sin(wt). E_k ~ sin^2(wt). E_p ~ cos^2(wt)
+            const ek_ratio = Math.pow(Math.sin(omega * time), 2);
+            const ep_ratio = Math.pow(Math.cos(omega * time), 2);
+            
+            // Interpolate color between Green (Ek) and Blue (Ep)
+            const r = Math.round(59 * ep_ratio + 76 * ek_ratio);
+            const green = Math.round(130 * ep_ratio + 175 * ek_ratio);
+            const b = Math.round(246 * ep_ratio + 80 * ek_ratio);
+            
+            ctxP.fillStyle = `rgb(${r}, ${green}, ${b})`;
+            ctxP.fill();
+            ctxP.strokeStyle = '#fff';
+            ctxP.lineWidth = 2;
+            ctxP.stroke();
+
+            // --- DRAW WAVE ---
+            ctxW.clearRect(0, 0, canvasW.width, canvasW.height);
+            
+            // Store history (y-position representing displacement)
+            const waveY = canvasW.height / 2 + (currentAngle / amplitude) * 80;
+            waveHistory.unshift(waveY);
+            if (waveHistory.length > maxWavePoints) {
+                waveHistory.pop();
+            }
+
+            // Draw axis
+            ctxW.beginPath();
+            ctxW.moveTo(0, canvasW.height / 2);
+            ctxW.lineTo(canvasW.width, canvasW.height / 2);
+            ctxW.strokeStyle = '#333';
+            ctxW.lineWidth = 1;
+            ctxW.stroke();
+
+            // Draw wave
+            if (waveHistory.length > 1) {
+                ctxW.beginPath();
+                ctxW.moveTo(0, waveHistory[0]);
+                for (let i = 1; i < waveHistory.length; i++) {
+                    // Move right as time passes
+                    const px = i * (canvasW.width / maxWavePoints);
+                    ctxW.lineTo(px, waveHistory[i]);
+                }
+                ctxW.strokeStyle = `rgb(${r}, ${green}, ${b})`;
+                ctxW.lineWidth = 3;
+                ctxW.stroke();
+            }
+            
+            // Draw connection line
+            ctxW.beginPath();
+            ctxW.arc(0, waveY, 5, 0, Math.PI*2);
+            ctxW.fillStyle = '#fff';
+            ctxW.fill();
+
+            requestAnimationFrame(renderSim);
+        }
+
+        // Start loop
+        requestAnimationFrame(renderSim);
+
+    </script>
+</body>
+</html>
