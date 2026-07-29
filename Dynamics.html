@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Конспект: Динамика (Интерактивный)</title>
     
     <script>
@@ -30,11 +31,14 @@
             --info-text: #3B82F6;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             margin: 0; padding: 0;
             background-color: var(--bg-main); color: var(--text-main);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
@@ -70,14 +74,13 @@
         .formula-box {
             background: rgba(0,0,0,0.3); border: 1px solid var(--border);
             padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
         }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
 
-        .data-table {
-            width: 100%; border-collapse: collapse; margin-top: 15px;
-        }
-        .data-table th, .data-table td {
-            border: 1px solid var(--border); padding: 10px; text-align: left;
-        }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
         .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
         .data-table td { color: var(--text-muted); }
 
@@ -89,7 +92,7 @@
         .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; }
         
-        .canvas-container { display: flex; justify-content: center; }
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; }
         canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
 
         .btn {
@@ -99,12 +102,17 @@
         }
         .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
 
-        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); }
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto;}
         .step-content.active { display: block; animation: slideDown 0.3s ease; }
         
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
         mjx-container[jax="SVG"] { color: inherit !important; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 10px; }
+            .control-group[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+            .card { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -146,7 +154,7 @@
         </div>
 
         <h2><i data-lucide="magnet"></i> 2. Основные силы</h2>
-        <div class="card">
+        <div class="card table-container">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -184,7 +192,7 @@
         </div>
 
         <h2><i data-lucide="play-circle"></i> 3. Лаборатория: Тянем брусок</h2>
-        <p style="color: var(--text-muted);">Попробуй сдвинуть брусок. Если сила тяги меньше максимальной силы трения покоя, он не сдвинется ($a=0$). Как только сила тяги превысит трение, появится ускорение.</p>
+        <p style="color: var(--text-muted);">Запусти симуляцию и изменяй ползунки в реальном времени. Попробуй сначала разогнать брусок, а затем выставить тягу ровно на уровень силы трения, чтобы увидеть <b>равномерное движение</b> по инерции!</p>
         
         <div class="simulator">
             <div class="sim-controls">
@@ -194,19 +202,25 @@
                 </div>
                 <div class="control-group">
                     <label>Масса бруска ($m$): <span id="m-val">2 кг</span></label>
-                    <input type="range" id="m-slider" min="1" max="10" value="2" step="0.5">
+                    <input type="range" id="m-slider" min="1" max="10" value="2" step="1">
                 </div>
                 <div class="control-group" style="grid-column: span 2;">
                     <label>Коэф. трения ($\mu$): <span id="mu-val">0.3</span></label>
-                    <input type="range" id="mu-slider" min="0" max="0.8" value="0.3" step="0.05">
+                    <input type="range" id="mu-slider" min="0" max="0.8" value="0.3" step="0.1">
                 </div>
             </div>
             
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="color: var(--text-muted);">$N$ = <span id="calc-n" style="color: #fff;">20.0</span> Н</div>
+                <div style="color: var(--text-muted);">$F_{тр.max}$ = <span id="calc-fmax" style="color: #fff;">6.0</span> Н</div>
+                <div style="color: var(--text-muted);">$F_{тр.факт}$ = <span id="calc-freal" style="color: #fff;">6.0</span> Н</div>
+                <div style="color: var(--accent); font-weight: bold;">$a$ = <span id="sim-a-output">0.00</span> м/с²</div>
+            </div>
+            
+            <div id="sim-status" style="margin-bottom: 15px; font-weight: bold; padding-left: 10px; border-left: 4px solid #FFC107; color: #FFC107; font-size: 1.1rem;">ПОКОИТСЯ</div>
+
             <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 15px;">
                 <button class="btn" id="sim-play"><i data-lucide="play" style="width:16px;"></i> Симуляция</button>
-                <div style="font-family: monospace; font-size: 1.1rem; color: #fff;">
-                    $a$ = <span id="sim-a-output" style="color: var(--accent);">0.00</span> м/с²
-                </div>
             </div>
 
             <div class="canvas-container">
@@ -249,7 +263,7 @@
         <div class="card">
             <p><strong>Задача:</strong> Брусок массой 2 кг тянут по горизонтальной поверхности силой 10 Н. Коэффициент трения равен 0,2. Найдите ускорение бруска ($g = 10~м/с^2$).</p>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
                 <button class="btn" id="btn-hint" onclick="showStep('step1')"><i data-lucide="help-circle" style="width: 16px;"></i> Шаг 1: Силы по вертикали</button>
                 <button class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);" onclick="showStep('step2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать полное решение</button>
             </div>
@@ -273,12 +287,17 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
 
         function showStep(stepId) {
             document.getElementById(stepId).classList.add('active');
             if(stepId === 'step2') {
                 document.getElementById('btn-hint').style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(stepId)]).catch(err => console.error(err));
             }
         }
 
@@ -289,63 +308,153 @@
         const sliderF = document.getElementById('f-pull-slider');
         const sliderM = document.getElementById('m-slider');
         const sliderMu = document.getElementById('mu-slider');
+        
         const valF = document.getElementById('f-pull-val');
         const valM = document.getElementById('m-val');
         const valMu = document.getElementById('mu-val');
+        
+        const calcN = document.getElementById('calc-n');
+        const calcFmax = document.getElementById('calc-fmax');
+        const calcFreal = document.getElementById('calc-freal');
         const outA = document.getElementById('sim-a-output');
+        const simStatus = document.getElementById('sim-status');
         const btnPlay = document.getElementById('sim-play');
 
-        const g = 9.8; // Use 9.8 or 10 as preferred
+        const g = 10; 
         let boxX = 100;
-        let velocity = 0;
+        let velocity = 0; 
         let isAnimating = false;
         let animationId;
         let lastTime = 0;
 
-        function drawScene() {
+        function drawArrow(fromx, fromy, tox, toy, color, text) {
+            if(Math.abs(tox - fromx) < 1 && Math.abs(toy - fromy) < 1) return;
+            const headlen = 10; 
+            const dx = tox - fromx;
+            const dy = toy - fromy;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+
+            if(text) {
+                ctx.fillStyle = color;
+                ctx.font = 'bold 14px sans-serif';
+                if(dx > 0) ctx.fillText(text, tox + 15, toy + 5);
+                else if (dx < 0) ctx.fillText(text, tox - 20, toy + 5);
+                else if (dy < 0) ctx.fillText(text, tox, toy - 15);
+                else ctx.fillText(text, tox, toy + 20);
+            }
+        }
+
+        function updatePhysicsAndDraw(deltaTime) {
             const F_pull = parseFloat(sliderF.value);
             const m = parseFloat(sliderM.value);
             const mu = parseFloat(sliderMu.value);
-            
-            // Update labels
-            valF.textContent = F_pull + ' Н';
-            valM.textContent = m + ' кг';
-            valMu.textContent = mu;
 
-            // Physics calculation
             const N = m * g;
             const F_fric_max = mu * N;
+            
             let a = 0;
             let F_fric_actual = 0;
 
-            if (F_pull > F_fric_max) {
-                // Moving
+            // Core Physics Engine
+            if (velocity > 0.01) {
+                // Moving right: Friction is kinetic (opposing motion)
                 F_fric_actual = F_fric_max;
                 a = (F_pull - F_fric_actual) / m;
             } else {
-                // Static
-                F_fric_actual = F_pull; 
-                a = 0;
-                velocity = 0; // ensure it stops
+                // Stopped: Static friction acts
+                if (F_pull > F_fric_max) {
+                    // Pull overcomes static friction -> Starts moving
+                    F_fric_actual = F_fric_max;
+                    a = (F_pull - F_fric_actual) / m;
+                } else {
+                    // Pull is not enough -> Stays stopped
+                    F_fric_actual = F_pull;
+                    a = 0;
+                    velocity = 0;
+                }
             }
-            
-            // Format output (handle floating point display)
-            outA.textContent = a.toFixed(2);
-            if(a > 0) outA.style.color = 'var(--accent)';
-            else outA.style.color = 'var(--text-muted)';
+
+            // Apply time integration if animating
+            if (deltaTime > 0 && isAnimating) {
+                velocity += a * deltaTime * 20; // 20 is speed scale
+                
+                // If velocity drops below zero while pulling right, it means friction stopped it.
+                if (velocity < 0) {
+                    velocity = 0;
+                    a = 0;
+                    F_fric_actual = F_pull; // Static friction takes over
+                }
+                
+                boxX += velocity * deltaTime * 3; // position scale
+
+                // Wrap around canvas
+                if (boxX > canvas.width + 50) {
+                    boxX = - (50 + m * 8); 
+                }
+            }
+
+            // --- Update UI ---
+            valF.textContent = F_pull + ' Н';
+            valM.textContent = m + ' кг';
+            valMu.textContent = mu.toFixed(1);
+
+            calcN.textContent = N.toFixed(1);
+            calcFmax.textContent = F_fric_max.toFixed(1);
+            calcFreal.textContent = F_fric_actual.toFixed(1);
+            outA.textContent = Math.abs(a) < 0.01 ? "0.00" : a.toFixed(2);
+            outA.style.color = Math.abs(a) > 0.01 ? 'var(--accent)' : 'var(--text-main)';
+
+            if (velocity > 0.01) {
+                if (a > 0.05) {
+                    simStatus.textContent = "РАЗГОН (a > 0)";
+                    simStatus.style.color = "#4CAF50"; simStatus.style.borderLeftColor = "#4CAF50";
+                } else if (a < -0.05) {
+                    simStatus.textContent = "ТОРМОЖЕНИЕ (a < 0)";
+                    simStatus.style.color = "#EF4444"; simStatus.style.borderLeftColor = "#EF4444";
+                } else {
+                    simStatus.textContent = "РАВНОМЕРНОЕ ДВИЖЕНИЕ (v = const, a = 0)";
+                    simStatus.style.color = "#3B82F6"; simStatus.style.borderLeftColor = "#3B82F6";
+                }
+            } else {
+                if (F_pull > F_fric_max) {
+                    simStatus.textContent = "НАЧИНАЕТ ДВИЖЕНИЕ";
+                    simStatus.style.color = "#4CAF50"; simStatus.style.borderLeftColor = "#4CAF50";
+                } else {
+                    simStatus.textContent = "ПОКОИТСЯ (Трение покоя)";
+                    simStatus.style.color = "#FFC107"; simStatus.style.borderLeftColor = "#FFC107";
+                }
+            }
+
+            // --- Draw Canvas ---
+            const rect = canvas.getBoundingClientRect();
+            if(canvas.width !== rect.width) {
+                canvas.width = rect.width;
+            }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Ground
+            // Ground
             ctx.fillStyle = '#333';
             ctx.fillRect(0, 150, canvas.width, 50);
             
-            // Draw Box
-            const boxWidth = 60 + m * 10; // Visual scale for mass
+            // Box
+            const boxWidth = 50 + m * 8; 
             const boxHeight = 50;
-            
-            // Reset position if it goes off screen during animation
-            if(boxX > canvas.width + 50) boxX = -boxWidth;
+            const centerX = boxX + boxWidth/2;
+            const centerY = 150 - boxHeight/2;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(boxX + 5, 150, boxWidth, 5);
 
             ctx.fillStyle = '#FFB74D';
             ctx.fillRect(boxX, 150 - boxHeight, boxWidth, boxHeight);
@@ -354,104 +463,65 @@
             ctx.strokeRect(boxX, 150 - boxHeight, boxWidth, boxHeight);
             
             ctx.fillStyle = '#000';
-            ctx.font = '14px sans-serif';
+            ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(m + 'кг', boxX + boxWidth/2, 150 - boxHeight/2 + 5);
+            ctx.fillText(m + ' кг', centerX, centerY + 5);
 
-            // Draw Vectors
-            const centerX = boxX + boxWidth/2;
-            const centerY = 150 - boxHeight/2;
-
-            function drawArrow(fromx, fromy, tox, toy, color, text) {
-                if(fromx === tox && fromy === toy) return;
-                const headlen = 10; 
-                const dx = tox - fromx;
-                const dy = toy - fromy;
-                const angle = Math.atan2(dy, dx);
-                
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(fromx, fromy);
-                ctx.lineTo(tox, toy);
-                ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
-                ctx.moveTo(tox, toy);
-                ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
-                ctx.stroke();
-
-                if(text) {
-                    ctx.fillStyle = color;
-                    ctx.font = '14px sans-serif';
-                    // Text positioning logic
-                    if(dx > 0) ctx.fillText(text, tox + 15, toy + 5);
-                    else if (dx < 0) ctx.fillText(text, tox - 15, toy + 5);
-                    else if (dy < 0) ctx.fillText(text, tox, toy - 15);
-                    else ctx.fillText(text, tox, toy + 20);
-                }
-            }
-
-            // Pull Force (Right)
+            // Forces
             if(F_pull > 0) {
-                const fLen = F_pull * 2; // Scale factor
+                const fLen = F_pull * 2; 
                 drawArrow(boxX + boxWidth, centerY, boxX + boxWidth + fLen, centerY, '#4CAF50', 'F');
             }
-
-            // Friction Force (Left)
             if(F_fric_actual > 0) {
                 const fricLen = F_fric_actual * 2;
-                drawArrow(boxX, centerY, boxX - fricLen, centerY, '#EF4444', 'Fтр');
+                drawArrow(boxX, 150, boxX - fricLen, 150, '#EF4444', 'Fтр');
             }
             
-            // Gravity (Down)
-            drawArrow(centerX, centerY, centerX, centerY + 40, '#a0a0a0');
-            // Normal (Up)
-            drawArrow(centerX, centerY, centerX, centerY - 40, '#a0a0a0');
-
-            return a;
+            const nLen = Math.min(N * 1.5, 40);
+            drawArrow(centerX, centerY, centerX, centerY + nLen, '#888'); // mg
+            drawArrow(centerX, centerY, centerX, centerY - nLen, '#888'); // N
         }
 
-        // Animation Loop
         function animate(time) {
             if(!lastTime) lastTime = time;
-            const deltaTime = (time - lastTime) / 1000; // in seconds
+            const deltaTime = (time - lastTime) / 1000; 
             lastTime = time;
 
-            const a = drawScene();
-            
-            if(a > 0) {
-                velocity += a * deltaTime * 20; // scaled for visual
-                boxX += velocity * deltaTime;
-            }
-
-            if(isAnimating) {
+            if (isAnimating) {
+                updatePhysicsAndDraw(deltaTime);
                 animationId = requestAnimationFrame(animate);
             }
         }
 
-        // Listeners
-        sliderF.addEventListener('input', () => { if(!isAnimating) drawScene(); });
-        sliderM.addEventListener('input', () => { if(!isAnimating) drawScene(); });
-        sliderMu.addEventListener('input', () => { if(!isAnimating) drawScene(); });
+        // Update statically when paused
+        function handleSlider() {
+            if (!isAnimating) {
+                updatePhysicsAndDraw(0);
+            }
+        }
+
+        sliderF.addEventListener('input', handleSlider);
+        sliderM.addEventListener('input', handleSlider);
+        sliderMu.addEventListener('input', handleSlider);
 
         btnPlay.addEventListener('click', () => {
             if(isAnimating) {
                 isAnimating = false;
                 cancelAnimationFrame(animationId);
                 btnPlay.innerHTML = '<i data-lucide="play" style="width:16px;"></i> Симуляция';
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             } else {
                 isAnimating = true;
                 lastTime = 0;
-                // reset position if stopped previously
                 if(boxX > canvas.width) { boxX = 50; velocity = 0; }
                 animationId = requestAnimationFrame(animate);
-                btnPlay.innerHTML = '<i data-lucide="square" style="width:16px;"></i> Стоп';
-                lucide.createIcons();
+                btnPlay.innerHTML = '<i data-lucide="square" style="width:16px;"></i> Пауза';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
         });
 
         // Initial draw
-        drawScene();
+        updatePhysicsAndDraw(0);
 
     </script>
 </body>
