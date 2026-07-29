@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Идеальный газ и Изопроцессы</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* SVG Graph Inline */
+        .svg-graph {
+            width: 120px; height: 120px; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border); border-radius: 6px; padding: 5px;
+        }
+
+        /* Симуляторы */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        input[type="range"]:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; gap: 10px; flex-wrap: wrap; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .process-selector {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 100px; text-align: center;
+        }
+        .process-btn.active {
+            background: rgba(76, 175, 80, 0.1); border-color: var(--accent); color: var(--accent); font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Уравнение состояния идеального газа и Изопроцессы</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое идеальный газ?</strong><br>
+                <span style="color: var(--text-muted);">Это математическая модель, в которой мы считаем, что молекулы — это крошечные шарики (материальные точки), которые не притягиваются друг к другу и взаимодействуют только при абсолютно упругих столкновениях. В реальности воздух, водород, азот ведут себя так при низком давлении и не слишком сильном холоде.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="calculator"></i> 1. Уравнение Клапейрона-Менделеева</h2>
+        <div class="card">
+            <p>Это самое главное уравнение всей молекулярной физики. Оно связывает три главных макропараметра газа: Давление ($p$), Объём ($V$) и Температуру ($T$).</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$pV = \frac{m}{M}RT = \nu RT$$
+            </div>
+            <ul>
+                <li>$p$ — давление (Па).</li>
+                <li>$V$ — объем (м³).</li>
+                <li>$\nu = \frac{m}{M}$ — количество вещества (моль).</li>
+                <li>$R = 8,31\text{ Дж/(моль}\cdot\text{К)}$ — универсальная газовая постоянная.</li>
+                <li>$T$ — абсолютная температура (обязательно в Кельвинах!).</li>
+            </ul>
+
+            <h3 style="margin-top: 25px;">Обобщенное газовое уравнение</h3>
+            <p style="color: var(--text-muted);">Если количество газа (масса) в сосуде не меняется, то отношение $\frac{pV}{T}$ остается постоянным. Если газ перевели из состояния 1 в состояние 2, то:</p>
+            <div class="formula-box">
+                $$\frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2}$$
+            </div>
+        </div>
+
+        <h2><i data-lucide="thermometer"></i> 2. Температурные шкалы</h2>
+        <div class="card">
+            <p style="color: var(--error-text); font-weight: bold; text-align: center;">В газовых законах всегда используются КЕЛЬВИНЫ!</p>
+            <div class="formula-box">
+                $$T(\text{К}) = t(^\circ\text{C}) + 273$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Например: $27^\circ\text{C} = 27 + 273 = 300\text{ К}$.</p>
+        </div>
+
+        <h2><i data-lucide="arrow-right-left"></i> 3. Изопроцессы</h2>
+        <div class="card table-container">
+            <p style="color: var(--text-muted);">Приставка «изо-» означает «равный, одинаковый». Изопроцесс — это процесс, при котором масса газа и один из трех параметров (p, V или T) остаются постоянными.</p>
+            
+            <table class="data-table" style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>Процесс</th>
+                        <th>Что постоянно?</th>
+                        <th>Закон</th>
+                        <th>Формула</th>
+                        <th>График в осях p-V</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: var(--brand-red);">Изотермический</strong></td>
+                        <td>$$T = \text{const}$$</td>
+                        <td>Закон Бойля-Мариотта</td>
+                        <td>$$p_1 V_1 = p_2 V_2$$<span style="font-size: 0.8rem;">(Давление обратно пропорционально объему)</span></td>
+                        <td style="text-align: center;">
+                            <svg class="svg-graph" viewBox="0 0 100 100">
+                                <line x1="10" y1="90" x2="90" y2="90" stroke="#555" stroke-width="2"/>
+                                <line x1="10" y1="90" x2="10" y2="10" stroke="#555" stroke-width="2"/>
+                                <text x="85" y="100" fill="#888" font-size="10">V</text><text x="0" y="10" fill="#888" font-size="10">p</text>
+                                <!-- Изотерма (гипербола) -->
+                                <path d="M 15 80 Q 20 20 80 15" fill="none" stroke="#EF4444" stroke-width="3"/>
+                            </svg>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--brand-blue);">Изохорный</strong></td>
+                        <td>$$V = \text{const}$$</td>
+                        <td>Закон Шарля</td>
+                        <td>$$\frac{p_1}{T_1} = \frac{p_2}{T_2}$$<span style="font-size: 0.8rem;">(Давление прямо пропорционально температуре)</span></td>
+                        <td style="text-align: center;">
+                            <svg class="svg-graph" viewBox="0 0 100 100">
+                                <line x1="10" y1="90" x2="90" y2="90" stroke="#555" stroke-width="2"/>
+                                <line x1="10" y1="90" x2="10" y2="10" stroke="#555" stroke-width="2"/>
+                                <text x="85" y="100" fill="#888" font-size="10">V</text><text x="0" y="10" fill="#888" font-size="10">p</text>
+                                <!-- Изохора (вертикаль) -->
+                                <line x1="40" y1="20" x2="40" y2="80" stroke="#3B82F6" stroke-width="3"/>
+                            </svg>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--accent);">Изобарный</strong></td>
+                        <td>$$p = \text{const}$$</td>
+                        <td>Закон Гей-Люссака</td>
+                        <td>$$\frac{V_1}{T_1} = \frac{V_2}{T_2}$$<span style="font-size: 0.8rem;">(Объем прямо пропорционален температуре)</span></td>
+                        <td style="text-align: center;">
+                            <svg class="svg-graph" viewBox="0 0 100 100">
+                                <line x1="10" y1="90" x2="90" y2="90" stroke="#555" stroke-width="2"/>
+                                <line x1="10" y1="90" x2="10" y2="10" stroke="#555" stroke-width="2"/>
+                                <text x="85" y="100" fill="#888" font-size="10">V</text><text x="0" y="10" fill="#888" font-size="10">p</text>
+                                <!-- Изобара (горизонталь) -->
+                                <line x1="20" y1="40" x2="80" y2="40" stroke="#4CAF50" stroke-width="3"/>
+                            </svg>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i data-lucide="cpu"></i> 4. Лаборатория: Изопроцессы</h2>
+        <p style="color: var(--text-muted);">Выберите процесс, чтобы зафиксировать один из параметров. Двигайте ползунки, чтобы увидеть, как меняются цилиндр с газом и график $p-V$.</p>
+
+        <div class="simulator">
+            <div class="process-selector">
+                <div class="process-btn" id="btn-iso-t" onclick="setProcess('T')">Изотермический ($T=const$)</div>
+                <div class="process-btn" id="btn-iso-p" onclick="setProcess('p')">Изобарный ($p=const$)</div>
+                <div class="process-btn active" id="btn-iso-v" onclick="setProcess('V')">Изохорный ($V=const$)</div>
+            </div>
+
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label>Объём ($V$): <span id="val-sim-v" style="color: var(--brand-blue);">50 л</span></label>
+                    <input type="range" id="sim-v" min="10" max="90" value="50" step="1">
+                </div>
+                <div class="control-group">
+                    <label>Температура ($T$): <span id="val-sim-t" style="color: var(--brand-red);">300 К</span></label>
+                    <input type="range" id="sim-t" min="100" max="600" value="300" step="10">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Давление ($p$)</div>
+                    <div class="dashboard-value" id="dash-p" style="color: var(--accent);">60.0 кПа</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Константа $\frac{pV}{T}$</div>
+                    <div class="dashboard-value" id="dash-k" style="color: #fff;">10.0</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-cylinder" width="300" height="300" style="background: #1a1a1a;"></canvas>
+                <canvas id="canvas-graph" width="350" height="300" style="background: #1a1a1a;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 5. Лайфхаки и Типичные ошибки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Лайфхаки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li>Для сравнения состояний всегда <b>составляйте таблицу</b> (p, V, T было $\rightarrow$ p, V, T стало). Это защитит от путаницы в индексах.</li>
+                    <li>В обобщенном уравнении $\frac{p_1V_1}{T_1} = \frac{p_2V_2}{T_2}$ <b>объем можно подставлять в литрах</b>, а давление в кПа. Главное — чтобы единицы были одинаковыми слева и справа. Но $T$ — СТРОГО В КЕЛЬВИНАХ!</li>
+                    <li>Всегда делайте вывод "на здравый смысл": если вы нагреваете газ (T растет) в закрытой стеклянной банке (V=const), то давление обязано вырасти.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Градусы Цельсия:</strong> Подставляют $27^\circ\text{C}$ прямо в знаменатель $\frac{pV}{T}$. Делить на 27 и делить на 300 — это колоссальная разница в ответе!</li>
+                    <li><strong>Утечка газа:</strong> Применяют законы изопроцессов к дырявым баллонам или шарикам, из которых выходит воздух. Законы работают только для <b>постоянной массы</b> газа.</li>
+                    <li><strong>Путаница $\nu$ и $N$:</strong> Путают количество вещества в молях ($\nu$) и число самих молекул ($N$).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Изохорный процесс</h3>
+            <p>Газ занимает объе м $4\text{ л}$ при давлении $200\text{ кПа}$ и температуре $300\text{ K}$. Найдите давление при $600\text{ K}$, если объе м газа остался неизменным.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Раз объем постоянен ($V=const$), это изохорный процесс (Закон Шарля). Уравнение: $\frac{p_1}{T_1} = \frac{p_2}{T_2}$. Температура уже в Кельвинах!
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. При $V = const$ используем закон Шарля:<br>
+                $$\frac{p_1}{T_1} = \frac{p_2}{T_2}$$</p>
+                
+                <p>2. Выразим искомое давление $p_2$:<br>
+                $$p_2 = p_1 \cdot \frac{T_2}{T_1}$$</p>
+                
+                <p>3. Подставим числа (даже не нужно переводить кПа в Па, ответ получится в кПа):<br>
+                $$p_2 = 200 \cdot \frac{600}{300} = 200 \cdot 2 = 400\text{ кПа}$$</p>
+
+                <p style="font-size: 0.9rem; color: var(--text-muted);">*Проверка на здравый смысл: нагрели в 2 раза $\rightarrow$ давление выросло в 2 раза. Верно!*</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 400 кПа</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Обобщенное уравнение</h3>
+            <p>При давлении $100\text{ кПа}$ и температуре $27^\circ\text{C}$ идеальный газ занимал объем $5\text{ л}$. Найдите его объем при давлении $200\text{ кПа}$ и температуре $127^\circ\text{C}$.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> Меняются все три параметра, значит используем обобщенное уравнение: $\frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2}$. <b>Самое главное:</b> перед подстановкой переведите $27^\circ\text{C}$ и $127^\circ\text{C}$ в Кельвины (+273).
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Переведем температуру в шкалу Кельвина:<br>
+                $$T_1 = 27 + 273 = 300\text{ K}$$
+                $$T_2 = 127 + 273 = 400\text{ K}$$</p>
+
+                <p>2. Запишем обобщенное газовое уравнение:<br>
+                $$\frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2}$$</p>
+                
+                <p>3. Выразим $V_2$ (по правилу пропорции):<br>
+                $$V_2 = V_1 \cdot \frac{p_1 \cdot T_2}{p_2 \cdot T_1}$$</p>
+                
+                <p>4. Подставляем числа (давление можно оставить в кПа, а объем в литрах, так как они сократятся):<br>
+                $$V_2 = 5 \cdot \frac{100 \cdot 400}{200 \cdot 300} = 5 \cdot \frac{40000}{60000} = 5 \cdot \frac{4}{6} = 5 \cdot \frac{2}{3} \approx 3,33\text{ л}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: ~3,33 л</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Safe MathJax rendering
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, hintBtnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (hintBtnId) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if(hintBtn) hintBtn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР: ИЗОПРОЦЕССЫ
+           ========================================== */
+        
+        // Model Constants
+        const k = 10; // p * V / T = k. We assume nR = 10 for visual scale.
+        
+        // State
+        let currentProcess = 'V'; // 'T', 'p', 'V'
+        let p = 60; // kPa
+        let V = 50; // L
+        let T = 300; // K
+
+        // DOM Elements
+        const elSimV = document.getElementById('sim-v');
+        const elSimT = document.getElementById('sim-t');
+        const valSimV = document.getElementById('val-sim-v');
+        const valSimT = document.getElementById('val-sim-t');
+        
+        const dashP = document.getElementById('dash-p');
+        const dashK = document.getElementById('dash-k');
+
+        const canvasCyl = document.getElementById('canvas-cylinder');
+        const ctxCyl = canvasCyl.getContext('2d');
+        const canvasGraph = document.getElementById('canvas-graph');
+        const ctxGraph = canvasGraph.getContext('2d');
+
+        // History for the graph
+        let processHistory = [];
+
+        function setProcess(type) {
+            currentProcess = type;
+            processHistory = []; // Reset graph path on process change
+            
+            document.querySelectorAll('.process-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-iso-${type.toLowerCase()}`).classList.add('active');
+
+            // Lock the appropriate slider
+            elSimV.disabled = (type === 'V');
+            elSimT.disabled = (type === 'T');
+            
+            // Adjust to fit current state
+            updatePhysicsFromInputs();
+        }
+
+        function updatePhysicsFromInputs() {
+            // Read unlocked sliders and calculate the third variable
+            if (currentProcess === 'V') {
+                // Isochoric: V is locked, read T, calc p
+                T = parseFloat(elSimT.value);
+                p = (k * T) / V;
+            } else if (currentProcess === 'p') {
+                // Isobaric: p is locked, read T, calc V
+                T = parseFloat(elSimT.value);
+                V = (k * T) / p;
+                
+                // Clamp V to visible range if needed, adjusting T
+                if (V < 10) { V = 10; T = (p * V) / k; elSimT.value = T; }
+                if (V > 90) { V = 90; T = (p * V) / k; elSimT.value = T; }
+                elSimV.value = V;
+            } else if (currentProcess === 'T') {
+                // Isothermal: T is locked, read V, calc p
+                V = parseFloat(elSimV.value);
+                p = (k * T) / V;
+            }
+
+            // Update UI
+            valSimV.textContent = V.toFixed(0) + ' л';
+            valSimT.textContent = T.toFixed(0) + ' К';
+            dashP.textContent = p.toFixed(1) + ' кПа';
+            dashK.textContent = ((p * V) / T).toFixed(1);
+
+            // Save point for graph
+            processHistory.push({V: V, p: p});
+            if (processHistory.length > 50) processHistory.shift();
+
+            drawCylinder();
+            drawGraph();
+        }
+
+        // Draw Cylinder Visualization
+        function drawCylinder() {
+            ctxCyl.clearRect(0, 0, canvasCyl.width, canvasCyl.height);
+            
+            const w = canvasCyl.width;
+            const h = canvasCyl.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const cylWidth = 100;
+            const cylHeightMax = 200;
+            const cylX = cx - cylWidth / 2;
+            const cylYBase = h - 20;
+
+            // Map Volume (10-100) to Piston Height
+            const pistonH = (V / 100) * cylHeightMax;
+            const pistonY = cylYBase - pistonH;
+
+            // Map Temperature (100-600) to Gas Color
+            // 100K -> Blue, 300K -> Green/Yellow, 600K -> Red
+            const tRatio = (T - 100) / 500; 
+            const r = Math.floor(50 + 205 * tRatio);
+            const b = Math.floor(250 - 200 * tRatio);
+            const gasColor = `rgba(${r}, 50, ${b}, 0.6)`;
+
+            // Draw Gas
+            ctxCyl.fillStyle = gasColor;
+            ctxCyl.fillRect(cylX + 2, pistonY, cylWidth - 4, pistonH);
+
+            // Draw Particles (fake visual depending on T and V)
+            ctxCyl.fillStyle = '#fff';
+            Math.seedrandom = T + V; // pseudo random based on state so it jumps
+            for(let i=0; i<30; i++) {
+                let px = cylX + 5 + Math.random() * (cylWidth - 10);
+                let py = pistonY + 5 + Math.random() * (pistonH - 10);
+                ctxCyl.fillRect(px, py, 2, 2);
+            }
+
+            // Draw Cylinder Walls
+            ctxCyl.strokeStyle = '#888';
+            ctxCyl.lineWidth = 4;
+            ctxCyl.beginPath();
+            ctxCyl.moveTo(cylX, cylYBase - cylHeightMax);
+            ctxCyl.lineTo(cylX, cylYBase);
+            ctxCyl.lineTo(cylX + cylWidth, cylYBase);
+            ctxCyl.lineTo(cylX + cylWidth, cylYBase - cylHeightMax);
+            ctxCyl.stroke();
+
+            // Draw Piston
+            ctxCyl.fillStyle = '#aaa';
+            ctxCyl.fillRect(cylX + 2, pistonY - 10, cylWidth - 4, 10);
+            
+            // Piston Rod
+            ctxCyl.fillStyle = '#555';
+            ctxCyl.fillRect(cx - 5, pistonY - 80, 10, 70);
+
+            // Draw Pressure Gauge
+            const gaugeX = cylX + cylWidth + 40;
+            const gaugeY = cy;
+            const gaugeR = 25;
+            
+            ctxCyl.beginPath();
+            ctxCyl.arc(gaugeX, gaugeY, gaugeR, 0, Math.PI*2);
+            ctxCyl.fillStyle = '#222';
+            ctxCyl.fill();
+            ctxCyl.strokeStyle = '#aaa';
+            ctxCyl.lineWidth = 2;
+            ctxCyl.stroke();
+
+            // Gauge needle (p varies from ~16 to ~600)
+            const maxP = 600;
+            const angle = -Math.PI * 0.8 + (p / maxP) * Math.PI * 1.6;
+            ctxCyl.strokeStyle = '#EF4444';
+            ctxCyl.lineWidth = 2;
+            ctxCyl.beginPath();
+            ctxCyl.moveTo(gaugeX, gaugeY);
+            ctxCyl.lineTo(gaugeX + (gaugeR - 5) * Math.cos(angle), gaugeY + (gaugeR - 5) * Math.sin(angle));
+            ctxCyl.stroke();
+            
+            ctxCyl.fillStyle = '#fff';
+            ctxCyl.font = '10px sans-serif';
+            ctxCyl.textAlign = 'center';
+            ctxCyl.fillText('p', gaugeX, gaugeY + 15);
+        }
+
+        // Draw p-V Graph
+        function drawGraph() {
+            ctxGraph.clearRect(0, 0, canvasGraph.width, canvasGraph.height);
+            
+            const margin = {top: 20, right: 20, bottom: 40, left: 50};
+            const w = canvasGraph.width - margin.left - margin.right;
+            const h = canvasGraph.height - margin.top - margin.bottom;
+
+            // Map values
+            // V goes 0 to 100
+            // p goes 0 to 600
+            const getX = (vol) => margin.left + (vol / 100) * w;
+            const getY = (pres) => margin.top + h - (pres / 600) * h;
+
+            // Axes
+            ctxGraph.strokeStyle = '#555';
+            ctxGraph.lineWidth = 2;
+            ctxGraph.beginPath();
+            ctxGraph.moveTo(margin.left, margin.top);
+            ctxGraph.lineTo(margin.left, margin.top + h); // Y axis (p)
+            ctxGraph.lineTo(margin.left + w, margin.top + h); // X axis (V)
+            ctxGraph.stroke();
+
+            ctxGraph.fillStyle = '#888';
+            ctxGraph.font = '12px sans-serif';
+            ctxGraph.textAlign = 'right';
+            ctxGraph.fillText('p (кПа)', margin.left - 5, margin.top + 10);
+            ctxGraph.textAlign = 'center';
+            ctxGraph.fillText('V (л)', margin.left + w / 2, margin.top + h + 25);
+
+            // Draw ideal path background line based on selected process
+            ctxGraph.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctxGraph.lineWidth = 2;
+            ctxGraph.setLineDash([5, 5]);
+            ctxGraph.beginPath();
+            
+            if (currentProcess === 'T') {
+                // Isotherm: p = (k*T)/V. Draw from V=10 to V=100
+                for(let v_i = 10; v_i <= 100; v_i += 2) {
+                    let p_i = (k * T) / v_i;
+                    if (v_i === 10) ctxGraph.moveTo(getX(v_i), getY(p_i));
+                    else ctxGraph.lineTo(getX(v_i), getY(p_i));
+                }
+            } else if (currentProcess === 'p') {
+                // Isobar: Horizontal line
+                ctxGraph.moveTo(getX(10), getY(p));
+                ctxGraph.lineTo(getX(100), getY(p));
+            } else if (currentProcess === 'V') {
+                // Isochor: Vertical line
+                ctxGraph.moveTo(getX(V), getY(0));
+                ctxGraph.lineTo(getX(V), getY(600));
+            }
+            ctxGraph.stroke();
+            ctxGraph.setLineDash([]);
+
+            // Draw history trail (Actual state changes)
+            if (processHistory.length > 1) {
+                ctxGraph.strokeStyle = '#4CAF50';
+                if(currentProcess === 'p') ctxGraph.strokeStyle = '#4CAF50';
+                if(currentProcess === 'V') ctxGraph.strokeStyle = '#3B82F6';
+                if(currentProcess === 'T') ctxGraph.strokeStyle = '#EF4444';
+                
+                ctxGraph.lineWidth = 4;
+                ctxGraph.lineJoin = 'round';
+                ctxGraph.beginPath();
+                ctxGraph.moveTo(getX(processHistory[0].V), getY(processHistory[0].p));
+                for(let i=1; i<processHistory.length; i++) {
+                    ctxGraph.lineTo(getX(processHistory[i].V), getY(processHistory[i].p));
+                }
+                ctxGraph.stroke();
+            }
+
+            // Current point dot
+            const cx = getX(V);
+            const cy = getY(p);
+            ctxGraph.beginPath();
+            ctxGraph.arc(cx, cy, 6, 0, Math.PI*2);
+            ctxGraph.fillStyle = '#fff';
+            ctxGraph.fill();
+            
+            // Label current point
+            ctxGraph.fillStyle = '#aaa';
+            ctxGraph.textAlign = 'left';
+            ctxGraph.fillText(`(${V.toFixed(0)}, ${p.toFixed(0)})`, cx + 10, cy - 10);
+        }
+
+        // Event Listeners
+        elSimV.addEventListener('input', updatePhysicsFromInputs);
+        elSimT.addEventListener('input', updatePhysicsFromInputs);
+
+        // Init
+        setProcess('V');
+
+    </script>
+</body>
+</html>
