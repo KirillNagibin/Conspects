@@ -206,7 +206,7 @@
         </div>
 
         <h2><i data-lucide="play-circle"></i> 3. Лаборатория: Тянем брусок</h2>
-        <p style="color: var(--text-muted);">Попробуй сдвинуть брусок. Если сила тяги меньше максимальной силы трения покоя, он не сдвинется ($a=0$). Попробуй разогнать его, а затем уравновесить силы, чтобы он двигался равномерно.</p>
+        <p style="color: var(--text-muted);">Попробуй сдвинуть брусок. Если сила тяги меньше максимальной силы трения покоя, он не сдвинется ($a=0$). Как только сила тяги превысит трение, появится ускорение.</p>
         
         <div class="simulator">
             <div class="sim-controls">
@@ -216,6 +216,7 @@
                 </div>
                 <div class="control-group">
                     <label>Масса бруска ($m$): <span id="m-val">2 кг</span></label>
+                    <!-- Улучшены шаги: теперь трение всегда можно подобрать целым числом -->
                     <input type="range" id="m-slider" min="1" max="10" value="2" step="1">
                 </div>
                 <div class="control-group" style="grid-column: span 2;">
@@ -224,6 +225,7 @@
                 </div>
             </div>
             
+            <!-- Живой дашборд расчетов -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
                 <div style="color: var(--text-muted);">$N$ = <span id="calc-n" style="color: #fff;">20.0</span> Н</div>
                 <div style="color: var(--text-muted);">$F_{тр.max}$ = <span id="calc-fmax" style="color: #fff;">6.0</span> Н</div>
@@ -231,6 +233,7 @@
                 <div style="color: var(--accent); font-weight: bold;">$a$ = <span id="calc-a">0.00</span> м/с²</div>
             </div>
             
+            <!-- Индикатор состояния -->
             <div id="sim-status" style="margin-bottom: 15px; font-weight: bold; padding-left: 10px; border-left: 4px solid #FFC107; color: #FFC107; transition: 0.3s;">ПОКОИТСЯ (Трение покоя)</div>
 
             <div class="canvas-container">
@@ -297,17 +300,23 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        // Защита от ReferenceError, если скрипт заблокирован в среде предпросмотра
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
 
         // Безопасная инициализация MathJax (защита от двойной загрузки)
-        function forceMathJaxRender() {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise().catch(err => console.error(err));
-            } else {
-                window.setTimeout(forceMathJaxRender, 200);
-            }
+        if (!window.MathJax || !window.MathJax.version) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = () => {
+                if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+            };
+        } else if (MathJax.typesetPromise) {
+            MathJax.typesetPromise();
         }
-        window.setTimeout(forceMathJaxRender, 100);
 
         function showStep(stepId) {
             document.getElementById(stepId).classList.add('active');
@@ -349,12 +358,12 @@
             if(calcA) calcA.textContent = a.toFixed(2);
 
             if(simStatus) {
-                if (currentVelocity > 0) {
-                    if (a > 0) {
+                if (currentVelocity > 0.001) {
+                    if (a > 0.01) {
                         simStatus.textContent = "РАЗГОН (Ускорение a > 0)";
                         simStatus.style.color = "#4CAF50";
                         simStatus.style.borderLeftColor = "#4CAF50";
-                    } else if (a < 0) {
+                    } else if (a < -0.01) {
                         simStatus.textContent = "ТОРМОЖЕНИЕ (Ускорение a < 0)";
                         simStatus.style.color = "#EF4444";
                         simStatus.style.borderLeftColor = "#EF4444";
@@ -377,7 +386,7 @@
             }
         }
 
-        function drawScene(m, F_pull, F_fric_actual, N, a) {
+        function drawScene(m, F_pull, F_fric_actual, N) {
             const rect = canvas.getBoundingClientRect();
             if(canvas.width !== rect.width) {
                 canvas.width = rect.width;
@@ -386,17 +395,14 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Ground
             ctx.fillStyle = '#333';
             ctx.fillRect(0, 150, canvas.width, 50);
             
-            // Box
             const boxWidth = 50 + m * 8; 
             const boxHeight = 50;
             
             if(boxX > canvas.width + 50) boxX = -boxWidth;
 
-            // Shadow
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillRect(boxX + 5, 150, boxWidth, 5);
 
@@ -441,7 +447,6 @@
                 }
             }
 
-            // Draw Forces
             if(F_pull > 0) {
                 const fLen = F_pull * 2; 
                 drawArrow(boxX + boxWidth, centerY, boxX + boxWidth + fLen, centerY, '#4CAF50', 'F');
@@ -453,18 +458,16 @@
             }
             
             const nLen = N * 1.5;
-            drawArrow(centerX, centerY, centerX, centerY + Math.min(nLen, 40), '#888'); // mg
-            drawArrow(centerX, centerY, centerX, centerY - Math.min(nLen, 40), '#888'); // N
+            drawArrow(centerX, centerY, centerX, centerY + Math.min(nLen, 40), '#888'); 
+            drawArrow(centerX, centerY, centerX, centerY - Math.min(nLen, 40), '#888'); 
 
-            // Net Force (∑F)
             const F_net = F_pull - F_fric_actual;
-            if (Math.abs(F_net) > 0) {
+            if (Math.abs(F_net) > 0.1) {
                 const netLen = F_net * 2;
                 drawArrow(centerX, centerY - boxHeight/2 - 15, centerX + netLen, centerY - boxHeight/2 - 15, '#fff', '∑F', true);
             }
             
-            // Velocity Vector (Blue)
-            if (velocity > 0) {
+            if (velocity > 0.001) {
                 const vLen = 20 + Math.min(velocity, 40); 
                 drawArrow(centerX, centerY - boxHeight/2 - 40, centerX + vLen, centerY - boxHeight/2 - 40, '#3B82F6', 'v');
             }
@@ -475,9 +478,9 @@
             const deltaTime = (time - lastTime) / 1000; 
             lastTime = time;
 
-            const F_pull = parseFloat(sliderF.value);
-            const m = parseFloat(sliderM.value);
-            const mu = parseFloat(sliderMu.value);
+            const F_pull = parseFloat(sliderF.value) || 0;
+            const m = parseFloat(sliderM.value) || 1;
+            const mu = parseFloat(sliderMu.value) || 0;
             
             valF.textContent = F_pull + ' Н';
             valM.textContent = m + ' кг';
@@ -489,45 +492,36 @@
             let a = 0;
             let F_fric_actual = 0;
 
-            if (velocity > 0) {
-                // Moving state
+            // Надежная физическая логика без микроколебаний
+            if (velocity > 0.001) {
                 F_fric_actual = F_fric_max;
                 a = (F_pull - F_fric_actual) / m;
             } else {
-                // Rest state
+                velocity = 0; 
                 if (F_pull > F_fric_max) {
-                    F_fric_actual = F_fric_max; // Breaking free
+                    F_fric_actual = F_fric_max; 
                     a = (F_pull - F_fric_actual) / m;
                 } else {
-                    F_fric_actual = F_pull; // Static friction compensates pull
+                    F_fric_actual = F_pull; 
                     a = 0;
-                    velocity = 0;
                 }
             }
             
-            // Clean up microscopic float errors to allow perfect zero acceleration
-            if (Math.abs(a) < 0.001) a = 0;
-
-            // Integration
-            velocity += a * deltaTime * 15;
-            
-            // Stop condition
-            if (velocity <= 0 && a <= 0) {
-                velocity = 0;
-                a = 0;
-                F_fric_actual = Math.min(F_pull, F_fric_max);
-            }
-
             updateDashboard(N, F_fric_max, F_fric_actual, F_pull, a, velocity);
+
+            velocity += a * deltaTime * 15; 
+            
+            if (velocity < 0) {
+                velocity = 0;
+            }
 
             boxX += velocity * deltaTime * 10;
 
-            drawScene(m, F_pull, F_fric_actual, N, a);
+            drawScene(m, F_pull, F_fric_actual, N);
 
             requestAnimationFrame(animate);
         }
 
-        // Trigger UI updates
         sliderF.addEventListener('input', () => {});
         sliderM.addEventListener('input', () => {});
         sliderMu.addEventListener('input', () => {});
