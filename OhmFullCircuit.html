@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Закон Ома для полной цепи и Мощность</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Simulator */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+        .btn-danger { background-color: transparent; border: 1px solid var(--error-text); color: var(--error-text); }
+        .btn-danger:hover { background-color: rgba(239, 68, 68, 0.1); }
+        .btn-danger.active { background-color: var(--error-text); color: #fff; }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Закон Ома для полной цепи</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">В 8 классе мы считали, что батарейка — это идеальная штука, которая просто выдает напряжение. На самом деле любой источник питания сам имеет сопротивление и тратит часть энергии на нагрев самого себя. Здесь мы научимся рассчитывать реальные цепи с учетом "неидеальности" батареек и узнаем, почему происходит короткое замыкание.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="battery"></i> 1. ЭДС и внутреннее сопротивление</h2>
+        <div class="card">
+            <h3 style="margin-top:0;">Что такое ЭДС ($\varepsilon$)</h3>
+            <p><strong>Электродвижущая сила (ЭДС)</strong> – это работа <i>сторонних</i> (не электрических) сил по перемещению единичного положительного заряда внутри источника.</p>
+            <div class="formula-box">
+                $$\varepsilon = \frac{A_{стор}}{q}$$
+            </div>
+            <ul>
+                <li>$\varepsilon$ – ЭДС (Вольты, В)</li>
+                <li>$A_{стор}$ – работа сторонних сил (например, химической реакции в батарейке) (Дж)</li>
+                <li>$q$ – заряд (Кл)</li>
+            </ul>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">ЭДС показывает, насколько сильно источник "толкает" заряды. Именно ЭДС создает ток даже без внешнего электрического поля.</p>
+
+            <h3 style="margin-top:25px;">Внутреннее сопротивление ($r$)</h3>
+            <p>Любой источник (батарейка, аккумулятор, генератор) имеет <strong>внутреннее сопротивление $r$</strong>. Оно создается самим материалом и процессами внутри источника.</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Из-за него часть энергии теряется (батарейка греется), и на клеммах напряжение получается <b>меньше</b>, чем изначальная ЭДС.</p>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 2. Закон Ома для полной цепи</h2>
+        <div class="card">
+            <p>Ток в цепи зависит не только от внешнего сопротивления проводов ($R$), но и от сопротивления самой батарейки ($r$).</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$I = \frac{\varepsilon}{R + r}$$
+            </div>
+            <ul>
+                <li>$I$ – сила тока во внешней цепи (А)</li>
+                <li>$\varepsilon$ – ЭДС источника (В)</li>
+                <li>$R$ – сопротивление внешней цепи (Ом)</li>
+                <li>$r$ – внутреннее сопротивление источника (Ом)</li>
+            </ul>
+
+            <h3 style="margin-top:25px;">Напряжение на зажимах (клеммах) источника ($U$)</h3>
+            <p style="color: var(--text-muted);">Напряжение на клеммах – это напряжение на всей цепи <i>снаружи</i> от источника. При протекании тока часть ЭДС "тратится" на преодоление внутреннего сопротивления.</p>
+            <div class="formula-box" style="border-color: var(--brand-blue);">
+                $$U = \varepsilon - I r$$
+            </div>
+            <p style="font-size: 0.9rem; text-align: center;">или, что то же самое по закону Ома для участка цепи: $U = I R$</p>
+        </div>
+
+        <h2><i data-lucide="flame"></i> 3. Работа, Мощность и КПД</h2>
+        <div class="card">
+            <p>Закон Джоуля-Ленца гласит, что мощность тока равна $P = I^2 R$. Посмотрим, как распределяется энергия во всей цепи:</p>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <tbody>
+                        <tr>
+                            <td><strong>Полная мощность источника</strong></td>
+                            <td style="font-weight:bold;">$P_{общ} = \varepsilon I$</td>
+                            <td>Вся энергия, которую выдает химия батарейки.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Полезная мощность</strong></td>
+                            <td style="color: var(--brand-blue); font-weight:bold;">$P_{пол} = U I = I^2 R$</td>
+                            <td>Мощность, выделяемая во <i>внешней</i> цепи (лампочка горит).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Потери мощности</strong></td>
+                            <td style="color: var(--brand-red); font-weight:bold;">$P_{пот} = I^2 r$</td>
+                            <td>Мощность, теряемая <i>внутри</i> батарейки (батарейка греется).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="margin-top:25px;">КПД источника ($\eta$)</h3>
+            <p>Показывает, какая доля энергии дошла до полезной нагрузки (лампочки).</p>
+            <div class="formula-box" style="border-color: #8B5CF6;">
+                $$\eta = \frac{P_{пол}}{P_{общ}} = \frac{I^2 R}{\varepsilon I} = \frac{R}{R + r}$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;"><i>Чем меньше внутреннее сопротивление ($r \ll R$), тем выше КПД, и тем ближе он к 1 (100%).</i></p>
+        </div>
+
+        <h2><i data-lucide="zap"></i> 4. Короткое замыкание (КЗ)</h2>
+        <div class="card">
+            <p><strong>Короткое замыкание</strong> – это ситуация, когда внешнее сопротивление цепи стремится к нулю ($R \approx 0$). Например, клеммы батарейки соединили пустым куском провода без нагрузки.</p>
+            <div class="formula-box" style="border-color: var(--brand-red);">
+                $$I_{кз} = \frac{\varepsilon}{r}$$
+            </div>
+            <ul>
+                <li>$I_{кз}$ – максимальный возможный ток, который физически может дать источник.</li>
+                <li>При КЗ напряжение на зажимах падает до нуля: $U = \varepsilon - I_{кз} r = 0$.</li>
+                <li>Вся энергия выделяется внутри самого источника ($P_{пот} = I_{кз}^2 r$), что приводит к его мгновенному перегреву, закипанию электролита или пожару. <b>КПД падает до 0%</b>.</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 5. Лаборатория: Источник тока</h2>
+        <p style="color: var(--text-muted);">Поэкспериментируйте с параметрами цепи. Обратите внимание: когда вы уменьшаете внешнее сопротивление $R$, ток растет, но напряжение на клеммах $U$ проседает! А если нажать кнопку «Сделать КЗ», вы увидите, что происходит с батарейкой.</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>ЭДС ($\varepsilon$):</span> <span id="val-e">12 В</span></label>
+                    <input type="range" id="sim-e" min="1" max="24" value="12" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-red);"><span>Внутреннее сопр. ($r$):</span> <span id="val-r_in">1.0 Ом</span></label>
+                    <input type="range" id="sim-r_in" min="0.1" max="5.0" value="1.0" step="0.1" style="accent-color: var(--brand-red);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);"><span>Внешнее сопр. ($R$):</span> <span id="val-r_out">5.0 Ом</span></label>
+                    <input type="range" id="sim-r_out" min="1.0" max="20.0" value="5.0" step="0.5" style="accent-color: var(--brand-blue);">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <button class="btn btn-danger" id="btn-kz" onclick="toggleShortCircuit()"><i data-lucide="zap" style="width: 16px;"></i> Сделать Короткое Замыкание (КЗ)</button>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item" style="border: 1px solid var(--accent); background: rgba(76, 175, 80, 0.1);">
+                    <div class="dashboard-label">Ток в цепи ($I$)</div>
+                    <div class="dashboard-value" id="dash-i" style="color: var(--accent);">2.00 А</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Напряжение ($U$)</div>
+                    <div class="dashboard-value" id="dash-u" style="color: var(--brand-blue);">10.0 В</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Полезная мощ. ($P_{пол}$)</div>
+                    <div class="dashboard-value" id="dash-p" style="color: #fff;">20.0 Вт</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">КПД ($\eta$)</div>
+                    <div class="dashboard-value" id="dash-eff" style="color: #8B5CF6;">83%</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label" style="color: var(--brand-red);">Ток КЗ ($I_{кз}$)</div>
+                    <div class="dashboard-value" id="dash-ikz" style="color: var(--brand-red);">12.00 А</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-ohm" width="600" height="250" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
+            </div>
+            
+            <div id="kz-warning" style="text-align: center; color: var(--error-text); font-weight: bold; margin-top: 15px; font-size: 1.1rem; display: none; text-transform: uppercase; animation: blink 1s infinite;">
+                <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i> Критическая перегрузка! Короткое замыкание! <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i>
+            </div>
+            
+            <style>
+                @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+            </style>
+        </div>
+
+        <h2><i data-lucide="alert-circle"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="check-square" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Идеальный вольтметр:</strong> Идеальный вольтметр, подключенный к клеммам <i>разомкнутого</i> источника (когда тока нет, $I=0$), показывает в точности ЭДС источника ($U = \varepsilon - 0\cdot r = \varepsilon$).</li>
+                    <li><strong>Аккумулятор заряжается:</strong> Если ток заставляют течь "против шерсти" (внутрь плюсовой клеммы), значит аккумулятор заряжают. Тогда напряжение на клеммах будет больше ЭДС: $U = \varepsilon + Ir$.</li>
+                    <li><strong>Максимальная мощность:</strong> Полезная мощность $P_{пол}$ достигает максимума, когда внешнее сопротивление равно внутреннему ($R = r$). КПД при этом равен ровно 50%.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Забытое $r$:</strong> Считать ток просто как $I = \varepsilon / R$, игнорируя внутреннее сопротивление батарейки.</li>
+                    <li><strong>Путаница $U$ и $\varepsilon$:</strong> Напряжение на клеммах $U$ зависит от тока. ЭДС $\varepsilon$ — это константа для данной батарейки, она не меняется от того, какую лампочку вы подключили!</li>
+                    <li><strong>КПД:</strong> Считать КПД по формуле $\eta = R / r$ вместо правильной $\eta = R / (R+r)$.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Расчет полной цепи</h3>
+            <p>ЭДС батареи равна $12\text{ В}$, а ее внутреннее сопротивление $2\text{ Ом}$. К батарее подключили резистор, после чего сила тока в цепи составила $3\text{ А}$. Найдите сопротивление резистора, напряжение на клеммах батареи и мощность потерь внутри источника.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Из закона Ома для полной цепи $I = \frac{\varepsilon}{R+r}$ выразим $(R+r)$:<br>
+                $$R + r = \frac{\varepsilon}{I} = \frac{12}{3} = 4\text{ Ом}$$<br>
+                Отсюда внешнее сопротивление $R = 4 - r = 4 - 2 = 2\text{ Ом}$.</p>
+                
+                <p>2. Напряжение на клеммах можно найти двумя путями. <br>Через внешнюю цепь: $U = I R = 3 \cdot 2 = 6\text{ В}$.<br>Через внутреннюю цепь: $U = \varepsilon - I r = 12 - 3 \cdot 2 = 6\text{ В}$.</p>
+                
+                <p>3. Мощность тепловых потерь внутри батареи:<br>
+                $$P_{пот} = I^2 r = 3^2 \cdot 2 = 9 \cdot 2 = 18\text{ Вт}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: R = 2 Ом; U = 6 В; P_пот = 18 Вт</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР: ИСТОЧНИК ТОКА И КЗ
+           ========================================== */
+        const canvas = document.getElementById('canvas-ohm');
+        const ctx = canvas.getContext('2d');
+        
+        // Инпуты
+        const inE = document.getElementById('sim-e');
+        const inRIn = document.getElementById('sim-r_in');
+        const inROut = document.getElementById('sim-r_out');
+        const btnKz = document.getElementById('btn-kz');
+        
+        // Лейблы
+        const valE = document.getElementById('val-e');
+        const valRIn = document.getElementById('val-r_in');
+        const valROut = document.getElementById('val-r_out');
+        const warnKz = document.getElementById('kz-warning');
+        
+        // Дашборды
+        const dashI = document.getElementById('dash-i');
+        const dashU = document.getElementById('dash-u');
+        const dashP = document.getElementById('dash-p');
+        const dashEff = document.getElementById('dash-eff');
+        const dashIKZ = document.getElementById('dash-ikz');
+
+        let isKz = false;
+        let savedROut = 5.0; // Для возврата из КЗ
+        let electrons = []; 
+        let batteryHeat = 0; // Для анимации покраснения батареи
+
+        function toggleShortCircuit() {
+            isKz = !isKz;
+            
+            if (isKz) {
+                savedROut = inROut.value;
+                inROut.value = 0;
+                inROut.disabled = true;
+                btnKz.classList.add('active');
+                btnKz.innerHTML = '<i data-lucide="zap-off" style="width: 16px;"></i> Отключить КЗ';
+                warnKz.style.display = 'block';
+            } else {
+                inROut.value = savedROut > 0.5 ? savedROut : 5.0;
+                inROut.disabled = false;
+                btnKz.classList.remove('active');
+                btnKz.innerHTML = '<i data-lucide="zap" style="width: 16px;"></i> Сделать Короткое Замыкание (КЗ)';
+                warnKz.style.display = 'none';
+            }
+            
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            updatePhysics();
+        }
+
+        function drawResistor(ctx, x, y, w, h, label, color) {
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(x - w/2, y - h/2, w, h);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x - w/2, y - h/2, w, h);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+        }
+
+        function updatePhysics() {
+            // Если включен режим КЗ, но кто-то хакнул инпут, жестко ставим 0
+            if (isKz) inROut.value = 0;
+
+            const E = parseFloat(inE.value);
+            const rIn = parseFloat(inRIn.value);
+            const ROut = parseFloat(inROut.value);
+
+            // Обновляем лейблы
+            valE.textContent = E + ' В';
+            valRIn.textContent = rIn.toFixed(1) + ' Ом';
+            valROut.textContent = isKz ? '0 Ом (КЗ)' : ROut.toFixed(1) + ' Ом';
+
+            // Физика
+            let I = E / (ROut + rIn);
+            let U = I * ROut; // Напряжение на клеммах
+            let P_useful = I * I * ROut;
+            let eff = (ROut / (ROut + rIn)) * 100;
+            let I_kz = E / rIn;
+
+            // Нагрев батареи (для цвета) от 0 до 1
+            // Если мощность потерь I^2 * r большая, батарея краснеет
+            let P_loss = I * I * rIn;
+            let max_loss = I_kz * I_kz * rIn; // Потери при КЗ максимальны
+            batteryHeat = max_loss > 0 ? P_loss / max_loss : 0;
+
+            // Обновляем дашборды
+            dashI.textContent = I.toFixed(2) + ' А';
+            // При КЗ ток красный
+            dashI.style.color = isKz ? 'var(--error-text)' : 'var(--accent)';
+            
+            dashU.textContent = U.toFixed(1) + ' В';
+            dashP.textContent = P_useful.toFixed(1) + ' Вт';
+            dashEff.textContent = isKz ? '0%' : eff.toFixed(0) + '%';
+            dashIKZ.textContent = I_kz.toFixed(2) + ' А';
+
+            // Электроны
+            const targetElectrons = Math.min(Math.floor(I * 15), 150); 
+            if (electrons.length < targetElectrons) {
+                electrons.push({ progress: Math.random() }); // Спавним рандомно по цепи
+            } else if (electrons.length > targetElectrons) {
+                electrons.pop();
+            }
+        }
+
+        // Вычисление координат на прямоугольной цепи
+        function getPosOnCircuit(progress, cx, w, h, batY, R_y) {
+            let p = progress % 1.0;
+            if (p < 0) p += 1.0;
+
+            const leftX = cx - 120;
+            const rightX = cx + 120;
+            
+            // Длины сегментов
+            const lenTop = rightX - leftX;
+            const lenRight = batY - R_y;
+            const lenBot = lenTop;
+            const lenLeft = lenRight;
+            const totalLen = lenTop + lenRight + lenBot + lenLeft;
+
+            const d1 = lenTop / totalLen;
+            const d2 = d1 + (lenRight / totalLen);
+            const d3 = d2 + (lenBot / totalLen);
+
+            // Идем от плюса (справа внизу) против часовой: Вправо-вверх, влево, вниз, вправо к минусу
+            if (p < d1) {
+                // Верхний провод (справа налево)
+                let localP = p / d1;
+                return { x: rightX - lenTop * localP, y: R_y };
+            } else if (p < d2) {
+                // Левый провод (сверху вниз)
+                let localP = (p - d1) / (lenRight / totalLen);
+                return { x: leftX, y: R_y + lenLeft * localP };
+            } else if (p < d3) {
+                // Нижний провод (слева направо)
+                let localP = (p - d2) / (lenBot / totalLen);
+                return { x: leftX + lenBot * localP, y: batY };
+            } else {
+                // Правый провод (снизу вверх)
+                let localP = (p - d3) / (lenRight / totalLen);
+                return { x: rightX, y: batY - lenRight * localP };
+            }
+        }
+
+        function drawCircuit() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const batY = h - 60;
+            const R_y = 60;
+            const leftX = cx - 120;
+            const rightX = cx + 120;
+
+            // 1. Рисуем провода
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.rect(leftX, R_y, rightX - leftX, batY - R_y);
+            // Делаем разрыв для батареи снизу
+            ctx.stroke();
+
+            // Закрашиваем разрыв под батареей цветом фона
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(cx - 70, batY - 5, 140, 10);
+
+            // 2. Рисуем внешний резистор R (Сверху)
+            if (!isKz) {
+                drawResistor(ctx, cx, R_y, 80, 30, `R = ${inROut.value} Ом`, '#3B82F6');
+            } else {
+                // Замыкание (просто жирный провод с эффектом свечения)
+                ctx.shadowColor = '#EF4444';
+                ctx.shadowBlur = 10;
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(cx - 40, R_y);
+                ctx.lineTo(cx + 40, R_y);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            // 3. Рисуем источник тока (Снизу)
+            // Цвет батареи зависит от нагрева (batteryHeat)
+            // 0 -> зеленый, 1 -> ярко-красный
+            let batColorR = Math.floor(30 + batteryHeat * 200);
+            let batColorG = Math.floor(30 + (1-batteryHeat) * 150);
+            let batColorB = 30;
+            let batFill = `rgb(${batColorR}, ${batColorG}, ${batColorB})`;
+
+            // Пунктирная рамка источника (показывает, что r внутри)
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(cx - 65, batY - 25, 130, 50);
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('Источник', cx, batY - 30);
+
+            // Сама ЭДС (кружочек или значок батареи)
+            ctx.beginPath();
+            ctx.arc(cx - 20, batY, 15, 0, Math.PI*2);
+            ctx.fillStyle = batFill;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Рисуем клеммы (+ и -)
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('+', cx - 20, batY - 25);
+            ctx.fillText('-', cx + 60, batY - 25);
+            // клеммные точки
+            ctx.beginPath(); ctx.arc(cx - 65, batY, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + 65, batY, 4, 0, Math.PI*2); ctx.fill();
+
+            // Внутреннее r
+            drawResistor(ctx, cx + 30, batY, 40, 16, `r`, '#EF4444');
+            
+            // Лейбл ЭДС
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`ε = ${inE.value} В`, cx - 20, batY + 25);
+
+            // 4. Электроны (Анимация)
+            const I = parseFloat(dashI.textContent); // Парсим значение тока
+            // Базовая скорость 0.005, масштабируем от тока
+            const speed = 0.002 + 0.001 * I; 
+            
+            ctx.fillStyle = '#F97316';
+            if (isKz) {
+                // При КЗ электроны летят бешено и светятся
+                ctx.shadowColor = '#F97316';
+                ctx.shadowBlur = 5;
+            }
+
+            electrons.forEach((el) => {
+                el.progress += speed;
+                const pos = getPosOnCircuit(el.progress, cx, w, h, batY, R_y);
+                
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.shadowBlur = 0; // reset
+
+            requestAnimationFrame(drawCircuit);
+        }
+
+        // --- Слушатели событий ---
+        inE.addEventListener('input', updatePhysics);
+        inRIn.addEventListener('input', updatePhysics);
+        inROut.addEventListener('input', updatePhysics);
+
+        // Инициализация
+        updatePhysics();
+        requestAnimationFrame(drawCircuit);
+
+    </script>
+</body>
+</html>
