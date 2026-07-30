@@ -101,7 +101,7 @@
         }
         .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .control-group { display: flex; flex-direction: column; gap: 5px; }
-        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; }
         
         .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
@@ -233,11 +233,11 @@
             <!-- Управление для реального двигателя -->
             <div class="sim-controls" id="controls-real">
                 <div class="control-group">
-                    <label style="color: var(--brand-red);">Получено тепла (Q<sub>н</sub>): <span id="val-real-qh">1000 Дж</span></label>
+                    <label style="color: var(--brand-red);"><span>Получено тепла (Q<sub>н</sub>):</span> <span id="val-real-qh">1000 Дж</span></label>
                     <input type="range" id="sim-real-qh" min="100" max="2000" value="1000" step="50">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-blue);">Отдано тепла (Q<sub>х</sub>): <span id="val-real-qc">600 Дж</span></label>
+                    <label style="color: var(--brand-blue);"><span>Отдано тепла (Q<sub>х</sub>):</span> <span id="val-real-qc">600 Дж</span></label>
                     <input type="range" id="sim-real-qc" min="0" max="1950" value="600" step="50">
                 </div>
             </div>
@@ -245,15 +245,15 @@
             <!-- Управление для цикла Карно -->
             <div class="sim-controls" id="controls-ideal" style="display: none;">
                 <div class="control-group">
-                    <label style="color: var(--brand-red);">Темп. Нагревателя (T<sub>н</sub>): <span id="val-ideal-th">800 К</span></label>
+                    <label style="color: var(--brand-red);"><span>Темп. Нагревателя (T<sub>н</sub>):</span> <span id="val-ideal-th">800 К</span></label>
                     <input type="range" id="sim-ideal-th" min="300" max="1500" value="800" step="10">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-blue);">Темп. Холодильника (T<sub>х</sub>): <span id="val-ideal-tc">300 К</span></label>
+                    <label style="color: var(--brand-blue);"><span>Темп. Холодильника (T<sub>х</sub>):</span> <span id="val-ideal-tc">300 К</span></label>
                     <input type="range" id="sim-ideal-tc" min="100" max="500" value="300" step="10">
                 </div>
                 <div class="control-group" style="grid-column: 1 / -1;">
-                    <label style="color: var(--accent);">Потребление (Q<sub>н</sub>): <span id="val-ideal-qh">1000 Дж</span></label>
+                    <label style="color: var(--accent);"><span>Потребление (Q<sub>н</sub>):</span> <span id="val-ideal-qh">1000 Дж</span></label>
                     <input type="range" id="sim-ideal-qh" min="100" max="2000" value="1000" step="50">
                 </div>
             </div>
