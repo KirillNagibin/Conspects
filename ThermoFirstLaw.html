@@ -122,6 +122,18 @@
         
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
+        .process-selector {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 120px; text-align: center; font-size: 0.9rem;
+        }
+        .process-btn.active {
+            background: rgba(76, 175, 80, 0.1); border-color: var(--accent); color: var(--accent); font-weight: bold;
+        }
+        input[type="range"]:disabled { opacity: 0.3; cursor: not-allowed; }
+
         @media (max-width: 600px) {
             .sim-controls { grid-template-columns: 1fr; gap: 15px; }
             .card { padding: 15px; }
@@ -180,19 +192,26 @@
         </div>
 
         <h2><i data-lucide="sliders"></i> 2. Лаборатория: Энергетический баланс</h2>
-        <p style="color: var(--text-muted);">Перемещайте ползунки, чтобы передавать газу тепло ($Q$) и заставлять его совершать работу ($A$). Симулятор автоматически рассчитает, как изменится внутренняя энергия газа ($\Delta U$). Обратите внимание на поведение молекул и термометра!</p>
+        <p style="color: var(--text-muted);">Выберите газовый процесс и изменяйте доступные параметры. Симулятор автоматически свяжет тепло ($Q$), работу ($A$) и внутреннюю энергию ($\Delta U$) согласно законам термодинамики (для одноатомного газа). Обратите внимание на поведение поршня, молекул и термометра!</p>
         
         <div class="simulator">
+            <div class="process-selector">
+                <div class="process-btn active" id="btn-proc-isobaric" onclick="setThermoProcess('isobaric')">Изобарный ($p=const$)</div>
+                <div class="process-btn" id="btn-proc-isochoric" onclick="setThermoProcess('isochoric')">Изохорный ($V=const$)</div>
+                <div class="process-btn" id="btn-proc-isothermal" onclick="setThermoProcess('isothermal')">Изотермический ($T=const$)</div>
+                <div class="process-btn" id="btn-proc-adiabatic" onclick="setThermoProcess('adiabatic')">Адиабатный ($Q=0$)</div>
+            </div>
+
             <div class="sim-controls">
                 <div class="control-group">
                     <label style="color: var(--brand-orange);">Теплообмен ($Q$): <span id="val-q">500 Дж</span></label>
                     <input type="range" id="sim-q" min="-1000" max="1000" value="500" step="50">
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">Вправо: Нагреваем. Влево: Охлаждаем.</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" id="hint-q">Влияет на нагрев и расширение</span>
                 </div>
                 <div class="control-group">
                     <label style="color: var(--brand-blue);">Работа газа ($A$): <span id="val-a">200 Дж</span></label>
                     <input type="range" id="sim-a" min="-1000" max="1000" value="200" step="50">
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">Вправо: Расширяется. Влево: Сжимают.</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" id="hint-a">Зависит от подведенного тепла</span>
                 </div>
             </div>
 
@@ -416,6 +435,8 @@
         const elA = document.getElementById('sim-a');
         const valQ = document.getElementById('val-q');
         const valA = document.getElementById('val-a');
+        const hintQ = document.getElementById('hint-q');
+        const hintA = document.getElementById('hint-a');
         
         const dashQ = document.getElementById('dash-q');
         const dashA = document.getElementById('dash-a');
@@ -426,6 +447,7 @@
         const numParticles = 40;
         
         // Базовое состояние
+        let currentProcess = 'isobaric';
         let Q = 500;
         let A = 200;
         let dU = 300;
@@ -443,19 +465,87 @@
             });
         }
 
-        function updatePhysicsAndDraw() {
-            Q = parseFloat(elQ.value);
-            A = parseFloat(elA.value);
-            dU = Q - A;
-
-            // Обновление текстов
-            valQ.textContent = Q > 0 ? `+${Q} Дж` : `${Q} Дж`;
-            valA.textContent = A > 0 ? `+${A} Дж` : `${A} Дж`;
+        function setThermoProcess(proc) {
+            currentProcess = proc;
             
-            dashQ.textContent = Q > 0 ? `+${Q} Дж` : `${Q} Дж`;
-            dashA.textContent = A > 0 ? `+${A} Дж` : `${A} Дж`;
-            dashDU.textContent = dU > 0 ? `+${dU} Дж` : `${dU} Дж`;
+            // Обновление UI кнопок
+            document.querySelectorAll('.process-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-proc-${proc}`).classList.add('active');
 
+            // Настройка ползунков
+            if (proc === 'isobaric') {
+                elQ.disabled = false; elA.disabled = false;
+                hintQ.textContent = "Влияет на нагрев и расширение";
+                hintA.textContent = "Зависит от подведенного тепла";
+            } else if (proc === 'isochoric') {
+                elQ.disabled = false; elA.disabled = true;
+                hintQ.textContent = "Влияет только на температуру";
+                hintA.textContent = "Газ заперт (A = 0)";
+            } else if (proc === 'isothermal') {
+                elQ.disabled = false; elA.disabled = false;
+                hintQ.textContent = "Все тепло уходит в работу";
+                hintA.textContent = "Вся работа берется из тепла";
+            } else if (proc === 'adiabatic') {
+                elQ.disabled = true; elA.disabled = false;
+                hintQ.textContent = "Изолировано (Q = 0)";
+                hintA.textContent = "Охлаждается при расширении";
+            }
+            
+            // Триггерим пересчет
+            if (proc === 'adiabatic') {
+                onInputA();
+            } else {
+                onInputQ();
+            }
+        }
+
+        function onInputQ() {
+            if (currentProcess === 'adiabatic') return; // Заблокировано
+            
+            Q = parseFloat(elQ.value);
+            
+            if (currentProcess === 'isochoric') {
+                A = 0;
+            } else if (currentProcess === 'isobaric') {
+                A = Q * 0.4; // Одноатомный газ (A = 2/5 Q)
+            } else if (currentProcess === 'isothermal') {
+                A = Q;
+            }
+            
+            elA.value = A;
+            updateValues();
+        }
+
+        function onInputA() {
+            if (currentProcess === 'isochoric') return; // Заблокировано
+            
+            A = parseFloat(elA.value);
+            
+            if (currentProcess === 'isobaric') {
+                Q = A * 2.5; // Одноатомный газ (Q = 5/2 A)
+            } else if (currentProcess === 'isothermal') {
+                Q = A;
+            } else if (currentProcess === 'adiabatic') {
+                Q = 0;
+            }
+            
+            elQ.value = Q;
+            updateValues();
+        }
+
+        function updateValues() {
+            dU = Q - A;
+            
+            // Обновление текстов
+            valQ.textContent = Q > 0 ? `+${Q.toFixed(0)} Дж` : `${Q.toFixed(0)} Дж`;
+            valA.textContent = A > 0 ? `+${A.toFixed(0)} Дж` : `${A.toFixed(0)} Дж`;
+            
+            dashQ.textContent = Q > 0 ? `+${Q.toFixed(0)} Дж` : `${Q.toFixed(0)} Дж`;
+            dashA.textContent = A > 0 ? `+${A.toFixed(0)} Дж` : `${A.toFixed(0)} Дж`;
+            dashDU.textContent = dU > 0 ? `+${dU.toFixed(0)} Дж` : `${dU.toFixed(0)} Дж`;
+        }
+
+        function updatePhysicsAndDraw() {
             // Геометрия цилиндра
             const w = canvas.width;
             const h = canvas.height;
@@ -477,8 +567,20 @@
 
             ctx.clearRect(0, 0, w, h);
 
+            // 0. Отрисовка термоизоляции для адиабатного процесса
+            if (currentProcess === 'adiabatic') {
+                ctx.fillStyle = '#555';
+                ctx.fillRect(cylX - 10, 10, cylWidth + 20, cylBaseY);
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(cylX, 20, cylWidth, cylBaseY);
+                ctx.fillStyle = '#888';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('ТЕРМОИЗОЛЯЦИЯ', cx, cylBaseY + 30);
+            }
+
             // 1. Отрисовка источника тепла (Q)
-            if (Q > 0) {
+            if (Q > 0 && currentProcess !== 'adiabatic') {
                 // Огонь
                 const flameIntensity = Q / 1000;
                 ctx.fillStyle = `rgba(249, 115, 22, ${0.4 + 0.6 * flameIntensity})`;
@@ -497,7 +599,7 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(`+Q`, cx, cylBaseY + 45);
 
-            } else if (Q < 0) {
+            } else if (Q < 0 && currentProcess !== 'adiabatic') {
                 // Лед
                 const iceIntensity = Math.abs(Q) / 1000;
                 ctx.fillStyle = `rgba(59, 130, 246, ${0.4 + 0.6 * iceIntensity})`;
@@ -560,6 +662,13 @@
             ctx.fillStyle = '#666';
             ctx.fillRect(cx - 5, pistonY - 80, 10, 65); // Шток
 
+            // Фиксатор для изохорного процесса
+            if (currentProcess === 'isochoric') {
+                ctx.fillStyle = '#EF4444';
+                ctx.fillRect(cylX - 10, pistonY - 10, 10, 10);
+                ctx.fillRect(cylX + cylWidth, pistonY - 10, 10, 10);
+            }
+
             // 5. Вектор Работы (A)
             if (A > 0) {
                 // Стрелка вверх
@@ -621,10 +730,11 @@
         }
 
         // Event Listeners
-        elQ.addEventListener('input', () => {});
-        elA.addEventListener('input', () => {});
+        elQ.addEventListener('input', onInputQ);
+        elA.addEventListener('input', onInputA);
 
         // Start
+        setThermoProcess('isobaric');
         updatePhysicsAndDraw();
 
     </script>
