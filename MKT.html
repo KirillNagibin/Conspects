@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Основы МКТ</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-cyan: #06B6D4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Основы молекулярно-кинетической теории (МКТ)</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Главная идея раздела</strong><br>
+                <span style="color: var(--text-muted);">МКТ связывает два мира: невидимый микромир (миллиарды хаотично летающих молекул) и макромир (понятные нам давление, температура, объем). Давление — это просто удары молекул о стенки, а температура — их скорость.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="microscope"></i> 1. Постулаты и структура вещества</h2>
+        <div class="card">
+            <p>Три кита, на которых строится вся термодинамика:</p>
+            <ol>
+                <li>Все вещества состоят из мельчайших частиц – атомов и молекул.</li>
+                <li>Между частицами есть пустое пространство и силы взаимодействия (притяжения и отталкивания).</li>
+                <li>Частицы находятся в <b>непрерывном хаотическом тепловом движении</b>.</li>
+            </ol>
+            
+            <h3 style="margin-top: 20px;">Количество вещества ($\nu$)</h3>
+            <p style="color: var(--text-muted);">Вместо того чтобы считать каждую молекулу отдельно (их триллионы), физики считают их "порциями" — молями. В 1 моле всегда находится ровно $N_A = 6.02 \cdot 10^{23}$ частиц.</p>
+            <div class="formula-box">
+                $$\nu = \frac{N}{N_A} = \frac{m}{M}$$
+            </div>
+            <ul>
+                <li>$N$ — число молекул.</li>
+                <li>$m$ — масса всего газа.</li>
+                <li>$M$ — молярная масса (кг/моль) — масса одного моля вещества.</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="thermometer"></i> 2. Температура = Скорость</h2>
+        <div class="card">
+            <p>В физике температура ($T$) — это не "насколько нам горячо". Температура — это прямая мера <b>средней кинетической энергии</b> хаотичного движения молекул.</p>
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-red);">
+                    <div style="font-size: 0.9rem; color: var(--brand-red); margin-bottom: 5px;">Энергия одной молекулы</div>
+                    $$E_k = \frac{3}{2} kT$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-orange);">
+                    <div style="font-size: 0.9rem; color: var(--brand-orange); margin-bottom: 5px;">Средняя скорость молекул</div>
+                    $$v_{кв} = \sqrt{\frac{3kT}{m_0}} = \sqrt{\frac{3RT}{M}}$$
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;"><i>$k = 1.38 \cdot 10^{-23}$ Дж/К — постоянная Больцмана. <br>$R = 8.31$ Дж/(моль·К) — универсальная газовая постоянная ($R = k \cdot N_A$).</i></p>
+        </div>
+
+        <h2><i data-lucide="minimize-2"></i> 3. Основное уравнение МКТ</h2>
+        <div class="card">
+            <p>Газ давит на стенки сосуда, потому что миллиарды молекул каждую секунду врезаются в них и отскакивают. Основное уравнение связывает это макро-давление ($p$) с микро-параметрами молекул:</p>
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--accent);">
+                    <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 5px;">Через скорость</div>
+                    $$p = \frac{1}{3} m_0 n v^2$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Через энергию</div>
+                    $$p = \frac{2}{3} n E_k$$
+                </div>
+                <div class="formula-box" style="border-color: #8B5CF6;">
+                    <div style="font-size: 0.9rem; color: #8B5CF6; margin-bottom: 5px;">Через температуру</div>
+                    $$p = n k T$$
+                </div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Здесь $n = \frac{N}{V}$ — <b>концентрация</b> (сколько молекул сидит в 1 кубическом метре). <br>Из формулы $p = nkT$ четко видно: давление растет, если мы либо сжимаем газ (растет $n$), либо нагреваем его (растет $T$).</p>
+        </div>
+
+        <h2><i data-lucide="flask-conical"></i> 4. Лаборатория: Микро vs Макро</h2>
+        <p style="color: var(--text-muted);">Управляй микромиром! Изменяй температуру (скорость молекул), объем сосуда и количество частиц. Наблюдай, как эти микро-изменения сказываются на манометре (макро-давление).</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);"><span>Температура ($T$):</span> <span id="val-sim-t">300 К</span></label>
+                    <input type="range" id="sim-t" min="100" max="1000" value="300" step="10">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-cyan);"><span>Объем сосуда ($V$):</span> <span id="val-sim-v">100 л</span></label>
+                    <input type="range" id="sim-v" min="50" max="250" value="100" step="10">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Число частиц ($N \sim \nu$):</span> <span id="val-sim-n">100 у.е.</span></label>
+                    <input type="range" id="sim-n" min="10" max="300" value="100" step="10">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Концентрация ($n$)</div>
+                    <div class="dashboard-value" id="dash-n" style="color: var(--brand-cyan);">1.0</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Кинетическая энергия ($E_k$)</div>
+                    <div class="dashboard-value" id="dash-ek" style="color: var(--brand-red);">1.0</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--accent); background: rgba(76, 175, 80, 0.1);">
+                    <div class="dashboard-label">Давление на стенки ($p$)</div>
+                    <div class="dashboard-value" id="dash-p" style="color: var(--accent);">1.0 атм</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-mkt" width="600" height="300" style="background: transparent; border-radius: 8px; border: 1px solid #333;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 5. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Кельвины рулят:</strong> Во всех формулах МКТ температура ТОЛЬКО в Кельвинах ($T = t^\circ C + 273$). Если температура упала в 2 раза (с 600 К до 300 К), то и энергия упадет в 2 раза.</li>
+                    <li><strong>"Химические" переходы:</strong> В задачах часто дают массу газа $m$ и молярную массу $M$. Запомни мостик: $\nu = \frac{m}{M}$, а число частиц $N = \nu \cdot N_A$.</li>
+                    <li><strong>Сравнение газов:</strong> Если два разных газа (например, водород и кислород) находятся при **одинаковой температуре**, то их средняя кинетическая энергия $E_k$ **одинакова**! Но молекулы водорода при этом будут летать гораздо быстрее, так как они легче ($v \sim \frac{1}{\sqrt{M}}$).</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Путаница $m_0$ и $M$:</strong> $m_0$ — это крошечная масса одной конкретной молекулы (в кг). А $M$ — это масса целого моля ($6 \cdot 10^{23}$ штук). Формула связи: $M = m_0 \cdot N_A$.</li>
+                    <li><strong>Теплота $\neq$ Температура:</strong> Количество теплоты ($Q$) измеряется в Джоулях и показывает переданную энергию. Температура ($T$) — это характеристика состояния.</li>
+                    <li><strong>Концентрация:</strong> Забывают, что $n = \frac{N}{V}$. Если объем сосуда увеличить в 2 раза, молекулы "разбредутся", концентрация упадет в 2 раза, и давление тоже упадет.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Энергия и Температура</h3>
+            <p>Найдите среднюю кинетическую энергию поступательного движения молекулы идеального газа при температуре $27^\circ C$. ($k = 1.38 \cdot 10^{-23}$ Дж/К).</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Главная ловушка — градусы Цельсия. Обязательно переведи температуру в абсолютную шкалу Кельвина ($T = t + 273$). Затем используй формулу связи энергии и температуры: $E_k = \frac{3}{2}kT$.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Переведем температуру в Кельвины:<br>
+                $$T = 27 + 273 = 300 \text{ К}$$</p>
+                
+                <p>2. Запишем формулу средней кинетической энергии:<br>
+                $$E_k = \frac{3}{2} kT$$</p>
+                
+                <p>3. Подставим значения:<br>
+                $$E_k = 1.5 \cdot 1.38 \cdot 10^{-23} \cdot 300 = 1.5 \cdot 414 \cdot 10^{-23} = 621 \cdot 10^{-23} \text{ Дж}$$</p>
+                
+                <p>4. Приведем к стандартному виду:<br>
+                $$E_k = 6.21 \cdot 10^{-21} \text{ Дж}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: $6.21 \cdot 10^{-21}$ Дж</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Изменение параметров</h3>
+            <p>Абсолютную температуру идеального газа в закрытом сосуде увеличили в 2 раза. Как при этом изменились: средняя кинетическая энергия молекул, средняя квадратичная скорость молекул и давление газа?</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение (Анализ формул):</strong></p>
+                <p>1. Сосуд закрыт, значит объем не меняется ($V = const$) и количество молекул не меняется ($N = const$). Значит, концентрация $n = \frac{N}{V}$ остается неизменной.</p>
+
+                <p>2. <b>Кинетическая энергия:</b> $E_k = \frac{3}{2}kT$. Энергия прямо пропорциональна температуре $T$. Если $T$ выросла в 2 раза, то и $E_k$ <b>увеличилась в 2 раза</b>.</p>
+                
+                <p>3. <b>Скорость молекул:</b> $v \sim \sqrt{T}$. Скорость пропорциональна корню из температуры. Если $T$ выросла в 2 раза, то скорость $v$ <b>увеличилась в $\sqrt{2}$ раз</b> (примерно в $1.41$ раза).</p>
+
+                <p>4. <b>Давление газа:</b> $p = nkT$. Так как концентрация $n$ постоянна, давление прямо пропорционально температуре. Значит, давление $p$ <b>увеличилось в 2 раза</b>.</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: Энергия и давление выросли в 2 раза, скорость — в $\sqrt{2}$ раз.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР МКТ
+           ========================================== */
+        
+        const canvas = document.getElementById('canvas-mkt');
+        const ctx = canvas.getContext('2d');
+        
+        // Инпуты
+        const inT = document.getElementById('sim-t');
+        const inV = document.getElementById('sim-v');
+        const inN = document.getElementById('sim-n');
+        
+        // Значения лейблов
+        const valT = document.getElementById('val-sim-t');
+        const valV = document.getElementById('val-sim-v');
+        const valN = document.getElementById('val-sim-n');
+        
+        // Дашборды
+        const dashN = document.getElementById('dash-n');
+        const dashEk = document.getElementById('dash-ek');
+        const dashP = document.getElementById('dash-p');
+
+        let currentBoxWidth = 600; // Визуальная ширина контейнера (от 120 до 600)
+        let particles = [];
+
+        // Базовые параметры для "нормального" состояния
+        const baseT = 300;
+        const baseV = 100;
+        const baseN = 100;
+
+        function updatePhysics() {
+            const T = parseInt(inT.value);
+            const V = parseInt(inV.value);
+            const N = parseInt(inN.value);
+
+            // Обновляем лейблы
+            valT.textContent = T + ' К';
+            valV.textContent = V + ' л';
+            valN.textContent = N + ' у.е.';
+
+            // Физика (относительные величины)
+            const n_rel = (N / baseN) / (V / baseV);
+            const ek_rel = T / baseT;
+            const p_rel = n_rel * ek_rel;
+
+            // Обновляем дашборды
+            dashN.textContent = n_rel.toFixed(2);
+            dashEk.textContent = ek_rel.toFixed(2);
+            dashP.textContent = p_rel.toFixed(2) + ' атм';
+
+            // Обновляем визуальный объем (поршень)
+            // При V=250 ширина равна 600. При V=50 ширина равна 120.
+            currentBoxWidth = 120 + ((V - 50) / 200) * 480;
+
+            // Управляем частицами (добавляем или удаляем, чтобы соответствовать N)
+            const visualN = N; // 1 у.е. = 1 частица для наглядности
+            
+            if (particles.length < visualN) {
+                // Добавляем нехватающие
+                const needed = visualN - particles.length;
+                for (let i = 0; i < needed; i++) {
+                    particles.push(createParticle());
+                }
+            } else if (particles.length > visualN) {
+                // Удаляем лишние
+                particles.splice(visualN);
+            }
+
+            // Обновляем скорость и цвет частиц на основе Температуры
+            const speedMultiplier = Math.sqrt(T / baseT) * 3; // Базовая скорость ~3
+            
+            // Цвет: Холодный (синий) -> Норма (зеленый) -> Горячий (красный)
+            // T от 100 до 1000
+            let r, g, b;
+            if (T < 300) {
+                // Синий -> Зеленый
+                let ratio = (T - 100) / 200; // 0 to 1
+                r = 6 + ratio * 70; // 06B6D4 to 4CAF50
+                g = 182 - ratio * 7;
+                b = 212 - ratio * 132;
+            } else {
+                // Зеленый -> Красный
+                let ratio = (T - 300) / 700; // 0 to 1
+                r = 76 + ratio * 163; // 4CAF50 to EF4444
+                g = 175 - ratio * 107;
+                b = 80 - ratio * 12;
+            }
+            const pColor = `rgb(${r}, ${g}, ${b})`;
+
+            particles.forEach(p => {
+                p.color = pColor;
+                // Нормализуем текущий вектор скорости и умножаем на новый множитель
+                const currentSpeed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+                if (currentSpeed > 0) {
+                    p.vx = (p.vx / currentSpeed) * speedMultiplier;
+                    p.vy = (p.vy / currentSpeed) * speedMultiplier;
+                } else {
+                    // Если вдруг остановилась
+                    p.vx = (Math.random() - 0.5) * speedMultiplier;
+                    p.vy = (Math.random() - 0.5) * speedMultiplier;
+                }
+            });
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * (currentBoxWidth - 10) + 5,
+                y: Math.random() * (canvas.height - 10) + 5,
+                vx: (Math.random() - 0.5), // Направление будет отнормализовано позже
+                vy: (Math.random() - 0.5),
+                radius: 3,
+                color: '#fff' // Обновится в updatePhysics
+            };
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Отрисовка внутреннего пространства газа
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, currentBoxWidth, canvas.height);
+
+            // 2. Отрисовка поршня (Стенка справа)
+            ctx.fillStyle = '#2a2a2a'; 
+            ctx.fillRect(currentBoxWidth, 0, canvas.width - currentBoxWidth, canvas.height);
+            
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(currentBoxWidth, 0);
+            ctx.lineTo(currentBoxWidth, canvas.height);
+            ctx.stroke();
+
+            ctx.fillStyle = '#444';
+            ctx.fillRect(currentBoxWidth + (canvas.width - currentBoxWidth)/2 - 10, canvas.height/2 - 40, 20, 80);
+
+            // 3. Обновление и отрисовка частиц
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Упругие столкновения со стенками (с учетом текущего объема)
+                if (p.x - p.radius < 0) { 
+                    p.x = p.radius; 
+                    p.vx *= -1; 
+                }
+                if (p.x + p.radius > currentBoxWidth) { 
+                    p.x = currentBoxWidth - p.radius; 
+                    p.vx *= -1; 
+                }
+                if (p.y - p.radius < 0) { 
+                    p.y = p.radius; 
+                    p.vy *= -1; 
+                }
+                if (p.y + p.radius > canvas.height) { 
+                    p.y = canvas.height - p.radius; 
+                    p.vy *= -1; 
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawFrame);
+        }
+
+        // Слушатели событий
+        inT.addEventListener('input', updatePhysics);
+        inV.addEventListener('input', updatePhysics);
+        inN.addEventListener('input', updatePhysics);
+
+        // Инициализация
+        updatePhysics(); // Создаст начальные частицы и рассчитает физику
+        drawFrame();
+
+    </script>
+</body>
+</html>
