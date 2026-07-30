@@ -243,12 +243,14 @@
                 </div>
                 <div class="control-group">
                     <label style="color: var(--brand-blue);"><span>Внешнее сопр. ($R$):</span> <span id="val-r_out">5.0 Ом</span></label>
-                    <input type="range" id="sim-r_out" min="1.0" max="20.0" value="5.0" step="0.5" style="accent-color: var(--brand-blue);">
+                    <input type="range" id="sim-r_out" min="0.0" max="20.0" value="5.0" step="0.5" style="accent-color: var(--brand-blue);">
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-                <button class="btn btn-danger" id="btn-kz" onclick="toggleShortCircuit()"><i data-lucide="zap" style="width: 16px;"></i> Сделать Короткое Замыкание (КЗ)</button>
+            <div style="display: flex; justify-content: center; margin-bottom: 20px; min-height: 40px;">
+                <button class="btn btn-outline" id="btn-repair" onclick="repairCircuit()" style="display: none; border-color: var(--brand-orange); color: var(--brand-orange);">
+                    <i data-lucide="wrench" style="width: 16px;"></i> Заменить предохранитель (Восстановить цепь)
+                </button>
             </div>
 
             <div class="dashboard-grid">
@@ -278,8 +280,8 @@
                 <canvas id="canvas-ohm" width="600" height="250" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
             </div>
             
-            <div id="kz-warning" style="text-align: center; color: var(--error-text); font-weight: bold; margin-top: 15px; font-size: 1.1rem; display: none; text-transform: uppercase; animation: blink 1s infinite;">
-                <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i> Критическая перегрузка! Короткое замыкание! <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i>
+            <div id="kz-warning" style="text-align: center; color: var(--brand-orange); font-weight: bold; margin-top: 15px; font-size: 1.1rem; display: none; text-transform: uppercase; animation: blink 1s infinite;">
+                <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i> Короткое замыкание! Предохранитель сгорел. <i data-lucide="alert-triangle" style="width: 20px; vertical-align: middle;"></i>
             </div>
             
             <style>
@@ -377,7 +379,7 @@
         const inE = document.getElementById('sim-e');
         const inRIn = document.getElementById('sim-r_in');
         const inROut = document.getElementById('sim-r_out');
-        const btnKz = document.getElementById('btn-kz');
+        const btnRepair = document.getElementById('btn-repair');
         
         // Лейблы
         const valE = document.getElementById('val-e');
@@ -392,28 +394,19 @@
         const dashEff = document.getElementById('dash-eff');
         const dashIKZ = document.getElementById('dash-ikz');
 
-        let isKz = false;
-        let savedROut = 5.0; // Для возврата из КЗ
+        let isBroken = false;
         let electrons = []; 
         let batteryHeat = 0; // Для анимации покраснения батареи
 
-        function toggleShortCircuit() {
-            isKz = !isKz;
-            
-            if (isKz) {
-                savedROut = inROut.value;
-                inROut.value = 0;
-                inROut.disabled = true;
-                btnKz.classList.add('active');
-                btnKz.innerHTML = '<i data-lucide="zap-off" style="width: 16px;"></i> Отключить КЗ';
-                warnKz.style.display = 'block';
-            } else {
-                inROut.value = savedROut > 0.5 ? savedROut : 5.0;
-                inROut.disabled = false;
-                btnKz.classList.remove('active');
-                btnKz.innerHTML = '<i data-lucide="zap" style="width: 16px;"></i> Сделать Короткое Замыкание (КЗ)';
-                warnKz.style.display = 'none';
+        function repairCircuit() {
+            // Если пользователь нажал "Починить", но ползунок всё еще на нуле — авто-сдвигаем его
+            if (parseFloat(inROut.value) === 0) {
+                inROut.value = 5.0; 
             }
+            
+            isBroken = false;
+            btnRepair.style.display = 'none';
+            warnKz.style.display = 'none';
             
             if (typeof lucide !== 'undefined') lucide.createIcons();
             updatePhysics();
@@ -434,47 +427,62 @@
         }
 
         function updatePhysics() {
-            // Если включен режим КЗ, но кто-то хакнул инпут, жестко ставим 0
-            if (isKz) inROut.value = 0;
-
             const E = parseFloat(inE.value);
             const rIn = parseFloat(inRIn.value);
             const ROut = parseFloat(inROut.value);
 
+            // Проверка на КЗ (внешнее сопротивление упало до нуля)
+            if (ROut === 0 && !isBroken) {
+                isBroken = true;
+                btnRepair.style.display = 'inline-flex';
+                warnKz.style.display = 'block';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                electrons = []; // Электроны мгновенно останавливаются и пропадают
+            }
+
             // Обновляем лейблы
             valE.textContent = E + ' В';
             valRIn.textContent = rIn.toFixed(1) + ' Ом';
-            valROut.textContent = isKz ? '0 Ом (КЗ)' : ROut.toFixed(1) + ' Ом';
+            valROut.textContent = isBroken ? 'ОБРЫВ' : ROut.toFixed(1) + ' Ом';
 
-            // Физика
-            let I = E / (ROut + rIn);
-            let U = I * ROut; // Напряжение на клеммах
-            let P_useful = I * I * ROut;
-            let eff = (ROut / (ROut + rIn)) * 100;
-            let I_kz = E / rIn;
+            let I, U, P_useful, eff, I_kz;
+            I_kz = E / rIn; // Ток КЗ (максимальная характеристика источника)
 
-            // Нагрев батареи (для цвета) от 0 до 1
-            // Если мощность потерь I^2 * r большая, батарея краснеет
-            let P_loss = I * I * rIn;
-            let max_loss = I_kz * I_kz * rIn; // Потери при КЗ максимальны
-            batteryHeat = max_loss > 0 ? P_loss / max_loss : 0;
+            if (isBroken) {
+                I = 0;
+                U = E; // Напряжение на клеммах при разомкнутой цепи равно ЭДС
+                P_useful = 0;
+                eff = 0;
+                batteryHeat = 0; // Батарея больше не греется
+                dashI.style.color = 'var(--text-muted)';
+            } else {
+                I = E / (ROut + rIn);
+                U = I * ROut; 
+                P_useful = I * I * ROut;
+                eff = (ROut / (ROut + rIn)) * 100;
+                
+                // Нагрев батареи (для цвета) от 0 до 1
+                let P_loss = I * I * rIn;
+                let max_loss = I_kz * I_kz * rIn;
+                batteryHeat = max_loss > 0 ? P_loss / max_loss : 0;
+                dashI.style.color = 'var(--accent)';
+            }
 
             // Обновляем дашборды
             dashI.textContent = I.toFixed(2) + ' А';
-            // При КЗ ток красный
-            dashI.style.color = isKz ? 'var(--error-text)' : 'var(--accent)';
-            
             dashU.textContent = U.toFixed(1) + ' В';
             dashP.textContent = P_useful.toFixed(1) + ' Вт';
-            dashEff.textContent = isKz ? '0%' : eff.toFixed(0) + '%';
+            dashEff.textContent = eff.toFixed(0) + '%';
             dashIKZ.textContent = I_kz.toFixed(2) + ' А';
 
-            // Электроны
-            const targetElectrons = Math.min(Math.floor(I * 15), 150); 
-            if (electrons.length < targetElectrons) {
-                electrons.push({ progress: Math.random() }); // Спавним рандомно по цепи
-            } else if (electrons.length > targetElectrons) {
-                electrons.pop();
+            // Спавн электронов (только если цепь цела)
+            if (!isBroken) {
+                const targetElectrons = Math.min(Math.floor(I * 15), 150); 
+                if (electrons.length < targetElectrons) {
+                    electrons.push({ progress: Math.random() }); 
+                } else if (electrons.length > targetElectrons) {
+                    electrons.pop();
+                }
             }
         }
 
@@ -541,20 +549,30 @@
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(cx - 70, batY - 5, 140, 10);
 
-            // 2. Рисуем внешний резистор R (Сверху)
-            if (!isKz) {
-                drawResistor(ctx, cx, R_y, 80, 30, `R = ${inROut.value} Ом`, '#3B82F6');
-            } else {
-                // Замыкание (просто жирный провод с эффектом свечения)
-                ctx.shadowColor = '#EF4444';
-                ctx.shadowBlur = 10;
-                ctx.strokeStyle = '#EF4444';
-                ctx.lineWidth = 6;
+            // 2. Рисуем внешнюю цепь / Резистор (Сверху)
+            if (isBroken) {
+                // Отрисовка разорванного предохранителя
+                ctx.strokeStyle = '#555';
                 ctx.beginPath();
-                ctx.moveTo(cx - 40, R_y);
-                ctx.lineTo(cx + 40, R_y);
+                ctx.moveTo(cx - 80, R_y);
+                ctx.lineTo(cx - 20, R_y);
+                ctx.moveTo(cx + 80, R_y);
+                ctx.lineTo(cx + 20, R_y);
                 ctx.stroke();
-                ctx.shadowBlur = 0;
+                
+                // Оплавленные концы
+                ctx.fillStyle = '#F97316';
+                ctx.beginPath();
+                ctx.arc(cx - 20, R_y, 4, 0, Math.PI*2);
+                ctx.arc(cx + 20, R_y, 4, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#FFC107';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('СГОРЕЛ', cx, R_y - 15);
+            } else {
+                drawResistor(ctx, cx, R_y, 80, 30, `R = ${inROut.value} Ом`, '#3B82F6');
             }
 
             // 3. Рисуем источник тока (Снизу)
@@ -603,26 +621,21 @@
             ctx.fillText(`ε = ${inE.value} В`, cx - 20, batY + 25);
 
             // 4. Электроны (Анимация)
-            const I = parseFloat(dashI.textContent); // Парсим значение тока
-            // Базовая скорость 0.005, масштабируем от тока
-            const speed = 0.002 + 0.001 * I; 
-            
-            ctx.fillStyle = '#F97316';
-            if (isKz) {
-                // При КЗ электроны летят бешено и светятся
-                ctx.shadowColor = '#F97316';
-                ctx.shadowBlur = 5;
-            }
-
-            electrons.forEach((el) => {
-                el.progress += speed;
-                const pos = getPosOnCircuit(el.progress, cx, w, h, batY, R_y);
+            if (!isBroken) {
+                const I = parseFloat(dashI.textContent); 
+                const speed = 0.002 + 0.001 * I; 
                 
-                ctx.beginPath();
-                ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.shadowBlur = 0; // reset
+                ctx.fillStyle = '#F97316';
+
+                electrons.forEach((el) => {
+                    el.progress += speed;
+                    const pos = getPosOnCircuit(el.progress, cx, w, h, batY, R_y);
+                    
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
 
             requestAnimationFrame(drawCircuit);
         }
