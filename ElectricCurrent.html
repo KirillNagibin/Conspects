@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Электрический ток и законы цепей</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .process-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 150px; text-align: center; font-size: 0.9rem;
+        }
+        .process-btn.active {
+            background: rgba(76, 175, 80, 0.1); border-color: var(--accent); color: var(--accent); font-weight: bold;
+        }
+        
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Электрический ток и законы цепей</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="zap" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Если электростатика изучает неподвижные заряды, то здесь заряды начинают двигаться. Мы разберем, что заставляет их течь по проводам (напряжение), что им мешает (сопротивление) и как посчитать работу, которую они при этом совершают.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 1. Электрический ток: Суть и условия</h2>
+        <div class="card">
+            <p><strong>Электрический ток</strong> — это упорядоченное (направленное) движение заряженных частиц.</p>
+            <p>Чтобы ток существовал длительное время, необходимы два условия:</p>
+            <ol>
+                <li>Наличие <strong>свободных зарядов</strong> (электронов в металлах, ионов в жидкостях).</li>
+                <li>Наличие <strong>электрического поля</strong> (оно создает силу, толкающую заряды). Электрическое поле поддерживается источником тока, который создает на концах проводника разность потенциалов — <strong>напряжение ($U$)</strong>.</li>
+            </ol>
+
+            <h3 style="margin-top: 25px;">Сила тока ($I$)</h3>
+            <p style="color: var(--text-muted);">Показывает, какой заряд ($q$) проходит через поперечное сечение проводника за единицу времени ($t$). Аналогия: сколько литров воды протекает по трубе за секунду.</p>
+            <div class="formula-box">
+                $$I = \frac{q}{t}$$
+            </div>
+            <ul>
+                <li>$I$ — сила тока (Амперы, А)</li>
+                <li>$q$ — прошедший заряд (Кулоны, Кл)</li>
+                <li>$t$ — время (Секунды, с)</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="minus-circle"></i> 2. Сопротивление и Закон Ома</h2>
+        <div class="card">
+            <h3 style="margin-top: 0;">Электрическое сопротивление ($R$)</h3>
+            <p>Проводник мешает течь зарядам: электроны сталкиваются с атомами кристаллической решетки, теряя энергию. Эта "помеха" называется сопротивлением.</p>
+            <div class="formula-box" style="border-color: var(--brand-orange);">
+                $$R = \rho \frac{l}{S}$$
+            </div>
+            <ul>
+                <li>$R$ — сопротивление (Омы, Ом)</li>
+                <li>$\rho$ (ро) — <strong>удельное сопротивление</strong> материала (зависит от того, медь это или железо). Единица: Ом·мм²/м.</li>
+                <li>$l$ — длина проводника (м). Чем длиннее труба, тем тяжелее течь.</li>
+                <li>$S$ — площадь поперечного сечения (мм²). Чем шире труба, тем легче течь.</li>
+            </ul>
+
+            <h3 style="margin-top: 25px;">Закон Ома для участка цепи</h3>
+            <p style="color: var(--text-muted);">Самый важный закон электричества! Сила тока прямо пропорциональна напряжению и обратно пропорциональна сопротивлению.</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$I = \frac{U}{R}$$
+            </div>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 3. Соединение проводников</h2>
+        <div class="card table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Характеристика</th>
+                        <th><span style="color: var(--brand-blue);">Последовательное</span><br><span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);">Один за другим (как вагоны)</span></th>
+                        <th><span style="color: var(--brand-red);">Параллельное</span><br><span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);">Ток разветвляется (как река)</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Сила тока ($I$)</strong></td>
+                        <td style="font-weight: bold;">$I = I_1 = I_2 = const$</td>
+                        <td>$I = I_1 + I_2$<br><span style="font-size:0.8rem; color:var(--text-muted);">Ток делится по ветвям</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Напряжение ($U$)</strong></td>
+                        <td>$U = U_1 + U_2$</td>
+                        <td style="font-weight: bold;">$U = U_1 = U_2 = const$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Общее сопротивление ($R$)</strong></td>
+                        <td>$R = R_1 + R_2$<br><span style="font-size:0.8rem; color:var(--text-muted);">Общее R всегда <b>больше</b> наибольшего</span></td>
+                        <td>$\frac{1}{R} = \frac{1}{R_1} + \frac{1}{R_2}$<br><span style="font-size:0.8rem; color:var(--text-muted);">Общее R всегда <b>меньше</b> наименьшего!</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 15px;"><i>Лайфхак для параллельного: если соединены два резистора, общее сопротивление можно считать по формуле $R = \frac{R_1 \cdot R_2}{R_1 + R_2}$. Если соединены $N$ одинаковых резисторов с сопротивлением $R_1$, то $R_{общ} = \frac{R_1}{N}$.</i></p>
+        </div>
+
+        <h2><i data-lucide="power"></i> 4. Лаборатория: Законы цепей</h2>
+        <p style="color: var(--text-muted);">Соберите свою цепь! Переключайтесь между последовательным и параллельным соединением. Меняйте сопротивления резисторов и напряжение источника, чтобы увидеть, как перераспределяются токи ($I$) и напряжения ($U$) по закону Ома.</p>
+
+        <div class="simulator">
+            <div class="process-selector">
+                <div class="process-btn active" id="btn-mode-series" onclick="setCircuitMode('series')">Последовательное соединение</div>
+                <div class="process-btn" id="btn-mode-parallel" onclick="setCircuitMode('parallel')">Параллельное соединение</div>
+            </div>
+
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>Напряжение источника ($U$):</span> <span id="val-u">12 В</span></label>
+                    <input type="range" id="sim-u" min="1" max="24" value="12" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Резистор 1 ($R_1$):</span> <span id="val-r1">4 Ом</span></label>
+                    <input type="range" id="sim-r1" min="1" max="20" value="4" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Резистор 2 ($R_2$):</span> <span id="val-r2">6 Ом</span></label>
+                    <input type="range" id="sim-r2" min="1" max="20" value="6" step="1">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Общее R</div>
+                    <div class="dashboard-value" id="dash-rtotal" style="color: #fff;">10.0 Ом</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--accent); background: rgba(76, 175, 80, 0.1);">
+                    <div class="dashboard-label">Общий ток (Амперметр)</div>
+                    <div class="dashboard-value" id="dash-itotal" style="color: var(--accent);">1.20 А</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Напряжение U₁</div>
+                    <div class="dashboard-value" id="dash-u1" style="color: var(--brand-blue);">4.8 В</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Напряжение U₂</div>
+                    <div class="dashboard-value" id="dash-u2" style="color: var(--brand-blue);">7.2 В</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Ток I₁</div>
+                    <div class="dashboard-value" id="dash-i1" style="color: var(--brand-red);">1.20 А</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Ток I₂</div>
+                    <div class="dashboard-value" id="dash-i2" style="color: var(--brand-red);">1.20 А</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-circuit" width="600" height="250" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="battery-charging"></i> 5. Работа, Мощность и Закон Джоуля-Ленца</h2>
+        <div class="card">
+            <h3 style="margin-top: 0;">Работа тока ($A$) и Мощность ($P$)</h3>
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: #8B5CF6;">
+                    <div style="font-size: 0.9rem; color: #8B5CF6; margin-bottom: 5px;">Работа (Дж)</div>
+                    $$A = U I t$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-orange);">
+                    <div style="font-size: 0.9rem; color: var(--brand-orange); margin-bottom: 5px;">Мощность (Вт)</div>
+                    $$P = \frac{A}{t} = U I$$
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 25px;">Закон Джоуля-Ленца</h3>
+            <p>Когда ток идет по проводнику, он нагревается. Количество теплоты $Q$, выделяемое проводником, равно:</p>
+            <div class="formula-box" style="border-color: var(--brand-red);">
+                $$Q = I^2 R t$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;"><i>Обратите внимание: теплота сильно (в квадрате!) зависит от силы тока. Если ток вырастет в 2 раза, тепла выделится в 4 раза больше! На этом принципе работают все нагревательные приборы (чайники, утюги) и предохранители от короткого замыкания.</i></p>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Выбор формулы мощности:</strong> Для последовательной цепи удобнее использовать $P = I^2 R$ (т.к. ток одинаковый). Для параллельной — $P = \frac{U^2}{R}$ (т.к. напряжение одинаковое).</li>
+                    <li><strong>Замыкание накоротко:</strong> Если параллельно резистору подключить "пустой" провод без сопротивления ($R=0$), ток пойдет только по пустому проводу! Резистор перестанет работать (ток пойдет по пути наименьшего сопротивления).</li>
+                    <li><strong>Деформация провода:</strong> Если проводник вытянуть так, что он станет в 2 раза длиннее, его площадь сечения $S$ уменьшится в 2 раза (объем постоянен). В итоге сопротивление $R = \rho\frac{l}{S}$ вырастет в **4 раза**!</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Площадь в формуле $R$:</strong> В формулу $R = \rho\frac{l}{S}$ площадь $S$ обычно подставляют в <strong>мм²</strong>, потому что удельное сопротивление $\rho$ в таблицах дается в $\frac{\text{Ом}\cdot\text{мм}^2}{\text{м}}$. Не переводите в м², если используете табличное $\rho$!</li>
+                    <li><strong>Сложение параллельных R:</strong> Забывают перевернуть дробь! Считают $\frac{1}{R} = \frac{1}{2} + \frac{1}{2} = 1$ и радуются. А нужно найти само $R$.</li>
+                    <li><strong>Идеальные приборы:</strong> В задачах идеальный амперметр имеет сопротивление $R=0$ (его подключают последовательно). Идеальный вольтметр имеет сопротивление $R=\infty$ (его подключают параллельно, он не пропускает через себя ток).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Расчет цепи</h3>
+            <p>Два резистора с сопротивлениями $R_1 = 3\text{ Ом}$ и $R_2 = 6\text{ Ом}$ соединены параллельно и подключены к источнику напряжения $12\text{ В}$. Найдите общее сопротивление цепи и силу тока, протекающего через первый резистор.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> При параллельном соединении напряжение на обоих резисторах равно напряжению источника ($U = U_1 = U_2$). Для поиска тока через первый резистор используй закон Ома для участка цепи: $I_1 = \frac{U_1}{R_1}$. Общее сопротивление ищи по формуле для двух параллельных: $R_{общ} = \frac{R_1 R_2}{R_1 + R_2}$.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдем общее сопротивление цепи при параллельном соединении:<br>
+                $$R_{общ} = \frac{R_1 \cdot R_2}{R_1 + R_2} = \frac{3 \cdot 6}{3 + 6} = \frac{18}{9} = 2\text{ Ом}$$</p>
+                
+                <p>2. При параллельном соединении напряжение на ветвях одинаковое и равно напряжению источника:<br>
+                $$U_1 = U_2 = U = 12\text{ В}$$</p>
+                
+                <p>3. Применим закон Ома для первого резистора, чтобы найти силу тока на нем:<br>
+                $$I_1 = \frac{U_1}{R_1} = \frac{12}{3} = 4\text{ А}$$</p>
+                
+                <p style="font-size: 0.9rem; color: var(--text-muted);">*Для проверки: ток через второй резистор $I_2 = 12 / 6 = 2$ А. Общий ток $I = I_1 + I_2 = 6$ А. По закону Ома для всей цепи $I = U / R_{общ} = 12 / 2 = 6$ А. Всё сходится!*</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: R_общ = 2 Ом; I_1 = 4 А</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР: ЗАКОНЫ ЦЕПЕЙ
+           ========================================== */
+        const canvas = document.getElementById('canvas-circuit');
+        const ctx = canvas.getContext('2d');
+        
+        // Инпуты
+        const inU = document.getElementById('sim-u');
+        const inR1 = document.getElementById('sim-r1');
+        const inR2 = document.getElementById('sim-r2');
+        
+        // Значения лейблов
+        const valU = document.getElementById('val-u');
+        const valR1 = document.getElementById('val-r1');
+        const valR2 = document.getElementById('val-r2');
+        
+        // Дашборды
+        const dashRTotal = document.getElementById('dash-rtotal');
+        const dashITotal = document.getElementById('dash-itotal');
+        const dashU1 = document.getElementById('dash-u1');
+        const dashU2 = document.getElementById('dash-u2');
+        const dashI1 = document.getElementById('dash-i1');
+        const dashI2 = document.getElementById('dash-i2');
+
+        let mode = 'series'; // 'series' или 'parallel'
+        let electrons = []; // Анимация тока
+
+        function setCircuitMode(newMode) {
+            mode = newMode;
+            document.querySelectorAll('.process-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-mode-${mode}`).classList.add('active');
+            
+            // Очищаем электроны при смене цепи, чтобы не летали по старой траектории
+            electrons = []; 
+            updatePhysics();
+        }
+
+        // Вспомогательная функция для отрисовки резистора
+        function drawResistor(ctx, x, y, w, h, label, color) {
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(x - w/2, y - h/2, w, h);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x - w/2, y - h/2, w, h);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+        }
+
+        function updatePhysics() {
+            const U = parseFloat(inU.value);
+            const R1 = parseFloat(inR1.value);
+            const R2 = parseFloat(inR2.value);
+
+            // Обновляем лейблы
+            valU.textContent = U + ' В';
+            valR1.textContent = R1 + ' Ом';
+            valR2.textContent = R2 + ' Ом';
+
+            let RTotal, ITotal, U1, U2, I1, I2;
+
+            if (mode === 'series') {
+                RTotal = R1 + R2;
+                ITotal = U / RTotal;
+                I1 = ITotal;
+                I2 = ITotal;
+                U1 = I1 * R1;
+                U2 = I2 * R2;
+            } else {
+                RTotal = (R1 * R2) / (R1 + R2);
+                ITotal = U / RTotal;
+                U1 = U;
+                U2 = U;
+                I1 = U1 / R1;
+                I2 = U2 / R2;
+            }
+
+            // Обновляем дашборды
+            dashRTotal.textContent = RTotal.toFixed(2) + ' Ом';
+            dashITotal.textContent = ITotal.toFixed(2) + ' А';
+            dashU1.textContent = U1.toFixed(1) + ' В';
+            dashU2.textContent = U2.toFixed(1) + ' В';
+            dashI1.textContent = I1.toFixed(2) + ' А';
+            dashI2.textContent = I2.toFixed(2) + ' А';
+
+            // Управляем количеством электронов для анимации в зависимости от общего тока
+            // Базовый ток ~ 1А = 10 электронов на экране
+            const targetElectrons = Math.min(Math.floor(ITotal * 15), 100); 
+            
+            if (electrons.length < targetElectrons) {
+                // Добавляем новые в начало цепи
+                electrons.push({ progress: 0 });
+            } else if (electrons.length > targetElectrons) {
+                // Убираем
+                electrons.pop();
+            }
+
+            // Рисуем статику
+            drawCircuitStatic();
+        }
+
+        // Отрисовка статичных элементов цепи на Canvas
+        function drawCircuitStatic() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            
+            // Базовые стили для проводов
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+
+            // Источник питания (Батарея внизу по центру)
+            const batY = h - 40;
+            const batW = 40;
+            
+            if (mode === 'series') {
+                // ПОСЛЕДОВАТЕЛЬНАЯ ЦЕПЬ
+                const R1_x = cx - 80;
+                const R2_x = cx + 80;
+                const R_y = 60;
+                
+                // Провода
+                ctx.beginPath();
+                // Левый контур
+                ctx.moveTo(cx - batW, batY);
+                ctx.lineTo(50, batY);
+                ctx.lineTo(50, R_y);
+                ctx.lineTo(R1_x - 30, R_y);
+                
+                // Перемычка между R1 и R2
+                ctx.moveTo(R1_x + 30, R_y);
+                ctx.lineTo(R2_x - 30, R_y);
+                
+                // Правый контур
+                ctx.moveTo(R2_x + 30, R_y);
+                ctx.lineTo(w - 50, R_y);
+                ctx.lineTo(w - 50, batY);
+                ctx.lineTo(cx + batW, batY);
+                ctx.stroke();
+
+                // Резисторы
+                drawResistor(ctx, R1_x, R_y, 60, 25, 'R1', '#3B82F6');
+                drawResistor(ctx, R2_x, R_y, 60, 25, 'R2', '#3B82F6');
+
+            } else {
+                // ПАРАЛЛЕЛЬНАЯ ЦЕПЬ
+                const R1_y = 50;
+                const R2_y = 120;
+                
+                // Провода
+                ctx.beginPath();
+                // Левый контур (разветвление)
+                ctx.moveTo(cx - batW, batY);
+                ctx.lineTo(50, batY);
+                ctx.lineTo(50, R1_y);
+                // Ветви к резисторам (левые)
+                ctx.moveTo(50, R1_y); ctx.lineTo(cx - 30, R1_y);
+                ctx.moveTo(50, R2_y); ctx.lineTo(cx - 30, R2_y);
+                
+                // Правый контур (схождение)
+                ctx.moveTo(cx + 30, R1_y); ctx.lineTo(w - 50, R1_y);
+                ctx.moveTo(cx + 30, R2_y); ctx.lineTo(w - 50, R2_y);
+                ctx.moveTo(w - 50, R1_y);
+                ctx.lineTo(w - 50, batY);
+                ctx.lineTo(cx + batW, batY);
+                ctx.stroke();
+                
+                // Резисторы
+                drawResistor(ctx, cx, R1_y, 60, 25, 'R1', '#EF4444');
+                drawResistor(ctx, cx, R2_y, 60, 25, 'R2', '#EF4444');
+            }
+
+            // Отрисовка батареи (источника)
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(cx - batW, batY - 15, batW*2, 30);
+            
+            ctx.strokeStyle = '#4CAF50';
+            ctx.lineWidth = 2;
+            
+            // Длинная палочка (+) слева
+            ctx.beginPath();
+            ctx.moveTo(cx - 15, batY - 20);
+            ctx.lineTo(cx - 15, batY + 20);
+            ctx.stroke();
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillText('+', cx - 25, batY - 20);
+            
+            // Короткая жирная палочка (-) справа
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(cx + 15, batY - 10);
+            ctx.lineTo(cx + 15, batY + 10);
+            ctx.stroke();
+            ctx.fillText('-', cx + 25, batY - 20);
+            
+            ctx.fillStyle = '#4CAF50';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(inU.value + 'В', cx, batY + 30);
+        }
+
+        // Функция для вычисления координат (x, y) электрона в зависимости от его прогресса [0, 1] по цепи
+        function getElectronPos(progress, pathNum = 0) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const batY = h - 40;
+            const batW = 40;
+
+            let p = progress; // 0..1
+            
+            // Электроны идут от минуса к плюсу (технически ток от + к -, но нарисуем шарики как ток для привычности: от + к -)
+            // Ток выходит из левой стороны (клемма +)
+            
+            if (mode === 'series') {
+                const R_y = 60;
+                // Разделим путь на участки (в % от общей длины)
+                // 1: Влево от батареи (cx - batW -> 50)
+                // 2: Вверх (batY -> R_y)
+                // 3: Вправо через резисторы (50 -> w - 50)
+                // 4: Вниз (R_y -> batY)
+                // 5: Влево к батарее (w - 50 -> cx + batW)
+                
+                if (p < 0.1) {
+                    return { x: cx - batW - (cx - batW - 50) * (p/0.1), y: batY };
+                } else if (p < 0.3) {
+                    let localP = (p - 0.1) / 0.2;
+                    return { x: 50, y: batY - (batY - R_y) * localP };
+                } else if (p < 0.7) {
+                    let localP = (p - 0.3) / 0.4;
+                    return { x: 50 + (w - 100) * localP, y: R_y };
+                } else if (p < 0.9) {
+                    let localP = (p - 0.7) / 0.2;
+                    return { x: w - 50, y: R_y + (batY - R_y) * localP };
+                } else {
+                    let localP = (p - 0.9) / 0.1;
+                    return { x: w - 50 - (w - 50 - cx - batW) * localP, y: batY };
+                }
+            } else {
+                // ПАРАЛЛЕЛЬНАЯ ЦЕПЬ
+                const R1_y = 50;
+                const R2_y = 120;
+                
+                // В параллельной цепи электроны делятся на два потока. 
+                // pathNum (0 или 1) определяет, через какой резистор пойдет электрон
+                const targetY = (pathNum === 0) ? R1_y : R2_y;
+                
+                if (p < 0.1) {
+                    return { x: cx - batW - (cx - batW - 50) * (p/0.1), y: batY };
+                } else if (p < 0.3) {
+                    let localP = (p - 0.1) / 0.2;
+                    return { x: 50, y: batY - (batY - targetY) * localP };
+                } else if (p < 0.7) {
+                    let localP = (p - 0.3) / 0.4;
+                    return { x: 50 + (w - 100) * localP, y: targetY };
+                } else if (p < 0.9) {
+                    let localP = (p - 0.7) / 0.2;
+                    return { x: w - 50, y: targetY + (batY - targetY) * localP };
+                } else {
+                    let localP = (p - 0.9) / 0.1;
+                    return { x: w - 50 - (w - 50 - cx - batW) * localP, y: batY };
+                }
+            }
+        }
+
+        function animateCircuit() {
+            // Рисуем статичный фон каждый кадр
+            drawCircuitStatic();
+
+            const U = parseFloat(inU.value);
+            const R1 = parseFloat(inR1.value);
+            const R2 = parseFloat(inR2.value);
+
+            // Скорость анимации зависит от напряжения
+            const speed = 0.002 * (U / 12); 
+
+            // Определяем долю тока для параллельной цепи
+            let branchProb = 0.5;
+            if (mode === 'parallel') {
+                // Ток делится обратно пропорционально сопротивлению
+                // Чем меньше R, тем больше электронов туда идет
+                branchProb = R2 / (R1 + R2); // вероятность пойти в ветвь R1
+            }
+
+            // Обновляем и рисуем электроны (шарики)
+            ctx.fillStyle = '#F97316'; // Оранжевые частицы тока
+            
+            electrons.forEach((el, index) => {
+                el.progress += speed;
+                
+                if (el.progress >= 1) {
+                    el.progress = 0;
+                    // При новом цикле решаем, в какую ветвь пойдет электрон
+                    el.pathNum = Math.random() < branchProb ? 0 : 1; 
+                }
+                
+                // Если путь не назначен, назначаем
+                if (el.pathNum === undefined) {
+                     el.pathNum = Math.random() < branchProb ? 0 : 1; 
+                }
+
+                const pos = getElectronPos(el.progress, el.pathNum);
+                
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateCircuit);
+        }
+
+        // --- Слушатели событий ---
+        inU.addEventListener('input', updatePhysics);
+        inR1.addEventListener('input', updatePhysics);
+        inR2.addEventListener('input', updatePhysics);
+
+        // Инициализация
+        updatePhysics();
+        requestAnimationFrame(animateCircuit);
+
+    </script>
+</body>
+</html>
