@@ -198,20 +198,24 @@
         <div class="simulator">
             <div class="sim-controls">
                 <div class="control-group">
-                    <label style="color: var(--brand-orange);"><span>Азот ($N_2$):</span> <span id="val-sim-n2">0 моль</span></label>
+                    <label style="color: var(--brand-orange);"><span>Азот ($N_2$):</span> <span id="val-sim-n2">30 моль</span></label>
                     <input type="range" id="sim-n2" min="0" max="100" value="30" step="1">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-red);"><span>Кислород ($O_2$):</span> <span id="val-sim-o2">0 моль</span></label>
+                    <label style="color: var(--brand-red);"><span>Кислород ($O_2$):</span> <span id="val-sim-o2">10 моль</span></label>
                     <input type="range" id="sim-o2" min="0" max="100" value="10" step="1">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-cyan);"><span>Водяной пар ($H_2O$):</span> <span id="val-sim-h2o">0 моль</span></label>
-                    <input type="range" id="sim-h2o" min="0" max="100" value="20" step="1">
+                    <label style="color: var(--brand-cyan);"><span>Водяной пар ($H_2O$):</span> <span id="val-sim-h2o">10 моль</span></label>
+                    <input type="range" id="sim-h2o" min="0" max="50" value="10" step="1">
                 </div>
                 <div class="control-group">
                     <label style="color: var(--accent);"><span>Температура ($T$):</span> <span id="val-sim-temp">300 К</span></label>
                     <input type="range" id="sim-temp" min="270" max="350" value="300" step="5">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Объем сосуда ($V$):</span> <span id="val-sim-v">100 л</span></label>
+                    <input type="range" id="sim-v" min="50" max="250" value="100" step="10">
                 </div>
             </div>
 
@@ -232,14 +236,18 @@
                     <div class="dashboard-label">P общее (Дальтон)</div>
                     <div class="dashboard-value" id="dash-p-total" style="color: #fff;">0 кПа</div>
                 </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Абс. влажность ($\rho$)</div>
+                    <div class="dashboard-value" id="dash-rho" style="color: var(--text-muted);">0 г/л</div>
+                </div>
                 <div class="dashboard-item" style="border: 1px solid var(--brand-blue); background: rgba(59, 130, 246, 0.1);">
-                    <div class="dashboard-label">Влажность ($\varphi$)</div>
+                    <div class="dashboard-label">Отн. влажность ($\varphi$)</div>
                     <div class="dashboard-value" id="dash-humidity" style="color: var(--brand-blue);">0 %</div>
                 </div>
             </div>
 
             <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
-                <canvas id="canvas-gas" width="600" height="350" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
+                <canvas id="canvas-gas" width="600" height="300" style="background: transparent; border-radius: 8px; border: 1px solid #333;"></canvas>
             </div>
             
             <div id="condensation-warning" style="text-align: center; margin-top: 15px; font-weight: bold; color: var(--brand-blue); display: none;">
@@ -374,38 +382,38 @@
         const inO2 = document.getElementById('sim-o2');
         const inH2O = document.getElementById('sim-h2o');
         const inTemp = document.getElementById('sim-temp');
+        const inV = document.getElementById('sim-v');
         
         // Displays
         const valN2 = document.getElementById('val-sim-n2');
         const valO2 = document.getElementById('val-sim-o2');
         const valH2O = document.getElementById('val-sim-h2o');
         const valTemp = document.getElementById('val-sim-temp');
+        const valV = document.getElementById('val-sim-v');
         
         const dashPN2 = document.getElementById('dash-p-n2');
         const dashPO2 = document.getElementById('dash-p-o2');
         const dashPH2O = document.getElementById('dash-p-h2o');
         const dashPTotal = document.getElementById('dash-p-total');
+        const dashRho = document.getElementById('dash-rho');
         const dashHumidity = document.getElementById('dash-humidity');
         const warningCondensation = document.getElementById('condensation-warning');
 
-        // Physics Constants (Simplified for visualization scale)
+        // Physics Constants
         const R = 8.31;
-        const V = 100; // Fake volume scale
+        let currentBoxWidth = 600; // Визуальная ширина контейнера
         
-        // Approximated Saturated Vapor Pressure Curve (Magnus-Tetens formula simplified)
-        // Returns pressure in visual units
+        // Approximated Saturated Vapor Pressure Curve
+        // Настроено так, чтобы был красивый игровой баланс
         function getPSat(T) {
-            // T in Kelvin. Convert to Celsius
             const Tc = T - 273.15;
-            // Using a simplified exponential curve for visual effect in the 270-350K range
-            // pSat roughly doubles every 10 degrees.
-            const baseP = 0.6; // pressure at 0C (273K)
-            return baseP * Math.exp(0.06 * Tc) * 15; // Scaled for UI
+            // Экспоненциальный рост давления насыщенного пара от температуры
+            return 100 * Math.exp(0.04 * Tc); 
         }
 
         // Particle System
         let particles = [];
-        let droplets = []; // Water droplets at the bottom
+        let droplets = []; 
 
         // Colors
         const colorN2 = '#F97316'; // Orange
@@ -417,7 +425,7 @@
             const addP = (count, color, mass) => {
                 for(let i=0; i<count; i++) {
                     particles.push({
-                        x: Math.random() * (canvas.width - 20) + 10,
+                        x: Math.random() * (currentBoxWidth - 20) + 10,
                         y: Math.random() * (canvas.height - 40) + 10,
                         vx: (Math.random() - 0.5) * 4,
                         vy: (Math.random() - 0.5) * 4,
@@ -437,12 +445,18 @@
             const nO2 = parseInt(inO2.value);
             const nH2O_total = parseInt(inH2O.value);
             const T = parseInt(inTemp.value);
+            const V = parseInt(inV.value);
+
+            // Обновляем визуальный поршень. V меняется от 50 до 250.
+            // При V=250 ширина равна 600. При V=50 ширина равна 120.
+            currentBoxWidth = 120 + ((V - 50) / 200) * 480;
 
             // Update Labels
             valN2.textContent = nN2 + ' моль';
             valO2.textContent = nO2 + ' моль';
             valH2O.textContent = nH2O_total + ' моль';
             valTemp.textContent = T + ' К';
+            valV.textContent = V + ' л';
 
             // Calculate pressures
             const pN2 = (nN2 * R * T) / V;
@@ -460,11 +474,11 @@
             if (humidity >= 100) {
                 humidity = 100;
                 pH2O_actual = pSat;
-                // How many moles can exist as gas?
+                // Сколько молей может остаться в виде газа?
                 nH2O_gas = (pSat * V) / (R * T);
                 nH2O_liquid = nH2O_total - nH2O_gas;
                 warningCondensation.style.display = 'block';
-                dashHumidity.style.color = '#EF4444'; // Red when saturated
+                dashHumidity.style.color = '#EF4444'; 
                 dashHumidity.parentElement.style.borderColor = '#EF4444';
             } else {
                 warningCondensation.style.display = 'none';
@@ -473,39 +487,39 @@
             }
 
             const pTotal = pN2 + pO2 + pH2O_actual;
+            const absoluteHumidity = (nH2O_gas * 18) / V; // г/л
 
             // Update Dashboards
             dashPN2.textContent = pN2.toFixed(0) + ' кПа';
             dashPO2.textContent = pO2.toFixed(0) + ' кПа';
             dashPH2O.textContent = pH2O_actual.toFixed(0) + ' кПа';
             dashPTotal.textContent = pTotal.toFixed(0) + ' кПа';
+            dashRho.textContent = absoluteHumidity.toFixed(1) + ' г/л';
             dashHumidity.textContent = humidity.toFixed(1) + ' %';
 
-            // Update visual particles
-            // We scale down the numbers for visual clarity (so it doesn't lag)
+            // Визуальный скейл для частиц
             const visualScale = 0.5;
             initParticles(nN2 * visualScale, nO2 * visualScale, nH2O_gas * visualScale);
             
-            // Setup droplets
+            // Создаем капли конденсата на дне
             droplets = [];
             if (nH2O_liquid > 0) {
                 for(let i=0; i < nH2O_liquid * visualScale * 2; i++) {
                     droplets.push({
-                        x: Math.random() * (canvas.width - 20) + 10,
+                        x: Math.random() * (currentBoxWidth - 20) + 10,
                         y: canvas.height - Math.random() * 15 - 5,
                         width: Math.random() * 20 + 10
                     });
                 }
             }
 
-            // Update speeds based on T
+            // Настройка скоростей молекул от Температуры
             const speedMultiplier = Math.sqrt(T / 300);
             particles.forEach(p => {
                 const speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
                 if(speed > 0) {
                     const normVx = p.vx / speed;
                     const normVy = p.vy / speed;
-                    // Base speed roughly 2
                     p.vx = normVx * 2 * speedMultiplier;
                     p.vy = normVy * 2 * speedMultiplier;
                 }
@@ -515,14 +529,32 @@
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw droplets (condensation) at bottom
+            // Отрисовка внутреннего пространства газа
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, currentBoxWidth, canvas.height);
+
+            // Отрисовка поршня / стенки
+            ctx.fillStyle = '#2a2a2a'; // Твердое тело поршня
+            ctx.fillRect(currentBoxWidth, 0, canvas.width - currentBoxWidth, canvas.height);
+            
+            // Линия соприкосновения
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(currentBoxWidth, 0);
+            ctx.lineTo(currentBoxWidth, canvas.height);
+            ctx.stroke();
+
+            // Ручка поршня (визуальный эффект)
+            ctx.fillStyle = '#444';
+            ctx.fillRect(currentBoxWidth + (canvas.width - currentBoxWidth)/2 - 10, canvas.height/2 - 40, 20, 80);
+
+            // Капли конденсата на дне
             if (droplets.length > 0) {
-                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)'; // Cyan liquid pool
-                // Draw a dynamic pool
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)'; 
                 const poolHeight = Math.min(30, droplets.length / 2);
-                ctx.fillRect(0, canvas.height - poolHeight, canvas.width, poolHeight);
+                ctx.fillRect(0, canvas.height - poolHeight, currentBoxWidth, poolHeight);
                 
-                // Draw individual drops
                 ctx.fillStyle = 'rgba(6, 182, 212, 0.8)';
                 droplets.forEach(d => {
                     ctx.beginPath();
@@ -531,7 +563,7 @@
                 });
             }
 
-            // Draw and update gas particles
+            // Обновление и отрисовка газа
             const poolHeight = droplets.length > 0 ? Math.min(30, droplets.length / 2) : 0;
             const floorY = canvas.height - poolHeight;
 
@@ -539,9 +571,9 @@
                 p.x += p.vx;
                 p.y += p.vy;
 
-                // Bounce off walls
+                // Столкновения со стенками (с учетом текущего объема)
                 if (p.x - p.radius < 0) { p.x = p.radius; p.vx *= -1; }
-                if (p.x + p.radius > canvas.width) { p.x = canvas.width - p.radius; p.vx *= -1; }
+                if (p.x + p.radius > currentBoxWidth) { p.x = currentBoxWidth - p.radius; p.vx *= -1; }
                 if (p.y - p.radius < 0) { p.y = p.radius; p.vy *= -1; }
                 if (p.y + p.radius > floorY) { p.y = floorY - p.radius; p.vy *= -1; }
 
@@ -559,6 +591,7 @@
         inO2.addEventListener('input', updatePhysics);
         inH2O.addEventListener('input', updatePhysics);
         inTemp.addEventListener('input', updatePhysics);
+        inV.addEventListener('input', updatePhysics);
 
         // Start
         updatePhysics();
