@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Конденсаторы и электроёмкость</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+            --brand-orange: #F97316;
+            --brand-cyan: #06B6D4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        
+        .process-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 200px; text-align: center; font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .process-btn.active {
+            background: rgba(59, 130, 246, 0.1); border-color: var(--brand-blue); color: var(--brand-blue); font-weight: bold;
+        }
+
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; transition: color 0.3s; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Конденсаторы и электроёмкость</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Конденсатор — это устройство для накопления электрического заряда и энергии поля. Представьте его как "электрическое ведро". Чем больше ведро (ёмкость), тем больше воды (заряда) в него поместится при том же давлении (напряжении).</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="battery-charging"></i> 1. Электроёмкость ($C$)</h2>
+        <div class="card">
+            <p>Электроёмкость характеризует способность проводника или системы проводников накапливать электрический заряд.</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$C = \frac{q}{U}$$
+            </div>
+            <ul>
+                <li>$C$ – электроёмкость. Измеряется в <b>Фарадах (Ф)</b>. 1 Фарад — это очень много, поэтому обычно используют микрофарады ($1\text{ мкФ} = 10^{-6}\text{ Ф}$) или пикофарады ($1\text{ пФ} = 10^{-12}\text{ Ф}$).</li>
+                <li>$q$ – заряд конденсатора (Кл). <br><span style="color: var(--warn-text); font-size: 0.9rem;">Важно: Под зарядом конденсатора понимается модуль заряда <b>только одной</b> из его обкладок (например, если на пластинах $+5$ мкКл и $-5$ мкКл, то $q = 5$ мкКл, а не $10$ и не $0$).</span></li>
+                <li>$U$ – напряжение (разность потенциалов) между обкладками (В).</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 2. Плоский конденсатор</h2>
+        <div class="card">
+            <p>Конденсатор состоит из двух проводников (обкладок), разделенных слоем диэлектрика. Для плоского конденсатора ёмкость зависит <b>только от его геометрии и материала</b> между пластинами:</p>
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Ёмкость плоского конденсатора</div>
+                    $$C = \frac{\varepsilon \varepsilon_0 S}{d}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-purple);">
+                    <div style="font-size: 0.9rem; color: var(--brand-purple); margin-bottom: 5px;">Связь $E$ и $U$</div>
+                    $$U = E \cdot d$$
+                </div>
+            </div>
+            <ul>
+                <li>$\varepsilon$ – диэлектрическая проницаемость вещества (для воздуха/вакуума $\varepsilon = 1$).</li>
+                <li>$\varepsilon_0 \approx 8.85 \cdot 10^{-12}$ Ф/м – электрическая постоянная.</li>
+                <li>$S$ – площадь <b>перекрытия</b> обкладок (м²).</li>
+                <li>$d$ – расстояние между обкладками (м).</li>
+                <li>$E$ – напряженность однородного электрического поля внутри (В/м).</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="zap"></i> 3. Энергия заряженного конденсатора</h2>
+        <div class="card">
+            <p>Энергию электрического поля конденсатора ($W_c$) можно рассчитать по одной из трёх формул. Выбирайте удобную в зависимости от того, какие величины известны или постоянны в задаче:</p>
+            <div class="formula-grid">
+                <div class="formula-box">
+                    $$W_c = \frac{qU}{2}$$
+                </div>
+                <div class="formula-box">
+                    $$W_c = \frac{CU^2}{2}$$
+                </div>
+                <div class="formula-box">
+                    $$W_c = \frac{q^2}{2C}$$
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 4. Лаборатория: Динамика конденсатора</h2>
+        <p style="color: var(--text-muted);">В задачах ЕГЭ конденсатор всегда находится в одном из двух состояний. <br><b>Инструкция:</b> Выберите состояние ключа. Затем меняйте параметры конденсатора (сдвигайте пластины, вносите диэлектрик). Наблюдайте, как реагируют заряд $q$, напряжение $U$ и энергия $W$.</p>
+
+        <div class="simulator">
+            <div class="process-selector">
+                <div class="process-btn active" id="btn-state-connected" onclick="setCapacitorState('connected')">
+                    <div style="font-weight: bold; color: #fff; margin-bottom: 4px;">Подключён к источнику</div>
+                    <div style="font-family: monospace;">U = const</div>
+                </div>
+                <div class="process-btn" id="btn-state-disconnected" onclick="setCapacitorState('disconnected')">
+                    <div style="font-weight: bold; color: #fff; margin-bottom: 4px;">Заряжен и отключён</div>
+                    <div style="font-family: monospace;">q = const</div>
+                </div>
+            </div>
+
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--text-main);"><span>Расстояние ($d$):</span> <span id="val-d">1.0 у.е.</span></label>
+                    <input type="range" id="sim-d" min="0.5" max="3.0" value="1.0" step="0.1" style="accent-color: #fff;">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-cyan);"><span>Площадь ($S$):</span> <span id="val-s">1.0 у.е.</span></label>
+                    <input type="range" id="sim-s" min="0.5" max="2.0" value="1.0" step="0.1" style="accent-color: var(--brand-cyan);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-purple);"><span>Диэлектрик ($\varepsilon$):</span> <span id="val-eps">1.0 (Воздух)</span></label>
+                    <input type="range" id="sim-eps" min="1.0" max="5.0" value="1.0" step="0.5" style="accent-color: var(--brand-purple);">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Ёмкость ($C$)</div>
+                    <div class="dashboard-value" id="dash-c" style="color: var(--accent);">1.00 C₀</div>
+                </div>
+                <div class="dashboard-item" id="dash-container-u">
+                    <div class="dashboard-label">Напряжение ($U$)</div>
+                    <div class="dashboard-value" id="dash-u" style="color: var(--brand-blue);">1.00 U₀</div>
+                </div>
+                <div class="dashboard-item" id="dash-container-q">
+                    <div class="dashboard-label">Заряд ($q$)</div>
+                    <div class="dashboard-value" id="dash-q" style="color: var(--brand-red);">1.00 q₀</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Поле ($E$)</div>
+                    <div class="dashboard-value" id="dash-e" style="color: #fff;">1.00 E₀</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Энергия ($W$)</div>
+                    <div class="dashboard-value" id="dash-w" style="color: var(--brand-orange);">1.00 W₀</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-capacitor" width="600" height="250" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
+            </div>
+            
+            <p id="sim-explanation" style="text-align: center; color: var(--brand-blue); font-size: 0.9rem; margin-top: 15px; font-weight: 500;">
+                Источник поддерживает постоянное напряжение. Заряд может притекать или утекать.
+            </p>
+        </div>
+
+        <h2><i data-lucide="git-merge"></i> 5. Соединение конденсаторов</h2>
+        <div class="card table-container">
+            <p style="color: var(--warn-text); font-weight: bold; text-align: center; margin-top: 0;">Формулы для ёмкости обратны формулам для сопротивления резисторов!</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Тип соединения</th>
+                        <th>Параллельное</th>
+                        <th>Последовательное</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Как выглядит</strong></td>
+                        <td>Пластины соединены "плюс к плюсу", "минус к минусу".</td>
+                        <td>Соединены друг за другом (цепочкой).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Цель</strong></td>
+                        <td>Для <b>увеличения</b> общей ёмкости.</td>
+                        <td>Для <b>распределения</b> напряжения.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Что одинаково?</strong></td>
+                        <td style="color: var(--brand-blue); font-weight: bold;">Напряжение: $U = U_1 = U_2$</td>
+                        <td style="color: var(--brand-red); font-weight: bold;">Заряд: $q = q_1 = q_2$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Сумма</strong></td>
+                        <td>$q = q_1 + q_2$</td>
+                        <td>$U = U_1 + U_2$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Общая ёмкость</strong></td>
+                        <td style="font-weight: bold; font-size: 1.1rem; color: var(--accent);">$C_{общ} = C_1 + C_2$</td>
+                        <td style="font-weight: bold; font-size: 1.1rem;">$\frac{1}{C_{общ}} = \frac{1}{C_1} + \frac{1}{C_2}$</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Постоянный ток:</strong> В установившемся режиме (после зарядки) постоянный ток через конденсатор <b>не течёт</b>. Он работает как разрыв цепи. Резистор, подключенный последовательно с конденсатором, ток не пропускает (напряжение на таком резисторе равно 0).</li>
+                    <li><strong>Выбор формулы энергии:</strong> Если $q = const$ (отключен), используй $W = \frac{q^2}{2C}$. Если $U = const$ (подключен), используй $W = \frac{CU^2}{2}$. Так тебе не придется думать, как меняются два параметра одновременно.</li>
+                    <li><strong>Диэлектрик всегда увеличивает:</strong> Если вставить диэлектрик ($\varepsilon > 1$), ёмкость $C$ <b>всегда</b> увеличивается в $\varepsilon$ раз.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Площадь $S$:</strong> Забывают, что $S$ — это площадь <b>перекрытия</b> пластин. Если одну пластину сдвинуть вбок наполовину, "рабочая" площадь уменьшится вдвое, и ёмкость упадет в 2 раза.</li>
+                    <li><strong>Изменение параметров:</strong> Пытаются сказать, как изменится заряд, не проверив состояние ключа. Всегда начинай задачу с вопроса: "Что здесь константа: $q$ или $U$?".</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Изменение параметров</h3>
+            <p>Плоский воздушный конденсатор зарядили и отключили от источника постоянного напряжения, а затем увеличили расстояние между его обкладками в 2 раза. Как изменятся при этом ёмкость конденсатора, напряжение на нём и напряжённость электрического поля?</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Конденсатор <i>отключен</i>. Значит заряду некуда уйти, $q = const$. Сначала напиши формулу для ёмкости $C$ через параметры $d$ и $S$. Пойми, что стало с $C$. Затем из формулы $C = q/U$ вырази напряжение $U$. Наконец, напряженность найди как $E = U/d$.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Конденсатор отключен, следовательно заряд на обкладках постоянен: <br>
+                $$q = const$$</p>
+                
+                <p>2. Расстояние $d$ увеличилось в 2 раза. Из формулы плоского конденсатора:<br>
+                $$C = \frac{\varepsilon_0 S}{d}$$<br>
+                Знаменатель вырос в 2 раза, значит <b>ёмкость $C$ уменьшится в 2 раза</b>.</p>
+                
+                <p>3. Из определения ёмкости выразим напряжение:<br>
+                $$U = \frac{q}{C}$$<br>
+                Так как $q = const$, а ёмкость $C$ упала в 2 раза, то <b>напряжение $U$ увеличится в 2 раза</b>.</p>
+
+                <p>4. Напряженность поля связана с напряжением:<br>
+                $$E = \frac{U}{d}$$<br>
+                Числитель $U$ вырос в 2 раза, знаменатель $d$ тоже вырос в 2 раза. Следовательно, <b>напряженность $E$ не изменится</b>.</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: Ёмкость уменьшится, напряжение увеличится, напряженность не изменится.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР: КОНДЕНСАТОР
+           ========================================== */
+        const canvas = document.getElementById('canvas-capacitor');
+        const ctx = canvas.getContext('2d');
+        
+        // Инпуты
+        const inD = document.getElementById('sim-d');
+        const inS = document.getElementById('sim-s');
+        const inEps = document.getElementById('sim-eps');
+        
+        // Лейблы
+        const valD = document.getElementById('val-d');
+        const valS = document.getElementById('val-s');
+        const valEps = document.getElementById('val-eps');
+        
+        // Дашборды
+        const dashC = document.getElementById('dash-c');
+        const dashU = document.getElementById('dash-u');
+        const dashQ = document.getElementById('dash-q');
+        const dashE = document.getElementById('dash-e');
+        const dashW = document.getElementById('dash-w');
+        
+        const dashContainerU = document.getElementById('dash-container-u');
+        const dashContainerQ = document.getElementById('dash-container-q');
+        const simExplanation = document.getElementById('sim-explanation');
+
+        let capState = 'connected'; // 'connected' or 'disconnected'
+        
+        // Значения при фиксации состояния (нужны для расчета относительных изменений)
+        let C_fixed = 1;
+        let d_fixed = 1;
+        let S_fixed = 1;
+        let eps_fixed = 1;
+
+        function setCapacitorState(newState) {
+            capState = newMode = newState;
+            
+            // UI кнопки
+            document.querySelectorAll('.process-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderColor = "var(--border)";
+            });
+            const activeBtn = document.getElementById(`btn-state-${newState}`);
+            activeBtn.classList.add('active');
+            
+            // Логика UI
+            if (newState === 'connected') {
+                activeBtn.style.borderColor = "var(--brand-blue)";
+                dashContainerU.style.border = "1px solid var(--brand-blue)";
+                dashContainerU.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                dashContainerQ.style.border = "none";
+                dashContainerQ.style.backgroundColor = "transparent";
+                simExplanation.textContent = "Источник поддерживает постоянное напряжение (U = const). Заряд может притекать или утекать.";
+                simExplanation.style.color = "var(--brand-blue)";
+            } else {
+                activeBtn.style.borderColor = "var(--brand-red)";
+                dashContainerQ.style.border = "1px solid var(--brand-red)";
+                dashContainerQ.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+                dashContainerU.style.border = "none";
+                dashContainerU.style.backgroundColor = "transparent";
+                simExplanation.textContent = "Конденсатор отключен от цепи. Зарядам некуда деться (q = const). Напряжение может меняться.";
+                simExplanation.style.color = "var(--brand-red)";
+            }
+
+            // "Сбрасываем" систему до начального состояния 1.0 (фиксируем момент отключения/подключения)
+            d_fixed = parseFloat(inD.value);
+            S_fixed = parseFloat(inS.value);
+            eps_fixed = parseFloat(inEps.value);
+            C_fixed = (eps_fixed * S_fixed) / d_fixed;
+
+            updatePhysics();
+        }
+
+        // Helper для стрелочек
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headlen = 8;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+        }
+
+        function updatePhysics() {
+            const d = parseFloat(inD.value);
+            const S = parseFloat(inS.value);
+            const eps = parseFloat(inEps.value);
+
+            // Обновляем лейблы инпутов
+            valD.textContent = d.toFixed(1) + ' у.е.';
+            valS.textContent = S.toFixed(1) + ' у.е.';
+            let epsLabel = eps.toFixed(1);
+            if (eps === 1) epsLabel += " (Воздух)";
+            if (eps >= 2 && eps < 3) epsLabel += " (Бумага)";
+            if (eps >= 3 && eps < 5) epsLabel += " (Стекло)";
+            if (eps === 5) epsLabel += " (Слюда)";
+            valEps.textContent = epsLabel;
+
+            // РАСЧЕТ ФИЗИКИ (в относительных единицах, базовое = 1.0)
+            const C_current = (eps * S) / d;
+            
+            // Относительная емкость по сравнению с моментом переключения ключа
+            const C_rel = C_current / C_fixed; 
+
+            let U_rel = 1.0;
+            let q_rel = 1.0;
+
+            if (capState === 'connected') {
+                U_rel = 1.0; // U = const
+                q_rel = C_rel * U_rel; // q = CU
+            } else {
+                q_rel = 1.0; // q = const
+                U_rel = q_rel / C_rel; // U = q/C
+            }
+
+            // E = U/d (Относительное расстояние тоже нужно учесть)
+            const E_rel = U_rel / (d / d_fixed);
+
+            // Энергия
+            let W_rel = 1.0;
+            if (capState === 'connected') {
+                W_rel = C_rel * U_rel * U_rel; // W ~ C*U^2 (U=const -> W ~ C)
+            } else {
+                W_rel = (q_rel * q_rel) / C_rel; // W ~ q^2/C (q=const -> W ~ 1/C)
+            }
+
+            // Обновляем дашборды
+            dashC.textContent = C_rel.toFixed(2) + ' C₀';
+            dashU.textContent = U_rel.toFixed(2) + ' U₀';
+            dashQ.textContent = q_rel.toFixed(2) + ' q₀';
+            dashE.textContent = E_rel.toFixed(2) + ' E₀';
+            dashW.textContent = W_rel.toFixed(2) + ' W₀';
+            
+            // Подсветка изменений
+            dashU.style.color = U_rel === 1.0 ? 'var(--brand-blue)' : (U_rel > 1.0 ? 'var(--error-text)' : 'var(--accent)');
+            dashQ.style.color = q_rel === 1.0 ? 'var(--brand-red)' : (q_rel > 1.0 ? 'var(--accent)' : 'var(--error-text)');
+
+            drawCanvas(d, S, eps, q_rel, E_rel, U_rel);
+        }
+
+        function drawCanvas(d, S, eps, q_rel, E_rel, U_rel) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            // Визуальный маппинг
+            // d: 0.5 - 3.0 -> 30px - 150px
+            const d_px = 30 + ((d - 0.5) / 2.5) * 120;
+            
+            // S: 0.5 - 2.0 -> 80px - 200px
+            const s_px = 80 + ((S - 0.5) / 1.5) * 120;
+
+            const plateWidth = s_px;
+            const plateThickness = 12;
+            const topY = cy - d_px / 2 - plateThickness;
+            const botY = cy + d_px / 2;
+
+            // 1. Отрисовка проводов и источника (если подключен)
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            if (capState === 'connected') {
+                // Провода к источнику
+                ctx.moveTo(cx, topY); ctx.lineTo(cx, 20); ctx.lineTo(50, 20); ctx.lineTo(50, cy - 20);
+                ctx.moveTo(cx, botY + plateThickness); ctx.lineTo(cx, canvas.height - 20); ctx.lineTo(50, canvas.height - 20); ctx.lineTo(50, cy + 20);
+                ctx.stroke();
+
+                // Рисуем батарейку слева
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText('U', 25, cy);
+                ctx.lineWidth = 2; ctx.strokeStyle = '#4CAF50';
+                ctx.beginPath(); ctx.moveTo(35, cy - 20); ctx.lineTo(65, cy - 20); ctx.stroke(); // Плюс
+                ctx.lineWidth = 4; ctx.strokeStyle = '#3B82F6';
+                ctx.beginPath(); ctx.moveTo(40, cy + 20); ctx.lineTo(60, cy + 20); ctx.stroke(); // Минус
+            } else {
+                // Оборванные провода
+                ctx.moveTo(cx, topY); ctx.lineTo(cx, topY - 30);
+                ctx.moveTo(cx, botY + plateThickness); ctx.lineTo(cx, botY + plateThickness + 30);
+                ctx.stroke();
+            }
+
+            // 2. Отрисовка диэлектрика
+            if (eps > 1.0) {
+                // Интенсивность цвета зависит от eps
+                const alpha = Math.min((eps - 1) * 0.15 + 0.1, 0.7);
+                ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
+                ctx.fillRect(cx - plateWidth / 2, cy - d_px / 2, plateWidth, d_px);
+                
+                // Подпись диэлектрика
+                ctx.fillStyle = `rgba(139, 92, 246, 0.8)`;
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('ε', cx - plateWidth/2 - 15, cy);
+            }
+
+            // 3. Линии поля E (количество и густота зависят от E_rel)
+            const numLines = Math.max(3, Math.floor(7 * E_rel));
+            if (E_rel > 0.05 && q_rel > 0) {
+                const spacing = plateWidth / (numLines + 1);
+                for (let i = 1; i <= numLines; i++) {
+                    const lx = cx - plateWidth / 2 + i * spacing;
+                    // Рисуем стрелочки сверху вниз (от + к -)
+                    drawArrow(ctx, lx, cy - d_px / 2 + 5, lx, cy + d_px / 2 - 5, 'rgba(255,255,255,0.3)');
+                }
+            }
+
+            // 4. Пластины
+            // Верхняя (+)
+            ctx.fillStyle = '#EF4444'; // Red for positive
+            ctx.fillRect(cx - plateWidth / 2, topY, plateWidth, plateThickness);
+            
+            // Нижняя (-)
+            ctx.fillStyle = '#3B82F6'; // Blue for negative
+            ctx.fillRect(cx - plateWidth / 2, botY, plateWidth, plateThickness);
+
+            // 5. Заряды (плюсики и минусы)
+            // Плотность зарядов зависит от q_rel
+            const numCharges = Math.max(0, Math.min(10, Math.floor(5 * q_rel)));
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (numCharges > 0) {
+                const qSpacing = plateWidth / (numCharges + 1);
+                for (let i = 1; i <= numCharges; i++) {
+                    const qx = cx - plateWidth / 2 + i * qSpacing;
+                    ctx.fillText('+', qx, topY + plateThickness / 2 + 1);
+                    ctx.fillText('-', qx, botY + plateThickness / 2);
+                }
+            }
+            
+            // 6. Подписи D и S
+            // Линейка для D
+            const rightX = cx + plateWidth/2 + 20;
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(rightX - 5, cy - d_px/2); ctx.lineTo(rightX + 5, cy - d_px/2);
+            ctx.moveTo(rightX - 5, cy + d_px/2); ctx.lineTo(rightX + 5, cy + d_px/2);
+            ctx.moveTo(rightX, cy - d_px/2); ctx.lineTo(rightX, cy + d_px/2);
+            ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.fillText('d', rightX + 15, cy);
+
+            // Линейка для S
+            ctx.beginPath();
+            const sY = topY - 15;
+            ctx.moveTo(cx - plateWidth/2, sY - 5); ctx.lineTo(cx - plateWidth/2, sY + 5);
+            ctx.moveTo(cx + plateWidth/2, sY - 5); ctx.lineTo(cx + plateWidth/2, sY + 5);
+            ctx.moveTo(cx - plateWidth/2, sY); ctx.lineTo(cx + plateWidth/2, sY);
+            ctx.stroke();
+            ctx.fillStyle = 'var(--brand-cyan)'; ctx.fillText('S', cx, sY - 10);
+            
+            // Вольтметр
+            if(capState === 'disconnected') {
+                ctx.fillStyle = 'var(--brand-blue)';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText(`U = ${U_rel.toFixed(1)} U₀`, cx, canvas.height - 15);
+            }
+        }
+
+        // Привязка событий
+        inD.addEventListener('input', updatePhysics);
+        inS.addEventListener('input', updatePhysics);
+        inEps.addEventListener('input', updatePhysics);
+
+        // Инициализация
+        setCapacitorState('connected');
+
+    </script>
+</body>
+</html>
