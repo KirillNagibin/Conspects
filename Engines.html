@@ -91,6 +91,14 @@
 
         /* Симулятор */
         .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .process-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 150px; text-align: center; font-size: 0.9rem;
+        }
+        .process-btn.active {
+            background: rgba(76, 175, 80, 0.1); border-color: var(--accent); color: var(--accent); font-weight: bold;
+        }
         .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .control-group { display: flex; flex-direction: column; gap: 5px; }
         .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
@@ -207,53 +215,67 @@
                         <td><strong style="color: var(--brand-blue);">Холодильник (обратный процесс)</strong></td>
                         <td>Электрический компрессор (работа)</td>
                         <td>Фреон (хладагент)</td>
-                        <td>Внутренняя камера (забираем тепло)</td>
+                        <td>Внутренняя камера (тепло забирают)</td>
                     </tr>
                 </tbody>
             </table>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 15px;">* Холодильник и тепловой насос работают по обратному циклу: мы совершаем работу (тратим электричество), чтобы забрать тепло от холодного тела и передать горячему (радиатору на задней стенке).</p>
         </div>
 
-        <h2><i data-lucide="cpu"></i> 4. Лаборатория: Энергетические потоки (Цикл Карно)</h2>
-        <p style="color: var(--text-muted);">Настройте температуры нагревателя и холодильника. Симулятор рассчитывает идеальный двигатель Карно. Наблюдайте, как распределяются потоки энергии: ширина стрелок пропорциональна количеству джоулей.</p>
+        <h2><i data-lucide="cpu"></i> 4. Лаборатория: Энергетические потоки</h2>
+        <p style="color: var(--text-muted);">Выберите режим работы. В реальном двигателе вы оперируете тепловыми потоками (Первый закон термодинамики). В идеальном двигателе Карно предельный КПД жестко задается температурами (Второй закон термодинамики).</p>
 
         <div class="simulator">
-            <div class="sim-controls">
+            <div class="process-selector">
+                <div class="process-btn active" id="btn-mode-real" onclick="setEngineMode('real')">Реальный двигатель (через Q)</div>
+                <div class="process-btn" id="btn-mode-ideal" onclick="setEngineMode('ideal')">Идеальный двигатель (через T)</div>
+            </div>
+
+            <!-- Управление для реального двигателя -->
+            <div class="sim-controls" id="controls-real">
                 <div class="control-group">
-                    <label style="color: var(--brand-red);">Темп. Нагревателя ($T_н$): <span id="val-th">800 К</span></label>
-                    <input type="range" id="sim-th" min="300" max="1500" value="800" step="10">
+                    <label style="color: var(--brand-red);">Получено тепла (Q<sub>н</sub>): <span id="val-real-qh">1000 Дж</span></label>
+                    <input type="range" id="sim-real-qh" min="100" max="2000" value="1000" step="50">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-blue);">Темп. Холодильника ($T_х$): <span id="val-tc">300 К</span></label>
-                    <input type="range" id="sim-tc" min="100" max="500" value="300" step="10">
+                    <label style="color: var(--brand-blue);">Отдано тепла (Q<sub>х</sub>): <span id="val-real-qc">600 Дж</span></label>
+                    <input type="range" id="sim-real-qc" min="0" max="1950" value="600" step="50">
+                </div>
+            </div>
+
+            <!-- Управление для цикла Карно -->
+            <div class="sim-controls" id="controls-ideal" style="display: none;">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);">Темп. Нагревателя (T<sub>н</sub>): <span id="val-ideal-th">800 К</span></label>
+                    <input type="range" id="sim-ideal-th" min="300" max="1500" value="800" step="10">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);">Темп. Холодильника (T<sub>х</sub>): <span id="val-ideal-tc">300 К</span></label>
+                    <input type="range" id="sim-ideal-tc" min="100" max="500" value="300" step="10">
                 </div>
                 <div class="control-group" style="grid-column: 1 / -1;">
-                    <label style="color: var(--accent);">Получено тепла ($Q_н$): <span id="val-qh">1000 Дж</span></label>
-                    <input type="range" id="sim-qh" min="100" max="2000" value="1000" step="50">
+                    <label style="color: var(--accent);">Потребление (Q<sub>н</sub>): <span id="val-ideal-qh">1000 Дж</span></label>
+                    <input type="range" id="sim-ideal-qh" min="100" max="2000" value="1000" step="50">
                 </div>
             </div>
 
             <div class="dashboard-grid">
                 <div class="dashboard-item">
-                    <div class="dashboard-label">КПД ($\eta_{макс}$)</div>
-                    <div class="dashboard-value" id="dash-eff" style="color: #fff;">62.5%</div>
+                    <div class="dashboard-label">КПД (&eta;)</div>
+                    <div class="dashboard-value" id="dash-eff" style="color: #fff;">40.0%</div>
                 </div>
                 <div class="dashboard-item">
-                    <div class="dashboard-label">Полезная работа ($A$)</div>
-                    <div class="dashboard-value" id="dash-a" style="color: var(--accent);">625 Дж</div>
+                    <div class="dashboard-label">Полезная работа (A)</div>
+                    <div class="dashboard-value" id="dash-a" style="color: var(--accent);">400 Дж</div>
                 </div>
                 <div class="dashboard-item">
-                    <div class="dashboard-label">Потери ($Q_х$)</div>
-                    <div class="dashboard-value" id="dash-qc" style="color: var(--brand-blue);">375 Дж</div>
+                    <div class="dashboard-label">Потери (Q<sub>х</sub>)</div>
+                    <div class="dashboard-value" id="dash-qc" style="color: var(--brand-blue);">600 Дж</div>
                 </div>
             </div>
 
             <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
                 <canvas id="canvas-engine" width="600" height="400" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
             </div>
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 15px;">
-                Вывод: Чтобы повысить КПД, нужно увеличивать разницу температур (греть сильнее или охлаждать сильнее). Но 100% КПД достичь невозможно, так как нельзя охладить холодильник до Абсолютного нуля (0 Кельвинов).
-            </p>
         </div>
 
         <h2><i data-lucide="lightbulb"></i> 5. Секреты и Ловушки</h2>
@@ -311,7 +333,7 @@
                 <p>3. Переведем в проценты:<br>
                 $$\eta \approx 33\%$$</p>
                 
-                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: $A = 200$ Дж, $\eta = 33\%$</div>
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: A = 200 Дж, &eta; = 33%</div>
             </div>
         </div>
 
@@ -351,12 +373,10 @@
     </div>
 
     <script>
-        // Initialize Icons
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
 
-        // Safe MathJax rendering
         function forceMathJaxRender() {
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise().catch(err => console.error(err));
@@ -378,18 +398,26 @@
             }
         }
 
-        // --- HEAT ENGINE SIMULATOR (Sankey-style flow) ---
         const canvas = document.getElementById('canvas-engine');
         const ctx = canvas.getContext('2d');
         
-        const elTh = document.getElementById('sim-th');
-        const elTc = document.getElementById('sim-tc');
-        const elQh = document.getElementById('sim-qh');
+        let currentMode = 'real'; // 'real' or 'ideal'
+
+        // Real Mode elements
+        const elRealQh = document.getElementById('sim-real-qh');
+        const elRealQc = document.getElementById('sim-real-qc');
+        const valRealQh = document.getElementById('val-real-qh');
+        const valRealQc = document.getElementById('val-real-qc');
+
+        // Ideal Mode elements
+        const elIdealTh = document.getElementById('sim-ideal-th');
+        const elIdealTc = document.getElementById('sim-ideal-tc');
+        const elIdealQh = document.getElementById('sim-ideal-qh');
+        const valIdealTh = document.getElementById('val-ideal-th');
+        const valIdealTc = document.getElementById('val-ideal-tc');
+        const valIdealQh = document.getElementById('val-ideal-qh');
         
-        const valTh = document.getElementById('val-th');
-        const valTc = document.getElementById('val-tc');
-        const valQh = document.getElementById('val-qh');
-        
+        // Dashboard elements
         const dashEff = document.getElementById('dash-eff');
         const dashA = document.getElementById('dash-a');
         const dashQc = document.getElementById('dash-qc');
@@ -403,32 +431,70 @@
         const colWork = '#4CAF50';   // Green
         const colCooler = '#3B82F6'; // Blue
 
-        function updatePhysicsAndDraw() {
-            let Th = parseFloat(elTh.value);
-            let Tc = parseFloat(elTc.value);
-            let Qh = parseFloat(elQh.value);
+        function setEngineMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.process-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-mode-${mode}`).classList.add('active');
 
-            // Prevent Tc from being >= Th for logical consistency
-            if (Tc >= Th) {
-                Tc = Th - 10;
-                elTc.value = Tc;
+            if (mode === 'real') {
+                document.getElementById('controls-real').style.display = 'grid';
+                document.getElementById('controls-ideal').style.display = 'none';
+            } else {
+                document.getElementById('controls-real').style.display = 'none';
+                document.getElementById('controls-ideal').style.display = 'grid';
+            }
+        }
+
+        function updatePhysicsAndDraw() {
+            let Th = null;
+            let Tc = null;
+            let Qh = 1000;
+            let Qc = 0;
+            let A = 0;
+            let eff = 0;
+
+            // 1. Calculate Physics based on current mode
+            if (currentMode === 'real') {
+                Qh = parseFloat(elRealQh.value);
+                Qc = parseFloat(elRealQc.value);
+
+                // Prevent logical impossibility where Qc > Qh
+                if (Qc >= Qh) {
+                    Qc = Qh - 10;
+                    elRealQc.value = Qc;
+                }
+
+                A = Qh - Qc;
+                eff = A / Qh;
+
+                valRealQh.textContent = Qh.toFixed(0) + ' Дж';
+                valRealQc.textContent = Qc.toFixed(0) + ' Дж';
+            } else {
+                Th = parseFloat(elIdealTh.value);
+                Tc = parseFloat(elIdealTc.value);
+                Qh = parseFloat(elIdealQh.value);
+
+                // Prevent logical impossibility where Tc > Th
+                if (Tc >= Th) {
+                    Tc = Th - 10;
+                    elIdealTc.value = Tc;
+                }
+
+                eff = 1 - (Tc / Th);
+                A = Qh * eff;
+                Qc = Qh - A;
+
+                valIdealTh.textContent = Th.toFixed(0) + ' К';
+                valIdealTc.textContent = Tc.toFixed(0) + ' К';
+                valIdealQh.textContent = Qh.toFixed(0) + ' Дж';
             }
 
-            // Calculate Physics
-            const eff = 1 - (Tc / Th);
-            const A = Qh * eff;
-            const Qc = Qh - A;
-
-            // Update DOM
-            valTh.textContent = Th.toFixed(0) + ' К';
-            valTc.textContent = Tc.toFixed(0) + ' К';
-            valQh.textContent = Qh.toFixed(0) + ' Дж';
-            
+            // Update Dashboard
             dashEff.textContent = (eff * 100).toFixed(1) + '%';
             dashA.textContent = A.toFixed(0) + ' Дж';
             dashQc.textContent = Qc.toFixed(0) + ' Дж';
 
-            // Draw Canvas
+            // 2. Draw Sankey Diagram on Canvas
             const w = canvas.width;
             const h = canvas.height;
             ctx.clearRect(0, 0, w, h);
@@ -439,18 +505,15 @@
             // Geometry bases
             const maxQWidth = 120; // max width of the pipe
             const qhWidth = (Qh / 2000) * maxQWidth + 20; 
-            const aWidth = qhWidth * eff;
-            const qcWidth = qhWidth * (1 - eff);
+            const aWidth = Math.max(qhWidth * eff, 5); // ensure at least 5px visible
+            const qcWidth = Math.max(qhWidth * (1 - eff), 5);
 
-            // 1. Draw Pipes (Sankey Flow)
-            // Main pipe from Heater
-            drawPipe(cx, 80, cx, cy - 40, qhWidth, colHeater);
-            // Pipe to Cooler
-            drawPipe(cx, cy + 40, cx, h - 80, qcWidth, colCooler);
-            // Pipe to Work
-            drawHorizontalPipe(cx + 40, cy, w - 80, cy, aWidth, colWork);
+            // Draw Pipes (Sankey Flow)
+            drawPipe(cx, 80, cx, cy - 40, qhWidth, colHeater); // Main pipe from Heater
+            drawPipe(cx, cy + 40, cx, h - 80, qcWidth, colCooler); // Pipe to Cooler
+            drawHorizontalPipe(cx + 40, cy, w - 80, cy, aWidth, colWork); // Pipe to Work
 
-            // 2. Draw Flow Animation (Dashed lines moving)
+            // Draw Flow Animation (Dashed lines moving)
             animationTime -= 1; // Speed of flow
             
             ctx.setLineDash([10, 10]);
@@ -471,11 +534,15 @@
             
             ctx.setLineDash([]); // Reset
 
-            // 3. Draw Blocks
-            // Heater Block
-            drawBlock(cx, 40, 200, 60, colHeater, 'Нагреватель', `T_н = ${Th} K`);
+            // Draw Blocks
+            // Heater Block (only show T if ideal)
+            const subHeater = Th ? `Tн = ${Th} K` : '';
+            drawBlock(cx, 40, 200, 60, colHeater, 'Нагреватель', subHeater);
+            
             // Cooler Block
-            drawBlock(cx, h - 40, 200, 60, colCooler, 'Холодильник', `T_х = ${Tc} K`);
+            const subCooler = Tc ? `Tх = ${Tc} K` : '';
+            drawBlock(cx, h - 40, 200, 60, colCooler, 'Холодильник', subCooler);
+            
             // Engine Block (Circle)
             ctx.beginPath();
             ctx.arc(cx, cy, 50, 0, Math.PI * 2);
@@ -494,8 +561,8 @@
             drawBlock(w - 40, cy, 80, aWidth + 40, colWork, 'A', `${A.toFixed(0)} Дж`);
 
             // Labels next to pipes
-            drawLabel(cx - qhWidth/2 - 30, cy - 50, `Q_н = ${Qh} Дж`, colHeater);
-            drawLabel(cx - qcWidth/2 - 30, cy + 50, `Q_х = ${Qc.toFixed(0)} Дж`, colCooler);
+            drawLabel(cx - qhWidth/2 - 35, cy - 50, `Qн = ${Qh.toFixed(0)} Дж`, colHeater);
+            drawLabel(cx - qcWidth/2 - 35, cy + 50, `Qх = ${Qc.toFixed(0)} Дж`, colCooler);
 
             reqId = requestAnimationFrame(updatePhysicsAndDraw);
         }
@@ -519,7 +586,6 @@
         }
 
         function drawPipe(x1, y1, x2, y2, width, color) {
-            // Faded background pipe
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -552,19 +618,14 @@
 
         function drawLabel(x, y, text, color) {
             ctx.fillStyle = '#111';
-            ctx.fillRect(x - 45, y - 12, 90, 24);
+            ctx.fillRect(x - 50, y - 12, 100, 24);
             ctx.fillStyle = color;
             ctx.font = '12px monospace';
             ctx.textAlign = 'center';
             ctx.fillText(text, x, y + 4);
         }
 
-        // Event Listeners
-        elTh.addEventListener('input', () => { /* Logic handled in loop */ });
-        elTc.addEventListener('input', () => { /* Logic handled in loop */ });
-        elQh.addEventListener('input', () => { /* Logic handled in loop */ });
-
-        // Start animation
+        // Start animation loop
         updatePhysicsAndDraw();
 
     </script>
