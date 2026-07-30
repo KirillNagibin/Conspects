@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Электрические заряды и закономерности их взаимодействия</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Simulator */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; touch-action: none; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+        
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .sim-controls { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Электрические заряды и закономерности их взаимодействия</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Этот раздел изучает фундаментальное свойство материи — электрический заряд, и то, как заряженные тела притягиваются или отталкиваются. Главные понятия здесь — Закон Кулона и принцип суперпозиции, описывающие электростатическое взаимодействие.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="zap"></i> 1. Что такое электрический заряд</h2>
+        <div class="card">
+            <p><strong>Электрический заряд ($q$)</strong> – это физическая величина, определяющая способность тел взаимодействовать электрическим образом.</p>
+            <ul>
+                <li>Единица измерения в СИ: <strong>Кулон (Кл)</strong>.</li>
+                <li>Заряды бывают двух видов: <strong>положительные (+)</strong> и <strong>отрицательные (−)</strong>.</li>
+                <li>Одноименные заряды отталкиваются, разноименные — притягиваются.</li>
+            </ul>
+            <p style="color: var(--text-muted);">Пример элементарных зарядов:</p>
+            <div class="formula-box">
+                Протон: $+e = +1.6 \cdot 10^{-19}$ Кл<br>
+                Электрон: $-e = -1.6 \cdot 10^{-19}$ Кл
+            </div>
+        </div>
+
+        <h2><i data-lucide="shield-check"></i> 2. Закон сохранения заряда и Электризация</h2>
+        <div class="card">
+            <p><strong>Закон сохранения электрического заряда:</strong> В изолированной системе алгебраическая сумма зарядов постоянна.</p>
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$\sum q = q_1 + q_2 + \dots = \text{const}$$
+            </div>
+            <p style="color: var(--text-muted);">Заряд не может появиться или исчезнуть, он только переходит от одного тела к другому. Если тело А ($+3$ нКл) коснулось тела В ($-1$ нКл) и заряд распределился поровну, то общий заряд останется ($+2$ нКл), просто разделится между ними (по $+1$ нКл на каждом).</p>
+
+            <h3 style="margin-top: 25px;">Электризация тел</h3>
+            <p>Электризация – это процесс сообщения телу электрического заряда. Основные способы:</p>
+            <ul>
+                <li><strong>Трение:</strong> перенос электронов с одного тела на другое (напр., стекло и шелк).</li>
+                <li><strong>Контакт (Соприкосновение):</strong> передача заряда при касании заряженного тела с незаряженным.</li>
+                <li><strong>Электростатическая индукция (влияние):</strong> перераспределение зарядов внутри тела под действием внешнего поля <i>без касания</i>. Внешнее поле притягивает заряды одного знака и отталкивает другого, создавая локальные области заряда, хотя тело в целом остается нейтральным.</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="magnet"></i> 3. Закон Кулона</h2>
+        <div class="card">
+            <p>Две точечные заряженные частицы взаимодействуют с силой, прямо пропорциональной произведению модулей зарядов и обратно пропорциональной квадрату расстояния между ними.</p>
+            <div class="formula-box" style="border-color: var(--brand-red);">
+                $$F = k \frac{|q_1| |q_2|}{r^2}$$
+            </div>
+            <ul>
+                <li>$F$ – сила взаимодействия (Н).</li>
+                <li>$q_1, q_2$ – заряды (Кл).</li>
+                <li>$r$ – расстояние между зарядами (м).</li>
+                <li>$k \approx 9 \cdot 10^9$ Н·м²/Кл² — электрическая постоянная (коэффициент пропорциональности).</li>
+            </ul>
+            <p style="color: var(--text-muted);">Электрическая сила похожа на силу всемирного тяготения ($F = G \frac{m_1 m_2}{r^2}$), но гравитация всегда притягивает, а электрическая сила может и отталкивать.</p>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 4. Принцип суперпозиции и влияние среды</h2>
+        <div class="card">
+            <h3 style="margin-top: 0;">Суперпозиция сил</h3>
+            <p>Если на заряд действует несколько других зарядов, то результирующая сила равна <strong>векторной сумме</strong> всех сил:</p>
+            <div class="formula-box" style="border-color: var(--brand-purple);">
+                $$\vec{F}_{рез} = \vec{F}_1 + \vec{F}_2 + \vec{F}_3 + \dots$$
+            </div>
+            <p style="color: var(--text-muted);">Силы не мешают друг другу, они накладываются.</p>
+
+            <h3 style="margin-top: 25px;">Влияние среды (Диэлектрическая проницаемость)</h3>
+            <p>В проводниках (металлы) заряды могут свободно двигаться, а в диэлектриках (стекло, вода) — связаны. Диэлектрики ослабляют электрическое взаимодействие.</p>
+            <p>Закон Кулона в среде:</p>
+            <div class="formula-box">
+                $$F = k \frac{|q_1| |q_2|}{\varepsilon r^2}$$
+            </div>
+            <p style="color: var(--text-muted);">Где $\varepsilon$ (эпсилон) – <strong>диэлектрическая проницаемость среды</strong>. Чем больше $\varepsilon$, тем слабее взаимодействие (в вакууме $\varepsilon = 1$, в воде $\varepsilon \approx 81$).</p>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 5. Лаборатория: Электростатика</h2>
+        <p style="color: var(--text-muted);">В этой симуляции вы можете управлять двумя основными зарядами ($q_1$ и $q_2$) и наблюдать силы, действующие между ними (вектор Кулона). Также показан "пробный" положительный заряд (маленький желтый), на котором визуализируется принцип суперпозиции сил от $q_1$ и $q_2$. Попробуйте изменить среду ($\varepsilon$), чтобы увидеть, как ослабевают силы!</p>
+        
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);">Заряд 1 ($q_1$): <span id="val-q1">1 мкКл</span></label>
+                    <input type="range" id="sim-q1" min="-5" max="5" value="1" step="1" style="accent-color: var(--brand-red);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);">Заряд 2 ($q_2$): <span id="val-q2">-1 мкКл</span></label>
+                    <input type="range" id="sim-q2" min="-5" max="5" value="-1" step="1" style="accent-color: var(--brand-blue);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--text-main);">Диэл. проницаемость ($\varepsilon$): <span id="val-eps">1 (Вакуум)</span></label>
+                    <input type="range" id="sim-eps" min="1" max="10" value="1" step="1" style="accent-color: var(--text-muted);">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Расстояние ($r$)</div>
+                    <div class="dashboard-value" id="dash-r" style="color: #fff;">0.00 м</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Сила Кулона ($F$)</div>
+                    <div class="dashboard-value" id="dash-f" style="color: var(--accent);">0.00 Н</div>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">
+                <i>* Вы можете перетаскивать большие заряды мышкой/пальцем. Желтый заряд - пробный ($+q$).</i>
+            </p>
+
+            <div class="canvas-container">
+                <canvas id="canvas-coulomb" width="700" height="400"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Лайфхаки и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Единицы измерения:</strong> Всегда переводите заряды в Кулоны ($1$ мкКл = $10^{-6}$ Кл, $1$ нКл = $10^{-9}$ Кл). Сантиметры переводите в метры!</li>
+                    <li><strong>Квадрат расстояния:</strong> Если увеличить расстояние в 2 раза, сила уменьшится в <strong>4 раза</strong> (а не в 2).</li>
+                    <li><strong>Одномерные задачи:</strong> Если три заряда лежат на одной прямой, векторы сил направлены вдоль этой прямой, и их можно складывать алгебраически с учетом знаков.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Забытый квадрат:</strong> Распространенная ошибка — забыть возвести расстояние $r$ в квадрат в знаменателе закона Кулона.</li>
+                    <li><strong>Знаки в формуле:</strong> В формулу Кулона подставляются <strong>модули</strong> зарядов ($|q|$). Знаки нужны только для определения <i>направления</i> силы (притяжение или отталкивание) на чертеже.</li>
+                    <li><strong>Забытая среда:</strong> В задачах, где заряды помещают в воду или масло, забывают разделить силу на диэлектрическую проницаемость $\varepsilon$.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Закон Кулона</h3>
+            <p>Два точечных заряда $q_1 = +2$ мкКл и $q_2 = -4$ мкКл находятся в вакууме на расстоянии $30$ см друг от друга. Определите модуль силы взаимодействия между ними. Притягиваются они или отталкиваются? ($k = 9 \cdot 10^9$ Н·м²/Кл²).</p>
+            
+            <div class="btn-group">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Переведем значения в СИ:<br>
+                $q_1 = 2 \cdot 10^{-6}$ Кл<br>
+                $q_2 = -4 \cdot 10^{-6}$ Кл (в формулу берем модуль $|q_2| = 4 \cdot 10^{-6}$ Кл)<br>
+                $r = 0.3$ м</p>
+                
+                <p>2. Применим закон Кулона для вакуума ($\varepsilon=1$):<br>
+                $$F = k \frac{|q_1| |q_2|}{r^2}$$</p>
+                
+                <p>3. Подставим числа:<br>
+                $$F = 9 \cdot 10^9 \frac{2 \cdot 10^{-6} \cdot 4 \cdot 10^{-6}}{(0.3)^2}$$<br>
+                $$F = 9 \cdot 10^9 \frac{8 \cdot 10^{-12}}{0.09}$$<br>
+                $$F = \frac{72 \cdot 10^{-3}}{9 \cdot 10^{-2}} = 8 \cdot 10^{-1} = 0.8 \text{ Н}$$</p>
+
+                <p>Так как заряды имеют противоположные знаки, они <strong>притягиваются</strong>.</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 0.8 Н, притягиваются.</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Изменение параметров</h3>
+            <p>Как изменится сила кулоновского взаимодействия двух точечных зарядов, если расстояние между ними увеличить в 3 раза, а модуль одного из зарядов увеличить в 2 раза?</p>
+            
+            <div class="btn-group">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> Запишите формулу $F = k \frac{q_1 q_2}{r^2}$. Посмотрите, где стоят изменяемые величины. Если мы увеличим $r$ в знаменателе в 3 раза, знаменатель увеличится в $3^2 = 9$ раз. Как это повлияет на дробь в целом?
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Исходная сила: $F_1 = k \frac{q_1 q_2}{r^2}$</p>
+                
+                <p>2. Новые значения: расстояние $r' = 3r$, заряд $q_1' = 2q_1$.</p>
+                
+                <p>3. Новая сила:<br>
+                $$F_2 = k \frac{2q_1 \cdot q_2}{(3r)^2} = k \frac{2q_1 q_2}{9r^2} = \frac{2}{9} \left( k \frac{q_1 q_2}{r^2} \right) = \frac{2}{9} F_1$$</p>
+
+                <p>Значение дроби умножилось на $2/9$. Это значит, что сила уменьшилась в $4.5$ раза ($9/2$).</p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: Уменьшится в 4.5 раза (или составит 2/9 от первоначальной).</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР: ЭЛЕКТРОСТАТИКА
+           ========================================== */
+        
+        const canvas = document.getElementById('canvas-coulomb');
+        const ctx = canvas.getContext('2d');
+        
+        // Инпуты
+        const inQ1 = document.getElementById('sim-q1');
+        const inQ2 = document.getElementById('sim-q2');
+        const inEps = document.getElementById('sim-eps');
+        
+        // Лейблы
+        const valQ1 = document.getElementById('val-q1');
+        const valQ2 = document.getElementById('val-q2');
+        const valEps = document.getElementById('val-eps');
+        const dashR = document.getElementById('dash-r');
+        const dashF = document.getElementById('dash-f');
+
+        // Константы симуляции
+        const K_ELEC = 9e9;
+        const SCALE_R = 100; // 100 пикселей = 1 метр для наглядности (чтобы не было огромных цифр)
+        const PIXEL_METER_RATIO = 0.01; // 1 px = 0.01 m
+        
+        // Состояние объектов
+        let q1 = {
+            x: 200, y: 200, radius: 25,
+            charge: parseFloat(inQ1.value) * 1e-6, // в Кулонах
+            isDragging: false,
+            colorBase: '#EF4444' // Красный (для + по умолчанию, будет меняться)
+        };
+        
+        let q2 = {
+            x: 500, y: 200, radius: 25,
+            charge: parseFloat(inQ2.value) * 1e-6,
+            isDragging: false,
+            colorBase: '#3B82F6' // Синий (для -)
+        };
+
+        let testQ = {
+            x: 350, y: 100, radius: 10,
+            charge: 1e-6, // +1 мкКл (пробный)
+            isDragging: false,
+            colorBase: '#FFC107' // Желтый
+        };
+
+        let eps = parseFloat(inEps.value);
+        let animationId;
+
+        // --- Управление Drag & Drop ---
+        let dragTarget = null;
+        
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Поддержка Touch и Mouse
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function isPointInCircle(px, py, circle) {
+            const dx = px - circle.x;
+            const dy = py - circle.y;
+            return dx*dx + dy*dy <= circle.radius*circle.radius * 1.5; // Чуть больше зона захвата
+        }
+
+        function handlePointerDown(e) {
+            const pos = getPointerPos(e);
+            // Приоритет: Пробный, затем основные
+            if (isPointInCircle(pos.x, pos.y, testQ)) dragTarget = testQ;
+            else if (isPointInCircle(pos.x, pos.y, q1)) dragTarget = q1;
+            else if (isPointInCircle(pos.x, pos.y, q2)) dragTarget = q2;
+
+            if (dragTarget) {
+                dragTarget.isDragging = true;
+                e.preventDefault(); // Предотвращаем скролл
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (!dragTarget) return;
+            const pos = getPointerPos(e);
+            
+            // Ограничиваем внутри холста
+            dragTarget.x = Math.max(dragTarget.radius, Math.min(canvas.width - dragTarget.radius, pos.x));
+            dragTarget.y = Math.max(dragTarget.radius, Math.min(canvas.height - dragTarget.radius, pos.y));
+            
+            updatePhysics();
+            e.preventDefault();
+        }
+
+        function handlePointerUp(e) {
+            if (dragTarget) {
+                dragTarget.isDragging = false;
+                dragTarget = null;
+            }
+        }
+
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+        
+        canvas.addEventListener('touchstart', handlePointerDown, {passive: false});
+        canvas.addEventListener('touchmove', handlePointerMove, {passive: false});
+        window.addEventListener('touchend', handlePointerUp);
+
+        // --- Вспомогательные функции ---
+        function getChargeColor(chargeVal) {
+            if (chargeVal > 0) return 'rgba(239, 68, 68, 0.8)'; // Red
+            if (chargeVal < 0) return 'rgba(59, 130, 246, 0.8)'; // Blue
+            return 'rgba(150, 150, 150, 0.8)'; // Gray for neutral
+        }
+
+        function getChargeText(chargeValC) {
+            const mc = Math.round(chargeValC * 1e6);
+            if (mc > 0) return '+' + mc;
+            if (mc === 0) return '0';
+            return mc.toString();
+        }
+
+        function drawArrow(ctx, fromX, fromY, toX, toY, color, width = 3) {
+            const headlen = 10;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // Защита от нулевого вектора
+            if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) return;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+        }
+
+        function calcCoulombForce(c1, c2, epsVal) {
+            // Расстояние в пикселях
+            const dx = c2.x - c1.x;
+            const dy = c2.y - c1.y;
+            const distPx = Math.sqrt(dx*dx + dy*dy);
+            
+            // Расстояние в метрах
+            const r = distPx * PIXEL_METER_RATIO;
+            
+            // Защита от деления на ноль (слишком близко)
+            if (r < 0.05) return { fx: 0, fy: 0, mag: 0, r: r };
+
+            // Модуль силы
+            const F_mag = K_ELEC * Math.abs(c1.charge * c2.charge) / (epsVal * r * r);
+            
+            // Направление силы (действующей на c2 со стороны c1)
+            // Нормализованный вектор от c1 к c2
+            const nx = dx / distPx;
+            const ny = dy / distPx;
+            
+            let fx, fy;
+            if (c1.charge * c2.charge > 0) {
+                // Отталкивание: вектор направлен от c1 к c2
+                fx = nx * F_mag;
+                fy = ny * F_mag;
+            } else {
+                // Притяжение: вектор направлен от c2 к c1 (противоположно)
+                fx = -nx * F_mag;
+                fy = -ny * F_mag;
+            }
+            
+            return { fx: fx, fy: fy, mag: F_mag, r: r, nx: nx, ny: ny };
+        }
+
+        // --- Основной цикл ---
+        function updatePhysics() {
+            // Обновляем параметры с UI
+            const val1 = parseFloat(inQ1.value);
+            const val2 = parseFloat(inQ2.value);
+            q1.charge = val1 * 1e-6;
+            q2.charge = val2 * 1e-6;
+            eps = parseFloat(inEps.value);
+
+            // Обновляем лейблы UI
+            valQ1.textContent = val1 + ' мкКл';
+            valQ2.textContent = val2 + ' мкКл';
+            
+            let epsLabel = eps;
+            if(eps === 1) epsLabel += " (Вакуум)";
+            if(eps === 2) epsLabel += " (Керосин)";
+            if(eps === 7) epsLabel += " (Стекло)";
+            if(eps === 10) epsLabel += " (Вода... почти)";
+            valEps.textContent = epsLabel;
+
+            // Расчет сил между главными зарядами
+            const forceMain = calcCoulombForce(q1, q2, eps);
+            
+            // Обновление дашборда
+            dashR.textContent = forceMain.r.toFixed(2) + ' м';
+            // Если заряд 0, сила 0
+            if (q1.charge === 0 || q2.charge === 0) {
+                 dashF.textContent = '0.00 Н';
+            } else {
+                 dashF.textContent = forceMain.mag.toFixed(2) + ' Н';
+            }
+
+            draw();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // --- 1. Взаимодействие между Q1 и Q2 ---
+            if (q1.charge !== 0 && q2.charge !== 0) {
+                const fMain = calcCoulombForce(q1, q2, eps);
+                
+                // Визуальный масштаб вектора (логарифмический или clamp)
+                let vScale = Math.min(Math.max(fMain.mag * 50, 20), 100); 
+                if(fMain.mag === 0) vScale = 0;
+
+                // Вектор на Q2
+                if (vScale > 0) {
+                    const norm_fx = fMain.fx / fMain.mag;
+                    const norm_fy = fMain.fy / fMain.mag;
+                    drawArrow(ctx, q2.x, q2.y, q2.x + norm_fx * vScale, q2.y + norm_fy * vScale, '#fff', 3);
+                    
+                    // По третьему закону Ньютона вектор на Q1
+                    drawArrow(ctx, q1.x, q1.y, q1.x - norm_fx * vScale, q1.y - norm_fy * vScale, '#fff', 3);
+                }
+                
+                // Пунктирная линия связи
+                ctx.beginPath();
+                ctx.moveTo(q1.x, q1.y);
+                ctx.lineTo(q2.x, q2.y);
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // --- 2. Силы, действующие на пробный заряд (Суперпозиция) ---
+            let f_on_test_x = 0;
+            let f_on_test_y = 0;
+
+            if (q1.charge !== 0) {
+                const f1_test = calcCoulombForce(q1, testQ, eps);
+                f_on_test_x += f1_test.fx;
+                f_on_test_y += f1_test.fy;
+                
+                // Рисуем слабую компонентную силу от Q1
+                let vScale1 = Math.min(f1_test.mag * 50, 70);
+                if (vScale1 > 5) {
+                    drawArrow(ctx, testQ.x, testQ.y, testQ.x + (f1_test.fx/f1_test.mag)*vScale1, testQ.y + (f1_test.fy/f1_test.mag)*vScale1, 'rgba(239, 68, 68, 0.5)', 2);
+                }
+            }
+
+            if (q2.charge !== 0) {
+                const f2_test = calcCoulombForce(q2, testQ, eps);
+                f_on_test_x += f2_test.fx;
+                f_on_test_y += f2_test.fy;
+                
+                // Рисуем слабую компонентную силу от Q2
+                let vScale2 = Math.min(f2_test.mag * 50, 70);
+                if (vScale2 > 5) {
+                    drawArrow(ctx, testQ.x, testQ.y, testQ.x + (f2_test.fx/f2_test.mag)*vScale2, testQ.y + (f2_test.fy/f2_test.mag)*vScale2, 'rgba(59, 130, 246, 0.5)', 2);
+                }
+            }
+
+            // Рисуем результирующую силу на пробный заряд
+            const f_test_mag = Math.sqrt(f_on_test_x*f_on_test_x + f_on_test_y*f_on_test_y);
+            if (f_test_mag > 0.01) {
+                let vScaleTot = Math.min(f_test_mag * 50, 90);
+                const norm_tx = f_on_test_x / f_test_mag;
+                const norm_ty = f_on_test_y / f_test_mag;
+                drawArrow(ctx, testQ.x, testQ.y, testQ.x + norm_tx * vScaleTot, testQ.y + norm_ty * vScaleTot, '#FFC107', 3);
+            }
+
+            // --- 3. Отрисовка самих зарядов ---
+            const drawCharge = (cObj, text, isTest) => {
+                ctx.beginPath();
+                ctx.arc(cObj.x, cObj.y, cObj.radius, 0, Math.PI * 2);
+                
+                if (isTest) {
+                    ctx.fillStyle = cObj.colorBase;
+                } else {
+                    ctx.fillStyle = getChargeColor(cObj.charge);
+                    if (cObj.charge === 0) ctx.strokeStyle = '#888';
+                }
+                
+                ctx.fill();
+                
+                // Glow if dragging
+                if (cObj.isDragging) {
+                    ctx.shadowColor = '#fff';
+                    ctx.shadowBlur = 15;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                if (isTest) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillText('+q', cObj.x, cObj.y);
+                } else {
+                    ctx.fillText(text, cObj.x, cObj.y);
+                }
+            };
+
+            drawCharge(testQ, '+q', true);
+            drawCharge(q1, getChargeText(q1.charge), false);
+            drawCharge(q2, getChargeText(q2.charge), false);
+        }
+
+        // --- Инициализация ---
+        inQ1.addEventListener('input', updatePhysics);
+        inQ2.addEventListener('input', updatePhysics);
+        inEps.addEventListener('input', updatePhysics);
+
+        updatePhysics(); // Начальный вызов
+
+    </script>
+</body>
+</html>
