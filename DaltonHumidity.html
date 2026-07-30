@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Закон Дальтона и Влажность</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-cyan: #06B6D4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Закон Дальтона и Влажность воздуха</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="info" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Воздух вокруг нас — это не один газ, а смесь газов (азот, кислород и водяной пар). Чтобы понять, почему выпадает роса или потеют окна, нужно разобраться, как эти газы уживаются в одном объеме, и как водяной пар подчиняется закону Дальтона.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="combine"></i> 1. Закон Дальтона (о парциальных давлениях)</h2>
+        <div class="card">
+            <p>Закон Дальтона описывает смесь идеальных газов. Он показывает, как общее давление смеси связано с давлениями отдельных компонентов.</p>
+            <div class="formula-box" style="border-color: #8B5CF6;">
+                $$p_{общ} = p_1 + p_2 + p_3 + \dots$$
+            </div>
+            
+            <h3 style="margin-top: 25px;">Что такое парциальное давление ($p_i$)?</h3>
+            <p style="color: var(--text-muted);">Это давление, которое создавал бы газ, если бы он <b>один занимал весь объём</b> смеси при той же температуре. Каждый газ в смеси "ведет себя" так, как будто остальные ему не мешают.</p>
+            <p>Поэтому атмосферное давление воздуха складывается из давлений его частей:
+            $$p_{атм} = p_{азота} + p_{кислорода} + p_{пара}$$</p>
+        </div>
+
+        <h2><i data-lucide="cloud-rain"></i> 2. Влажность воздуха и Насыщенный пар</h2>
+        <div class="card">
+            <p>Влажность воздуха – это характеристика, показывающая, сколько водяного пара содержится в воздухе. Чем выше температура, тем больше пара может "вместить" в себя воздух.</p>
+
+            <div style="display: grid; gap: 15px; margin-top: 15px;">
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border-left: 4px solid var(--brand-cyan);">
+                    <strong style="color: var(--brand-cyan);">Ненасыщенный пар</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 5px 0;">Воздух может принять в себя еще пар. Вода сохнет. Давление пара меньше максимально возможного: $p < p_{нас}$.</p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border-left: 4px solid var(--brand-blue);">
+                    <strong style="color: var(--brand-blue);">Насыщенный пар ($p_{нас}$)</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 5px 0;">Пар находится в равновесии с жидкостью (скорость испарения равна скорости конденсации). Воздух больше не может вместить влагу. <b>Это максимальное давление пара, которое возможно при данной температуре.</b></p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px;">Формулы влажности</h3>
+            <div class="formula-grid">
+                <div class="formula-box">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Абсолютная влажность ($\rho$)</div>
+                    $$\rho = \frac{m_{пара}}{V}$$
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Сколько кг пара реально есть в 1 м³</span>
+                </div>
+                <div class="formula-box" style="border-color: var(--accent);">
+                    <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 5px;">Относительная влажность ($\varphi$)</div>
+                    $$\varphi = \frac{p}{p_{нас}} \cdot 100\%$$
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Насколько воздух близок к насыщению</span>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;"><i>Также $\varphi$ можно считать через плотность: $\varphi = \frac{\rho}{\rho_{нас}} \cdot 100\%$. Влажность не может превышать 100%.</i></p>
+        </div>
+
+        <h2><i data-lucide="thermometer-snowflake"></i> 3. Точка росы</h2>
+        <div class="card">
+            <p><b>Точка росы</b> – это температура, при которой водяной пар, содержащийся в воздухе, становится насыщенным ($\varphi = 100\%$).</p>
+            <p style="color: var(--text-muted);">Если воздух охлаждается ниже этой температуры, "лишний" пар не может удерживаться в воздухе и начинается <b>конденсация</b> (выпадает роса, туман, иней или потеют окна).</p>
+        </div>
+
+        <h2><i data-lucide="flask-conical"></i> 4. Лаборатория: Смеси газов и Конденсация</h2>
+        <p style="color: var(--text-muted);">В закрытый сосуд можно добавлять молекулы Азота ($N_2$), Кислорода ($O_2$) и Водяного пара ($H_2O$). Наблюдайте, как складываются парциальные давления. Если переборщить с паром или понизить температуру — влажность превысит 100% и начнется конденсация (появятся капли воды)!</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-orange);"><span>Азот ($N_2$):</span> <span id="val-sim-n2">0 моль</span></label>
+                    <input type="range" id="sim-n2" min="0" max="100" value="30" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-red);"><span>Кислород ($O_2$):</span> <span id="val-sim-o2">0 моль</span></label>
+                    <input type="range" id="sim-o2" min="0" max="100" value="10" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-cyan);"><span>Водяной пар ($H_2O$):</span> <span id="val-sim-h2o">0 моль</span></label>
+                    <input type="range" id="sim-h2o" min="0" max="100" value="20" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>Температура ($T$):</span> <span id="val-sim-temp">300 К</span></label>
+                    <input type="range" id="sim-temp" min="270" max="350" value="300" step="5">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">P азота</div>
+                    <div class="dashboard-value" id="dash-p-n2" style="color: var(--brand-orange);">0 кПа</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">P кислорода</div>
+                    <div class="dashboard-value" id="dash-p-o2" style="color: var(--brand-red);">0 кПа</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">P пара</div>
+                    <div class="dashboard-value" id="dash-p-h2o" style="color: var(--brand-cyan);">0 кПа</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">P общее (Дальтон)</div>
+                    <div class="dashboard-value" id="dash-p-total" style="color: #fff;">0 кПа</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--brand-blue); background: rgba(59, 130, 246, 0.1);">
+                    <div class="dashboard-label">Влажность ($\varphi$)</div>
+                    <div class="dashboard-value" id="dash-humidity" style="color: var(--brand-blue);">0 %</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-gas" width="600" height="350" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333;"></canvas>
+            </div>
+            
+            <div id="condensation-warning" style="text-align: center; margin-top: 15px; font-weight: bold; color: var(--brand-blue); display: none;">
+                <i data-lucide="droplets" style="width: 18px; vertical-align: middle;"></i> Внимание: Воздух насыщен! Идет конденсация.
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 5. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li>Все газы в смеси имеют одинаковую температуру и занимают <b>один и тот же объем</b> (объем всего сосуда).</li>
+                    <li>В задачах на влажность помни: атмосферное давление — это сумма давлений сухого воздуха и водяного пара: $p_{атм} = p_{возд} + p_{пара}$.</li>
+                    <li>Таблицы давления насыщенного пара $p_{нас}(T)$ всегда даются в задачах – их не нужно запоминать.</li>
+                    <li>Относительная влажность обратно пропорциональна объему сосуда (если сжать воздух в 2 раза, влажность вырастет в 2 раза, пока не упрется в 100%).</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Путают $p$ и $p_{нас}$:</strong> В формулу влажности подставляют атмосферное давление или общее давление смеси вместо парциального давления самого пара.</li>
+                    <li><strong>Закон Дальтона и массы:</strong> Пытаются складывать массы или плотности для нахождения общего давления. Закон работает только через парциальные давления (или количества вещества в молях).</li>
+                    <li><strong>Миф о 100% влажности:</strong> Думают, что при $\varphi = 100\%$ воздух "заполнен водой" и там нет кислорода. Это не так, просто <i>водяной пар</i> достиг своего максимума для данной температуры.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <!-- Задача 1 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 1: Влажность воздуха</h3>
+            <p>При температуре $20^\circ C$ давление насыщенного водяного пара равно $2.3\text{ кПа}$. Определите относительную влажность воздуха, если парциальное давление водяного пара в комнате составляет $1.38\text{ кПа}$.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Запишем формулу относительной влажности:<br>
+                $$\varphi = \frac{p}{p_{нас}} \cdot 100\%$$</p>
+                
+                <p>2. Подставляем значения (можно не переводить кПа в Па, так как при делении единицы сокращаются):<br>
+                $$\varphi = \frac{1.38}{2.3} \cdot 100\%$$</p>
+                
+                <p>3. Вычисляем:<br>
+                $$\varphi = 0.6 \cdot 100\% = 60\%$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: 60%</div>
+            </div>
+        </div>
+
+        <!-- Задача 2 -->
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача 2: Закон Дальтона</h3>
+            <p>В сосуде объемом $2\text{ л}$ находится смесь кислорода ($0.1\text{ моль}$) и азота ($0.2\text{ моль}$) при температуре $300\text{ K}$. Найдите общее давление смеси. ($R = 8.31\text{ Дж/(моль}\cdot\text{К)}$).</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-2" onclick="showStep('hint2', 'hint-btn-2')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol2', 'hint-btn-2')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint2">
+                <strong>💡 Подсказка:</strong> По закону Дальтона общее давление равно сумме парциальных давлений: $p_{общ} = p_{О_2} + p_{N_2}$. Парциальное давление каждого газа можно найти из уравнения Менделеева-Клапейрона: $p = \frac{\nu RT}{V}$. Не забудьте перевести $2\text{ л}$ в кубические метры ($0.002\text{ м}^3$).
+            </div>
+
+            <div class="step-content" id="sol2">
+                <p><strong>Решение:</strong></p>
+                <p>1. Переведем объем в СИ:<br>
+                $$V = 2\text{ л} = 0.002\text{ м}^3$$</p>
+
+                <p>2. Найдем парциальное давление кислорода:<br>
+                $$p_1 = \frac{\nu_1 RT}{V} = \frac{0.1 \cdot 8.31 \cdot 300}{0.002} = \frac{249.3}{0.002} = 124650\text{ Па} \approx 125\text{ кПа}$$</p>
+                
+                <p>3. Найдем парциальное давление азота:<br>
+                $$p_2 = \frac{\nu_2 RT}{V} = \frac{0.2 \cdot 8.31 \cdot 300}{0.002} = \frac{498.6}{0.002} = 249300\text{ Па} \approx 249\text{ кПа}$$</p>
+                
+                <p>4. Применяем закон Дальтона:<br>
+                $$p_{общ} = p_1 + p_2 = 124650 + 249300 = 373950\text{ Па} \approx 374\text{ кПа}$$</p>
+
+                <p style="font-size: 0.9rem; color: var(--text-muted);">*Альтернативный способ: Сложить моли ($\nu_{общ} = 0.3\text{ моль}$) и подставить в одно уравнение.*</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: ~374 кПа</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР СМЕСИ ГАЗОВ И ВЛАЖНОСТИ
+           ========================================== */
+        
+        const canvas = document.getElementById('canvas-gas');
+        const ctx = canvas.getContext('2d');
+        
+        // Inputs
+        const inN2 = document.getElementById('sim-n2');
+        const inO2 = document.getElementById('sim-o2');
+        const inH2O = document.getElementById('sim-h2o');
+        const inTemp = document.getElementById('sim-temp');
+        
+        // Displays
+        const valN2 = document.getElementById('val-sim-n2');
+        const valO2 = document.getElementById('val-sim-o2');
+        const valH2O = document.getElementById('val-sim-h2o');
+        const valTemp = document.getElementById('val-sim-temp');
+        
+        const dashPN2 = document.getElementById('dash-p-n2');
+        const dashPO2 = document.getElementById('dash-p-o2');
+        const dashPH2O = document.getElementById('dash-p-h2o');
+        const dashPTotal = document.getElementById('dash-p-total');
+        const dashHumidity = document.getElementById('dash-humidity');
+        const warningCondensation = document.getElementById('condensation-warning');
+
+        // Physics Constants (Simplified for visualization scale)
+        const R = 8.31;
+        const V = 100; // Fake volume scale
+        
+        // Approximated Saturated Vapor Pressure Curve (Magnus-Tetens formula simplified)
+        // Returns pressure in visual units
+        function getPSat(T) {
+            // T in Kelvin. Convert to Celsius
+            const Tc = T - 273.15;
+            // Using a simplified exponential curve for visual effect in the 270-350K range
+            // pSat roughly doubles every 10 degrees.
+            const baseP = 0.6; // pressure at 0C (273K)
+            return baseP * Math.exp(0.06 * Tc) * 15; // Scaled for UI
+        }
+
+        // Particle System
+        let particles = [];
+        let droplets = []; // Water droplets at the bottom
+
+        // Colors
+        const colorN2 = '#F97316'; // Orange
+        const colorO2 = '#EF4444'; // Red
+        const colorH2O = '#06B6D4'; // Cyan
+
+        function initParticles(nN2, nO2, nH2O_gas) {
+            particles = [];
+            const addP = (count, color, mass) => {
+                for(let i=0; i<count; i++) {
+                    particles.push({
+                        x: Math.random() * (canvas.width - 20) + 10,
+                        y: Math.random() * (canvas.height - 40) + 10,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        color: color,
+                        radius: mass
+                    });
+                }
+            };
+            
+            addP(nN2, colorN2, 3);
+            addP(nO2, colorO2, 3.5);
+            addP(nH2O_gas, colorH2O, 2.5);
+        }
+
+        function updatePhysics() {
+            const nN2 = parseInt(inN2.value);
+            const nO2 = parseInt(inO2.value);
+            const nH2O_total = parseInt(inH2O.value);
+            const T = parseInt(inTemp.value);
+
+            // Update Labels
+            valN2.textContent = nN2 + ' моль';
+            valO2.textContent = nO2 + ' моль';
+            valH2O.textContent = nH2O_total + ' моль';
+            valTemp.textContent = T + ' К';
+
+            // Calculate pressures
+            const pN2 = (nN2 * R * T) / V;
+            const pO2 = (nO2 * R * T) / V;
+            
+            // Humidity Logic
+            const pSat = getPSat(T);
+            const pH2O_theoretical = (nH2O_total * R * T) / V;
+            
+            let pH2O_actual = pH2O_theoretical;
+            let humidity = (pH2O_theoretical / pSat) * 100;
+            let nH2O_gas = nH2O_total;
+            let nH2O_liquid = 0;
+
+            if (humidity >= 100) {
+                humidity = 100;
+                pH2O_actual = pSat;
+                // How many moles can exist as gas?
+                nH2O_gas = (pSat * V) / (R * T);
+                nH2O_liquid = nH2O_total - nH2O_gas;
+                warningCondensation.style.display = 'block';
+                dashHumidity.style.color = '#EF4444'; // Red when saturated
+                dashHumidity.parentElement.style.borderColor = '#EF4444';
+            } else {
+                warningCondensation.style.display = 'none';
+                dashHumidity.style.color = 'var(--brand-blue)';
+                dashHumidity.parentElement.style.borderColor = 'var(--brand-blue)';
+            }
+
+            const pTotal = pN2 + pO2 + pH2O_actual;
+
+            // Update Dashboards
+            dashPN2.textContent = pN2.toFixed(0) + ' кПа';
+            dashPO2.textContent = pO2.toFixed(0) + ' кПа';
+            dashPH2O.textContent = pH2O_actual.toFixed(0) + ' кПа';
+            dashPTotal.textContent = pTotal.toFixed(0) + ' кПа';
+            dashHumidity.textContent = humidity.toFixed(1) + ' %';
+
+            // Update visual particles
+            // We scale down the numbers for visual clarity (so it doesn't lag)
+            const visualScale = 0.5;
+            initParticles(nN2 * visualScale, nO2 * visualScale, nH2O_gas * visualScale);
+            
+            // Setup droplets
+            droplets = [];
+            if (nH2O_liquid > 0) {
+                for(let i=0; i < nH2O_liquid * visualScale * 2; i++) {
+                    droplets.push({
+                        x: Math.random() * (canvas.width - 20) + 10,
+                        y: canvas.height - Math.random() * 15 - 5,
+                        width: Math.random() * 20 + 10
+                    });
+                }
+            }
+
+            // Update speeds based on T
+            const speedMultiplier = Math.sqrt(T / 300);
+            particles.forEach(p => {
+                const speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+                if(speed > 0) {
+                    const normVx = p.vx / speed;
+                    const normVy = p.vy / speed;
+                    // Base speed roughly 2
+                    p.vx = normVx * 2 * speedMultiplier;
+                    p.vy = normVy * 2 * speedMultiplier;
+                }
+            });
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw droplets (condensation) at bottom
+            if (droplets.length > 0) {
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)'; // Cyan liquid pool
+                // Draw a dynamic pool
+                const poolHeight = Math.min(30, droplets.length / 2);
+                ctx.fillRect(0, canvas.height - poolHeight, canvas.width, poolHeight);
+                
+                // Draw individual drops
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.8)';
+                droplets.forEach(d => {
+                    ctx.beginPath();
+                    ctx.ellipse(d.x, d.y, d.width/2, 3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            // Draw and update gas particles
+            const poolHeight = droplets.length > 0 ? Math.min(30, droplets.length / 2) : 0;
+            const floorY = canvas.height - poolHeight;
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Bounce off walls
+                if (p.x - p.radius < 0) { p.x = p.radius; p.vx *= -1; }
+                if (p.x + p.radius > canvas.width) { p.x = canvas.width - p.radius; p.vx *= -1; }
+                if (p.y - p.radius < 0) { p.y = p.radius; p.vy *= -1; }
+                if (p.y + p.radius > floorY) { p.y = floorY - p.radius; p.vy *= -1; }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawFrame);
+        }
+
+        // Listeners
+        inN2.addEventListener('input', updatePhysics);
+        inO2.addEventListener('input', updatePhysics);
+        inH2O.addEventListener('input', updatePhysics);
+        inTemp.addEventListener('input', updatePhysics);
+
+        // Start
+        updatePhysics();
+        drawFrame();
+
+    </script>
+</body>
+</html>
