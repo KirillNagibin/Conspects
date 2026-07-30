@@ -211,15 +211,15 @@
         <div class="simulator">
             <div class="sim-controls">
                 <div class="control-group">
-                    <label style="color: var(--brand-red);">Заряд 1 ($q_1$): <span id="val-q1">1 мкКл</span></label>
-                    <input type="range" id="sim-q1" min="-5" max="5" value="1" step="1" style="accent-color: var(--brand-red);">
+                    <label style="color: var(--brand-red);"><span>Заряд 1 (q<sub>1</sub>):</span> <span id="val-q1">5 мкКл</span></label>
+                    <input type="range" id="sim-q1" min="-25" max="25" value="5" step="1" style="accent-color: var(--brand-red);">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-blue);">Заряд 2 ($q_2$): <span id="val-q2">-1 мкКл</span></label>
-                    <input type="range" id="sim-q2" min="-5" max="5" value="-1" step="1" style="accent-color: var(--brand-blue);">
+                    <label style="color: var(--brand-blue);"><span>Заряд 2 (q<sub>2</sub>):</span> <span id="val-q2">-5 мкКл</span></label>
+                    <input type="range" id="sim-q2" min="-25" max="25" value="-5" step="1" style="accent-color: var(--brand-blue);">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--text-main);">Диэл. проницаемость ($\varepsilon$): <span id="val-eps">1 (Вакуум)</span></label>
+                    <label style="color: var(--text-main);"><span>Диэл. проницаемость (&epsilon;):</span> <span id="val-eps">1 (Вакуум)</span></label>
                     <input type="range" id="sim-eps" min="1" max="10" value="1" step="1" style="accent-color: var(--text-muted);">
                 </div>
             </div>
@@ -583,7 +583,7 @@
                 const fMain = calcCoulombForce(q1, q2, eps);
                 
                 // Визуальный масштаб вектора (логарифмический или clamp)
-                let vScale = Math.min(Math.max(fMain.mag * 50, 20), 100); 
+                let vScale = Math.min(Math.max(fMain.mag * 100, 20), 120); 
                 if(fMain.mag === 0) vScale = 0;
 
                 // Вектор на Q2
@@ -617,7 +617,7 @@
                 f_on_test_y += f1_test.fy;
                 
                 // Рисуем слабую компонентную силу от Q1
-                let vScale1 = Math.min(f1_test.mag * 50, 70);
+                let vScale1 = Math.min(f1_test.mag * 100, 80);
                 if (vScale1 > 5) {
                     drawArrow(ctx, testQ.x, testQ.y, testQ.x + (f1_test.fx/f1_test.mag)*vScale1, testQ.y + (f1_test.fy/f1_test.mag)*vScale1, 'rgba(239, 68, 68, 0.5)', 2);
                 }
@@ -629,7 +629,7 @@
                 f_on_test_y += f2_test.fy;
                 
                 // Рисуем слабую компонентную силу от Q2
-                let vScale2 = Math.min(f2_test.mag * 50, 70);
+                let vScale2 = Math.min(f2_test.mag * 100, 80);
                 if (vScale2 > 5) {
                     drawArrow(ctx, testQ.x, testQ.y, testQ.x + (f2_test.fx/f2_test.mag)*vScale2, testQ.y + (f2_test.fy/f2_test.mag)*vScale2, 'rgba(59, 130, 246, 0.5)', 2);
                 }
@@ -638,7 +638,7 @@
             // Рисуем результирующую силу на пробный заряд
             const f_test_mag = Math.sqrt(f_on_test_x*f_on_test_x + f_on_test_y*f_on_test_y);
             if (f_test_mag > 0.01) {
-                let vScaleTot = Math.min(f_test_mag * 50, 90);
+                let vScaleTot = Math.min(f_test_mag * 100, 100);
                 const norm_tx = f_on_test_x / f_test_mag;
                 const norm_ty = f_on_test_y / f_test_mag;
                 drawArrow(ctx, testQ.x, testQ.y, testQ.x + norm_tx * vScaleTot, testQ.y + norm_ty * vScaleTot, '#FFC107', 3);
