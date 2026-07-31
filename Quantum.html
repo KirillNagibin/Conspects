@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Квантовая физика и Фотоэффект</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+            --brand-cyan: #06B6D4;
+            --brand-orange: #F97316;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; vertical-align: top;}
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;}
+        
+        /* Специфичный ползунок длины волны */
+        #sim-wave {
+            -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; outline: none;
+            background: linear-gradient(to right, #8a2be2 0%, #0000ff 25%, #00ff00 50%, #ffff00 75%, #ff0000 100%);
+        }
+        #sim-wave::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            background: #fff; cursor: pointer; box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        input[type="range"]:not(#sim-wave) { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        select { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 4px; outline: none; font-family: inherit;}
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #0a0a0a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; touch-action: none; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; transition: color 0.3s;}
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+            .sim-controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Квантовая физика и Фотоэффект</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="zap" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Рождение квантового мира</strong><br>
+                <span style="color: var(--text-muted);">В начале 20 века классическая физика зашла в тупик. Оказалось, что свет — это не только непрерывная волна. Свет излучается и поглощается крошечными порциями — <b>квантами (фотонами)</b>. Этот раздел изучает свет как поток частиц.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="sun"></i> 1. Свет как частица: Фотоны</h2>
+        <div class="card">
+            <p>Свет состоит из частиц — <b>фотонов</b>. У фотона <b>нет массы покоя</b> (его нельзя остановить и взвесить), но он переносит энергию и обладает импульсом, так как летит со скоростью света ($c$).</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-purple);">
+                    <div style="font-size: 0.9rem; color: var(--brand-purple); margin-bottom: 5px;">Энергия фотона ($E$)</div>
+                    $$E = h\nu = \frac{hc}{\lambda}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-cyan);">
+                    <div style="font-size: 0.9rem; color: var(--brand-cyan); margin-bottom: 5px;">Импульс фотона ($p$)</div>
+                    $$p = \frac{h}{\lambda} = \frac{E}{c}$$
+                </div>
+            </div>
+
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>$h \approx 6.6 \cdot 10^{-34} \text{ Дж}\cdot\text{с}$ — постоянная Планка.</li>
+                <li>$\nu$ — частота излучения, $\lambda$ — длина волны.</li>
+            </ul>
+            
+            <div class="alert-box alert-warning" style="margin-bottom: 0;">
+                <div class="icon-box"><i data-lucide="alert-circle" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">Главное правило:</strong> Чем <b>меньше</b> длина волны $\lambda$, тем <b>больше</b> энергия и импульс фотона. <br>
+                    По убыванию энергии: Гамма-излучение $\rightarrow$ Рентген $\rightarrow$ Ультрафиолет $\rightarrow$ Видимый свет $\rightarrow$ ИК $\rightarrow$ Радиоволны.
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="camera-flash"></i> 2. Фотоэффект</h2>
+        <div class="card">
+            <p><strong>Фотоэффект</strong> — это явление выбивания электронов из металла под действием света. Альберт Эйнштейн объяснил это с помощью квантов и получил за это Нобелевскую премию.</p>
+            
+            <div class="formula-box" style="border-color: var(--accent);">
+                <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 5px;">Уравнение Эйнштейна для фотоэффекта (Закон сохранения энергии)</div>
+                $$h\nu = A_{вых} + \frac{mv^2_{max}}{2}$$
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>$h\nu$ — энергия прилетевшего фотона.</li>
+                <li>$A_{вых}$ — <b>работа выхода</b>. Это энергия, которую электрон должен "заплатить" металлу, чтобы вырваться из него. Зависит <b>только</b> от рода металла (цинк, калий, натрий).</li>
+                <li>$\frac{mv^2_{max}}{2}$ — кинетическая энергия вылетевшего электрона (остаток энергии).</li>
+            </ul>
+
+            <h3 style="margin-top: 25px;">Красная граница фотоэффекта</h3>
+            <p style="color: var(--text-muted);">Если энергия фотона меньше работы выхода ($h\nu < A_{вых}$), то электрон не вылетит. Минимальная частота (или максимальная длина волны), при которой фотоэффект еще возможен, называется красной границей:</p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <span style="background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); font-size: 1.2rem;">$\nu_{кр} = \frac{A_{вых}}{h}$</span>
+                <span style="background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); font-size: 1.2rem;">$\lambda_{кр} = \frac{hc}{A_{вых}}$</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 3. Лаборатория: Опыт Столетова</h2>
+        <p style="color: var(--text-muted);">Меняйте цвет света (длину волны) и материал пластины. Обратите внимание: пока энергия фотона $E_{ф}$ не превысит работу выхода $A_{вых}$ выбранного металла, электроны вылетать не будут! <br>Изменяйте интенсивность (яркость): это меняет количество фотонов, но <b>не влияет</b> на их энергию и скорость электронов!</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label><span>Длина волны ($\lambda$):</span> <span id="val-wave" style="color: #A78BFA; font-weight: bold;">400 нм</span></label>
+                    <input type="range" id="sim-wave" min="200" max="750" value="400" step="10">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--text-main);"><span>Материал катода:</span></label>
+                    <select id="sim-material">
+                        <option value="2.3">Натрий (A = 2.3 эВ)</option>
+                        <option value="4.3" selected>Цинк (A = 4.3 эВ)</option>
+                        <option value="4.7">Медь (A = 4.7 эВ)</option>
+                        <option value="5.1">Золото (A = 5.1 эВ)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Интенсивность света:</span> <span id="val-intensity">5</span></label>
+                    <input type="range" id="sim-intensity" min="1" max="10" value="5" step="1" style="accent-color: #aaa;">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Энергия фотона ($E_ф$)</div>
+                    <div class="dashboard-value" id="dash-eph" style="color: var(--brand-purple);">3.10 эВ</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Работа выхода ($A_{вых}$)</div>
+                    <div class="dashboard-value" id="dash-aout" style="color: var(--brand-orange);">4.30 эВ</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--border);" id="dash-ek-box">
+                    <div class="dashboard-label">Кин. энергия электрона ($E_k$)</div>
+                    <div class="dashboard-value" id="dash-ek" style="color: var(--text-muted);">0.00 эВ</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Фототок</div>
+                    <div class="dashboard-value" id="dash-current" style="color: var(--accent);">0 шт/с</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-photoeffect" width="700" height="300" style="background: #111; border-radius: 8px; border: 1px solid #333; touch-action: none;"></canvas>
+            </div>
+            
+            <p id="no-effect-warning" style="display: none; text-align: center; color: var(--error-text); font-size: 1rem; font-weight: bold; margin-top: 15px; animation: pulse 1.5s infinite;">
+                <i data-lucide="shield-alert" style="width: 18px; vertical-align: middle;"></i> Фотоэффекта нет! Энергия фотона меньше работы выхода (красная граница).
+            </p>
+            <style>
+                @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+            </style>
+        </div>
+
+        <h2><i data-lucide="waves"></i> 4. Корпускулярно-волновой дуализм</h2>
+        <div class="card">
+            <p>Ученый Луи де Бройль выдвинул безумную идею: если свет (волна) ведет себя как частица, то, может быть, частицы (электроны, протоны) ведут себя как волны? И оказался прав! Любой объект имеет волновые свойства.</p>
+            
+            <div class="formula-box" style="border-color: #A78BFA;">
+                <div style="font-size: 0.9rem; color: #A78BFA; margin-bottom: 5px;">Длина волны де Бройля</div>
+                $$\lambda = \frac{h}{p} = \frac{h}{mv}$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Чем больше масса ($m$) или скорость ($v$), тем меньше длина волны. У летящего футбольного мяча длина волны ничтожно мала, поэтому мы не замечаем его волновых свойств. А вот для крошечного электрона эти свойства огромны (на этом работает электронный микроскоп).</p>
+        </div>
+
+        <h2><i data-lucide="orbit"></i> 5. Атом водорода и Линейчатые спектры</h2>
+        <div class="card">
+            <p>По постулатам Нильса Бора электроны в атоме могут летать только по строго определенным "орбитам" (энергетическим уровням). Переход между орбитами сопровождается испусканием или поглощением фотона.</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Энергия на $n$-ом уровне</div>
+                    $$E_n = -\frac{13.6 \text{ эВ}}{n^2}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-red);">
+                    <div style="font-size: 0.9rem; color: var(--brand-red); margin-bottom: 5px;">Энергия фотона при переходе</div>
+                    $$h\nu = |E_2 - E_1|$$
+                </div>
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>Электрон прыгает <b>вниз</b> (на меньший уровень) $\rightarrow$ фотон <b>испускается</b> (излучается свет).</li>
+                <li>Электрон прыгает <b>вверх</b> (на больший уровень) $\rightarrow$ фотон <b>поглощается</b> (нужно затратить энергию).</li>
+                <li>Линейчатые спектры (набор цветных полосок) дают <b>атомарные газы</b>. У каждого газа — свой уникальный спектр ("штрих-код" вещества).</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Главные закономерности и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Закономерности фотоэффекта
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li>При увеличении <b>частоты</b> света $\rightarrow$ электроны вылетают быстрее (энергия растет).</li>
+                    <li>При увеличении <b>интенсивности (яркости)</b> $\rightarrow$ энергия электронов НЕ меняется, но их вылетает больше (ток насыщения растет).</li>
+                    <li>Электронвольт (эВ) — это единица измерения энергии в микромире. Чтобы перевести эВ в Джоули, нужно умножить на заряд электрона: $1 \text{ эВ} = 1.6 \cdot 10^{-19} \text{ Дж}$. В формулу Планка с $h \approx 6.6 \cdot 10^{-34}$ нужно подставлять Джоули!</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Ошибка в длине волны:</strong> Подставляют $\lambda$ в формулу $hc/\lambda$ в нанометрах. Всегда переводи в метры! ($1 \text{ нм} = 10^{-9} \text{ м}$). Иначе энергия получится астрономической.</li>
+                    <li><strong>Зависимость работы выхода:</strong> Думают, что $A_{вых}$ зависит от света. Нет! Она зависит только от куска металла, который мы облучаем.</li>
+                    <li><strong>Путаница переходов в атоме:</strong> Думают, что чем выше орбита, тем <i>меньше</i> энергия электрона. Энергия отрицательная! $-1.5 \text{ эВ}$ больше, чем $-13.6 \text{ эВ}$. Чем дальше от ядра, тем энергия больше.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Уравнение Эйнштейна</h3>
+            <p>Работа выхода электронов из натрия равна $2.3 \text{ эВ}$. На поверхность натрия падает свет с длиной волны $\lambda = 400 \text{ нм}$. Возникнет ли фотоэффект? Если да, найдите максимальную кинетическую энергию фотоэлектронов в эВ. <br>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">(Примите $hc \approx 1240 \text{ эВ}\cdot\text{нм}$ — это очень полезный лайфхак для быстрого счета!)</span></p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Сначала найдите энергию падающего фотона $E_{ф} = hc / \lambda$. Лайфхак в скобках позволяет сразу получить ответ в электронвольтах, если подставить длину волны в нанометрах. Сравните $E_{ф}$ и $A_{вых}$. Если фотон сильнее, вычтите работу выхода из его энергии.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдем энергию одного фотона, падающего на металл. Используем удобную константу $hc \approx 1240 \text{ эВ}\cdot\text{нм}$: <br>
+                $$E_{ф} = \frac{hc}{\lambda} = \frac{1240}{400} = 3.1 \text{ эВ}$$</p>
+                
+                <p>2. Сравним с работой выхода натрия ($A_{вых} = 2.3 \text{ эВ}$).<br>
+                $3.1 \text{ эВ} > 2.3 \text{ эВ}$. Энергии фотона хватает с запасом, значит <b>фотоэффект возникнет</b>.</p>
+                
+                <p>3. Запишем уравнение Эйнштейна и выразим кинетическую энергию:<br>
+                $$E_{ф} = A_{вых} + E_k$$
+                $$E_k = E_{ф} - A_{вых}$$</p>
+
+                <p>4. Вычислим остаток энергии (кинетическую энергию электрона):<br>
+                $$E_k = 3.1 - 2.3 = 0.8 \text{ эВ}$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: Фотоэффект возникнет. $E_k = 0.8 \text{ эВ}$</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР ФОТОЭФФЕКТА
+           ========================================== */
+        const canvas = document.getElementById('canvas-photoeffect');
+        const ctx = canvas.getContext('2d');
+        
+        // Inputs
+        const inWave = document.getElementById('sim-wave');
+        const inMaterial = document.getElementById('sim-material');
+        const inIntensity = document.getElementById('sim-intensity');
+        
+        // Labels
+        const valWave = document.getElementById('val-wave');
+        const valIntensity = document.getElementById('val-intensity');
+        
+        // Dashboards
+        const dashEph = document.getElementById('dash-eph');
+        const dashAout = document.getElementById('dash-aout');
+        const dashEk = document.getElementById('dash-ek');
+        const dashCurrent = document.getElementById('dash-current');
+        const dashEkBox = document.getElementById('dash-ek-box');
+        const warningNoEffect = document.getElementById('no-effect-warning');
+
+        // Константа hc в эВ*нм
+        const HC_EV_NM = 1240;
+
+        // Helper: Wavelength (nm) to RGB string
+        function waveLengthToRGB(Wavelength) {
+            let R, G, B;
+            if (Wavelength >= 200 && Wavelength < 380) {
+                // UV - purplish/white for visualization
+                R = 0.5; G = 0; B = 1.0;
+            } else if (Wavelength >= 380 && Wavelength < 440) {
+                R = -(Wavelength - 440) / (440 - 380); G = 0.0; B = 1.0;
+            } else if (Wavelength >= 440 && Wavelength < 490) {
+                R = 0.0; G = (Wavelength - 440) / (490 - 440); B = 1.0;
+            } else if (Wavelength >= 490 && Wavelength < 510) {
+                R = 0.0; G = 1.0; B = -(Wavelength - 510) / (510 - 490);
+            } else if (Wavelength >= 510 && Wavelength < 580) {
+                R = (Wavelength - 510) / (580 - 510); G = 1.0; B = 0.0;
+            } else if (Wavelength >= 580 && Wavelength < 645) {
+                R = 1.0; G = -(Wavelength - 645) / (645 - 580); B = 0.0;
+            } else if (Wavelength >= 645 && Wavelength <= 780) {
+                R = 1.0; G = 0.0; B = 0.0;
+            } else {
+                R = 0.0; G = 0.0; B = 0.0;
+            }
+
+            let factor = 1.0;
+            if (Wavelength >= 200 && Wavelength < 420) {
+                factor = 0.3 + 0.7 * (Wavelength - 200) / (420 - 200);
+            } else if (Wavelength >= 700 && Wavelength <= 780) {
+                factor = 0.3 + 0.7 * (780 - Wavelength) / (780 - 700);
+            }
+
+            const rgbR = Math.round(R * factor * 255);
+            const rgbG = Math.round(G * factor * 255);
+            const rgbB = Math.round(B * factor * 255);
+
+            return `rgb(${rgbR}, ${rgbG}, ${rgbB})`;
+        }
+
+        // Particle systems
+        let photons = [];
+        let electrons = [];
+        let physicsState = { isEffect: false, Ek: 0, Eph: 0, current: 0 };
+        let lastTime = performance.now();
+
+        function updatePhysics() {
+            const lambda_nm = parseFloat(inWave.value);
+            const A_out = parseFloat(inMaterial.value);
+            const intensity = parseInt(inIntensity.value);
+
+            // Calculate Physics
+            const E_ph = HC_EV_NM / lambda_nm;
+            const E_k = E_ph - A_out;
+
+            physicsState.Eph = E_ph;
+            physicsState.isEffect = E_k > 0;
+            physicsState.Ek = E_k > 0 ? E_k : 0;
+            physicsState.current = E_k > 0 ? intensity * 10 : 0; // arbitrary unit for UI
+            physicsState.intensity = intensity;
+            physicsState.beamColor = waveLengthToRGB(lambda_nm);
+
+            // Update UI
+            valWave.textContent = lambda_nm + ' нм';
+            valWave.style.color = physicsState.beamColor;
+            
+            if (lambda_nm < 380) valWave.textContent += ' (УФ)';
+            else if (lambda_nm > 750) valWave.textContent += ' (ИК)';
+            
+            valIntensity.textContent = intensity;
+
+            dashEph.textContent = E_ph.toFixed(2) + ' эВ';
+            dashAout.textContent = A_out.toFixed(2) + ' эВ';
+            
+            if (physicsState.isEffect) {
+                dashEk.textContent = E_k.toFixed(2) + ' эВ';
+                dashEk.style.color = "var(--accent)";
+                dashEkBox.style.borderColor = "var(--accent)";
+                dashEkBox.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
+                
+                dashCurrent.textContent = physicsState.current + ' шт/с';
+                warningNoEffect.style.display = 'none';
+            } else {
+                dashEk.textContent = '0.00 эВ';
+                dashEk.style.color = "var(--text-muted)";
+                dashEkBox.style.borderColor = "var(--error-text)";
+                dashEkBox.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+                
+                dashCurrent.textContent = '0 шт/с';
+                warningNoEffect.style.display = 'block';
+            }
+        }
+
+        function drawSimulator() {
+            const now = performance.now();
+            const dt = (now - lastTime) / 1000 || 0.016;
+            lastTime = now;
+
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // 1. Draw Cathode (Metal Plate)
+            const plateW = 100;
+            const plateH = h - 40;
+            const plateX = 50;
+            const plateY = 20;
+            
+            // Texture for metal
+            ctx.fillStyle = '#555';
+            ctx.fillRect(plateX, plateY, plateW, plateH);
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(plateX, plateY, plateW, plateH);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            
+            const matName = inMaterial.options[inMaterial.selectedIndex].text.split(' ')[0];
+            ctx.fillText(matName, plateX + plateW/2, plateY + 20);
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Катод (-)', plateX + plateW/2, h - 30);
+
+            // 2. Draw Anode (Collector Plate)
+            const anodeX = w - 100;
+            ctx.fillStyle = '#222';
+            ctx.fillRect(anodeX, plateY, 20, plateH);
+            ctx.strokeStyle = '#666';
+            ctx.strokeRect(anodeX, plateY, 20, plateH);
+            ctx.fillStyle = '#fff';
+            ctx.fillText('Анод (+)', anodeX + 10, h - 30);
+
+            // 3. Draw Wires & Basic Circuit (just visual connection)
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(plateX, h-20); ctx.lineTo(10, h-20); ctx.lineTo(10, h-5);
+            ctx.moveTo(anodeX+20, h-20); ctx.lineTo(w-10, h-20); ctx.lineTo(w-10, h-5);
+            ctx.stroke();
+
+            // 4. Photon Emitter (Laser)
+            const laserX = plateX + plateW/2 + 50;
+            const laserY = 0; // comes from top right towards plate
+
+            // Spawn Photons
+            // Probability depends on intensity
+            if (Math.random() < physicsState.intensity * 0.1) {
+                // Determine target hit point on plate
+                const targetY = plateY + 40 + Math.random() * (plateH - 80);
+                // Photon starts off-screen top-right
+                const startX = targetY + 150; 
+                const startY = targetY - 150;
+                
+                photons.push({
+                    x: startX,
+                    y: startY,
+                    targetY: targetY,
+                    speed: 300, // fast visual speed
+                    active: true
+                });
+            }
+
+            // Update & Draw Photons
+            ctx.lineWidth = 2;
+            for (let i = photons.length - 1; i >= 0; i--) {
+                let p = photons[i];
+                if (!p.active) {
+                    photons.splice(i, 1);
+                    continue;
+                }
+
+                // Move photon (angle is always 45 deg down-left)
+                p.x -= p.speed * dt;
+                p.y += p.speed * dt;
+
+                // Draw wave packet
+                ctx.strokeStyle = physicsState.beamColor;
+                ctx.beginPath();
+                // Draw a squiggly line to represent photon wave
+                const waveLen = 20;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + waveLen, p.y - waveLen);
+                ctx.stroke();
+                
+                // Add a glow
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = physicsState.beamColor;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Check collision with plate
+                if (p.x <= plateX + plateW) {
+                    p.active = false; // Destroy photon
+                    
+                    // Spawn Electron if photoelectric effect occurs
+                    if (physicsState.isEffect) {
+                        // Velocity proportional to sqrt of Kinetic Energy
+                        const v_mag = 50 + Math.sqrt(physicsState.Ek) * 80;
+                        electrons.push({
+                            x: plateX + plateW,
+                            y: p.y,
+                            vx: v_mag * (0.8 + Math.random()*0.4), // Mostly right
+                            vy: (Math.random() - 0.5) * 40, // Slight vertical spread
+                            active: true
+                        });
+                    }
+                }
+            }
+
+            // 5. Update & Draw Electrons
+            ctx.fillStyle = '#06B6D4'; // Cyan electrons
+            for (let i = electrons.length - 1; i >= 0; i--) {
+                let e = electrons[i];
+                if (!e.active) {
+                    electrons.splice(i, 1);
+                    continue;
+                }
+
+                e.x += e.vx * dt;
+                e.y += e.vy * dt;
+
+                // Draw electron
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, 4, 0, Math.PI*2);
+                ctx.fill();
+                
+                // Glow
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = '#06B6D4';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Trail
+                ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(e.x, e.y);
+                ctx.lineTo(e.x - e.vx * 0.05, e.y - e.vy * 0.05);
+                ctx.stroke();
+
+                // Check collision with Anode
+                if (e.x >= anodeX) {
+                    e.active = false;
+                }
+            }
+
+            requestAnimationFrame(drawSimulator);
+        }
+
+        // Attach listeners
+        inWave.addEventListener('input', updatePhysics);
+        inMaterial.addEventListener('change', updatePhysics);
+        inIntensity.addEventListener('input', updatePhysics);
+
+        // Start
+        updatePhysics();
+        requestAnimationFrame(drawSimulator);
+
+    </script>
+</body>
+</html>
