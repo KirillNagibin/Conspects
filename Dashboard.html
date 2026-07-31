@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Интерактивный учебник физики | Дашборд</title>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            
+            /* Цвета разделов */
+            --color-mech: #3B82F6;     /* Синий - Механика */
+            --color-thermo: #EF4444;   /* Красный - Термодинамика */
+            --color-electro: #F97316;  /* Оранжевый - Электродинамика */
+            --color-optics: #06B6D4;   /* Бирюзовый - Оптика */
+            --color-quantum: #8B5CF6;  /* Фиолетовый - Кванты/Ядро */
+            --color-accent: #4CAF50;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 { 
+            font-size: 3rem; 
+            margin-bottom: 10px; 
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #fff, #a0a0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Поиск */
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-size: 1.1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        /* Секции */
+        .section-title {
+            font-size: 1.8rem;
+            margin: 40px 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Карточки */
+        .topic-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .mech:hover { border-color: var(--color-mech); }
+        .thermo:hover { border-color: var(--color-thermo); }
+        .electro:hover { border-color: var(--color-electro); }
+        .optics:hover { border-color: var(--color-optics); }
+        .quantum:hover { border-color: var(--color-quantum); }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mech .card-icon { background: rgba(59, 130, 246, 0.1); color: var(--color-mech); }
+        .thermo .card-icon { background: rgba(239, 68, 68, 0.1); color: var(--color-thermo); }
+        .electro .card-icon { background: rgba(249, 115, 22, 0.1); color: var(--color-electro); }
+        .optics .card-icon { background: rgba(6, 182, 212, 0.1); color: var(--color-optics); }
+        .quantum .card-icon { background: rgba(139, 92, 246, 0.1); color: var(--color-quantum); }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mech .card-footer { color: var(--color-mech); }
+        .thermo .card-footer { color: var(--color-thermo); }
+        .electro .card-footer { color: var(--color-electro); }
+        .optics .card-footer { color: var(--color-optics); }
+        .quantum .card-footer { color: var(--color-quantum); }
+
+        /* Сообщение если ничего не найдено */
+        #no-results {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 2.2rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Интерактивный учебник физики</h1>
+            <p>База умных конспектов с симуляциями и лабораториями для подготовки к ОГЭ и ЕГЭ</p>
+        </div>
+
+        <div class="search-container">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск по темам (например: Линзы, Сила Архимеда...)" oninput="filterTopics()">
+        </div>
+
+        <div id="no-results">По вашему запросу ничего не найдено 🔭</div>
+
+        <!-- РАЗДЕЛ: МЕХАНИКА -->
+        <div class="topic-section">
+            <h2 class="section-title" style="color: var(--color-mech); border-bottom-color: var(--color-mech);"><i data-lucide="settings"></i> Механика</h2>
+            <div class="grid">
+                
+                <a href="kinematics_interactive.html" class="topic-card mech" data-search="кинематика движение скорость ускорение графики">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="fast-forward"></i></div>
+                        <h3 class="card-title">Кинематика</h3>
+                    </div>
+                    <p class="card-desc">Равномерное и равноускоренное движение, чтение графиков скорости и пути.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="kinematics_angle_interactive.html" class="topic-card mech" data-search="движение под углом бросок парабола баллистика дальность">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="crosshair"></i></div>
+                        <h3 class="card-title">Движение под углом к горизонту</h3>
+                    </div>
+                    <p class="card-desc">Баллистика, разложение скоростей, дальность и высота полета.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="gravity_circular_interactive.html" class="topic-card mech" data-search="гравитация движение по окружности спутники орбита период">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="globe"></i></div>
+                        <h3 class="card-title">Гравитация и Окружность</h3>
+                    </div>
+                    <p class="card-desc">Закон всемирного тяготения, орбиты спутников, центростремительное ускорение.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="dynamics_interactive.html" class="topic-card mech" data-search="динамика законы ньютона силы трение упругость">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="move"></i></div>
+                        <h3 class="card-title">Динамика и Законы Ньютона</h3>
+                    </div>
+                    <p class="card-desc">Причины движения, проекции сил на оси, трение и реакция опоры.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="statics_blocks_interactive.html" class="topic-card mech" data-search="статика блоки рычаги равновесие момент силы">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="scale"></i></div>
+                        <h3 class="card-title">Статика и Блоки</h3>
+                    </div>
+                    <p class="card-desc">Условия равновесия, моменты сил, подвижные и неподвижные блоки.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="hydrostatics_interactive.html" class="topic-card mech" data-search="гидростатика давление архимед плавание тел вода">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="anchor"></i></div>
+                        <h3 class="card-title">Гидростатика</h3>
+                    </div>
+                    <p class="card-desc">Давление жидкостей, закон Паскаля, выталкивающая сила Архимеда.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="momentum_conservation.html" class="topic-card mech" data-search="импульс закон сохранения удары упругий неупругий">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="swords"></i></div>
+                        <h3 class="card-title">Закон сохранения импульса</h3>
+                    </div>
+                    <p class="card-desc">Импульс тела и силы, абсолютно упругие и неупругие соударения.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="energy_conservation_interactive.html" class="topic-card mech" data-search="энергия работа мощность сохранение кинетическая потенциальная">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="battery-charging"></i></div>
+                        <h3 class="card-title">Энергия, Работа, Мощность</h3>
+                    </div>
+                    <p class="card-desc">Кинетическая и потенциальная энергия, теорема о кинетической энергии.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="oscillations_waves_interactive.html" class="topic-card mech" data-search="колебания волны маятник пружинный математический звук">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="activity"></i></div>
+                        <h3 class="card-title">Колебания и Волны</h3>
+                    </div>
+                    <p class="card-desc">Математический и пружинный маятники, звук и волновые процессы.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- РАЗДЕЛ: МКТ И ТЕРМОДИНАМИКА -->
+        <div class="topic-section">
+            <h2 class="section-title" style="color: var(--color-thermo); border-bottom-color: var(--color-thermo);"><i data-lucide="thermometer"></i> МКТ и Термодинамика</h2>
+            <div class="grid">
+                
+                <a href="mkt_basics_interactive.html" class="topic-card thermo" data-search="мкт идеальный газ температура давление концентрация">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="microscope"></i></div>
+                        <h3 class="card-title">Основы МКТ</h3>
+                    </div>
+                    <p class="card-desc">Связь макро и микромира, основное уравнение МКТ, кинетическая энергия молекул.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="ideal_gas_interactive.html" class="topic-card thermo" data-search="газовые законы изопроцессы изобарный изохорный изотермический">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="box"></i></div>
+                        <h3 class="card-title">Газовые законы</h3>
+                    </div>
+                    <p class="card-desc">Уравнение Менделеева-Клапейрона, графики изопроцессов в осях p-V-T.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="thermodynamics_interactive.html" class="topic-card thermo" data-search="тепловые явления нагревание плавление кипение фазовые переходы">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="flame"></i></div>
+                        <h3 class="card-title">Тепловые явления</h3>
+                    </div>
+                    <p class="card-desc">Агрегатные состояния вещества, формулы нагрева, плавления и парообразования.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="humidity_dalton_interactive.html" class="topic-card thermo" data-search="влажность закон дальтона насыщенный пар парциальное давление">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="cloud-rain"></i></div>
+                        <h3 class="card-title">Влажность и Закон Дальтона</h3>
+                    </div>
+                    <p class="card-desc">Смеси газов, насыщенный и ненасыщенный пар, расчет относительной влажности.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="thermo_first_law_interactive.html" class="topic-card thermo" data-search="первый закон термодинамики работа газа внутренняя энергия">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="layers"></i></div>
+                        <h3 class="card-title">Первый закон термодинамики</h3>
+                    </div>
+                    <p class="card-desc">Внутренняя энергия, работа газа по графику, адиабатный процесс.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="thermal_engines_interactive.html" class="topic-card thermo" data-search="тепловые двигатели кпд цикл карно нагреватель холодильник">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="car"></i></div>
+                        <h3 class="card-title">Тепловые двигатели и КПД</h3>
+                    </div>
+                    <p class="card-desc">Принцип работы тепловой машины, расчет реального и идеального (Карно) КПД.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- РАЗДЕЛ: ЭЛЕКТРОДИНАМИКА -->
+        <div class="topic-section">
+            <h2 class="section-title" style="color: var(--color-electro); border-bottom-color: var(--color-electro);"><i data-lucide="zap"></i> Электродинамика</h2>
+            <div class="grid">
+                
+                <a href="electrostatics_interactive.html" class="topic-card electro" data-search="электростатика заряды закон кулона электризация">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="shield-check"></i></div>
+                        <h3 class="card-title">Электрические заряды</h3>
+                    </div>
+                    <p class="card-desc">Виды электризации, закон сохранения заряда, сила Кулона.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="electrostatics_work_interactive.html" class="topic-card electro" data-search="работа поля потенциал напряжение напряженность">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="activity"></i></div>
+                        <h3 class="card-title">Работа поля и Потенциал</h3>
+                    </div>
+                    <p class="card-desc">Потенциальная энергия заряда, связь напряжения и напряженности поля.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="capacitors_interactive.html" class="topic-card electro" data-search="конденсаторы электроемкость энергия поля диэлектрик">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="columns"></i></div>
+                        <h3 class="card-title">Конденсаторы</h3>
+                    </div>
+                    <p class="card-desc">Устройство плоского конденсатора, расчет энергии, влияние диэлектрика.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="electric_current_interactive.html" class="topic-card electro" data-search="электрический ток сопротивление закон ома джоуля ленца">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="plug"></i></div>
+                        <h3 class="card-title">Ток и Закон Ома (Участок)</h3>
+                    </div>
+                    <p class="card-desc">Сила тока, сопротивление проводов, последовательное и параллельное соединение.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="ohm_complete_circuit.html" class="topic-card electro" data-search="закон ома полная цепь эдс внутреннее сопротивление кз">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="battery"></i></div>
+                        <h3 class="card-title">Закон Ома для полной цепи</h3>
+                    </div>
+                    <p class="card-desc">ЭДС, внутреннее сопротивление источника, мощность и короткое замыкание.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="magnetic_field_interactive.html" class="topic-card electro" data-search="магнитное поле индукция сила ампера сила лоренца">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="magnet"></i></div>
+                        <h3 class="card-title">Магнитное поле</h3>
+                    </div>
+                    <p class="card-desc">Постоянные магниты, сила Ампера, движение частицы под действием силы Лоренца.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="emi_interactive.html" class="topic-card electro" data-search="эми электромагнитная индукция фарадей самоиндукция правило ленца">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="refresh-cw"></i></div>
+                        <h3 class="card-title">ЭМИ и Самоиндукция</h3>
+                    </div>
+                    <p class="card-desc">Магнитный поток, закон Фарадея, правило Ленца, ЭДС движущегося проводника.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="lc_circuit_interactive.html" class="topic-card electro" data-search="колебательный контур катушка конденсатор формула томсона">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="radio"></i></div>
+                        <h3 class="card-title">Колебательный контур</h3>
+                    </div>
+                    <p class="card-desc">Электромагнитные колебания, превращение энергии, формула Томсона.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- РАЗДЕЛ: ОПТИКА -->
+        <div class="topic-section">
+            <h2 class="section-title" style="color: var(--color-optics); border-bottom-color: var(--color-optics);"><i data-lucide="eye"></i> Оптика</h2>
+            <div class="grid">
+                
+                <a href="geometrical_optics_interactive.html" class="topic-card optics" data-search="геометрическая оптика отражение преломление пво снеллиус">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="sun"></i></div>
+                        <h3 class="card-title">Геометрическая оптика</h3>
+                    </div>
+                    <p class="card-desc">Законы отражения и преломления, показатель преломления, полное внутреннее отражение.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="optics_lenses_interactive.html" class="topic-card optics" data-search="линзы собирающая рассеивающая изображение оптическая сила">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="scan-line"></i></div>
+                        <h3 class="card-title">Тонкие линзы</h3>
+                    </div>
+                    <p class="card-desc">Формула тонкой линзы, построение изображений, расчет увеличения.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="wave_optics_interactive.html" class="topic-card optics" data-search="волновая оптика дифракция интерференция дисперсия решетка">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="waves"></i></div>
+                        <h3 class="card-title">Волновая оптика</h3>
+                    </div>
+                    <p class="card-desc">Интерференция, дисперсия, расчет дифракционной решетки и шкала ЭМВ.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- РАЗДЕЛ: КВАНТЫ И ЯДРО -->
+        <div class="topic-section">
+            <h2 class="section-title" style="color: var(--color-quantum); border-bottom-color: var(--color-quantum);"><i data-lucide="atom"></i> Квантовая и Ядерная физика</h2>
+            <div class="grid">
+                
+                <a href="quantum_photoeffect_interactive.html" class="topic-card quantum" data-search="кванты фотон фотоэффект эйнштейн атом бора">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="camera-flash"></i></div>
+                        <h3 class="card-title">Кванты и Фотоэффект</h3>
+                    </div>
+                    <p class="card-desc">Энергия и импульс фотона, уравнение Эйнштейна, постулаты Бора.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+                <a href="nuclear_physics_interactive.html" class="topic-card quantum" data-search="ядерная физика изотопы распад дефект массы период полураспада">
+                    <div class="card-header">
+                        <div class="card-icon"><i data-lucide="radiation"></i></div>
+                        <h3 class="card-title">Ядерная физика</h3>
+                    </div>
+                    <p class="card-desc">Строение ядра, альфа- и бета-распады, дефект массы, закон полураспада.</p>
+                    <div class="card-footer"><span>Открыть конспект</span> <i data-lucide="arrow-right" style="width: 16px;"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Инициализация иконок
+        lucide.createIcons();
+
+        // Логика живого поиска
+        function filterTopics() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.topic-card');
+            const sections = document.querySelectorAll('.topic-section');
+            let hasVisibleCards = false;
+
+            // Фильтрация карточек
+            cards.forEach(card => {
+                const searchTerms = card.getAttribute('data-search').toLowerCase();
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                
+                // Ищем совпадения в заголовке или в скрытых тегах data-search
+                if (searchTerms.includes(input) || title.includes(input)) {
+                    card.style.display = 'flex';
+                    hasVisibleCards = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Скрытие пустых секций (если в разделе все карточки скрыты)
+            sections.forEach(section => {
+                const visibleCardsInSection = section.querySelectorAll('.topic-card[style="display: flex;"]');
+                if (visibleCardsInSection.length === 0 && input !== "") {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
+                }
+            });
+
+            // Показ сообщения "Ничего не найдено"
+            const noResultsMsg = document.getElementById('no-results');
+            if (!hasVisibleCards && input !== "") {
+                noResultsMsg.style.display = 'block';
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
