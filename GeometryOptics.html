@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Геометрическая оптика (Отражение и преломление)</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-purple: #8B5CF6;
+            --brand-cyan: #06B6D4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; vertical-align: top;}
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;}
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #0a0a0a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; touch-action: none; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Геометрическая оптика: Отражение и Преломление</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="sun" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое геометрическая оптика?</strong><br>
+                <span style="color: var(--text-muted);">Это раздел физики, где мы не думаем о том, что свет — это волна или поток фотонов. Мы представляем свет просто как <b>прямую линию (световой луч)</b>. Оказывается, чтобы создать зеркало, телескоп или оптоволокно для интернета, достаточно знать всего пару простых законов геометрии.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="split-square-vertical"></i> 1. Закон отражения света</h2>
+        <div class="card">
+            <p>Когда свет падает на границу двух сред (например, на зеркало), часть его возвращается обратно в первую среду. Это отражение.</p>
+            
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$\alpha = \gamma$$
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>$\alpha$ — <b>Угол падения</b>. Это угол между падающим лучом и <b>ПЕРПЕНДИКУЛЯРОМ</b> (нормалью) к поверхности.</li>
+                <li>$\gamma$ — <b>Угол отражения</b>. Угол между отраженным лучом и тем же перпендикуляром.</li>
+                <li>Падающий луч, отраженный луч и перпендикуляр лежат <b>в одной плоскости</b>.</li>
+            </ul>
+
+            <h3 style="margin-top: 25px; color: #fff;">Плоское зеркало</h3>
+            <p style="color: var(--text-muted);">Изображение в плоском зеркале всегда: 1) мнимое (его нельзя поймать на экран, оно "за" зеркалом), 2) прямое, 3) равное по размеру предмету, 4) симметричное (расстояние от предмета до зеркала равно расстоянию от зеркала до изображения).</p>
+        </div>
+
+        <h2><i data-lucide="minimize-2"></i> 2. Показатель преломления ($n$)</h2>
+        <div class="card">
+            <p>В вакууме свет летит с максимальной во Вселенной скоростью: $c \approx 3 \cdot 10^8 \text{ м/с}$. Но в любой другой среде (вода, стекло, алмаз) свету "тяжело" пробираться сквозь атомы, и он тормозит.</p>
+            
+            <div class="formula-box" style="border-color: var(--brand-purple);">
+                <div style="font-size: 0.9rem; color: var(--brand-purple); margin-bottom: 5px;">Абсолютный показатель преломления</div>
+                $$n = \frac{c}{v}$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Он показывает, во сколько раз скорость света в данной среде ($v$) меньше скорости света в вакууме ($c$).<br>
+            Для вакуума $n = 1$. Для воздуха $n \approx 1$. Для воды $n \approx 1.33$. Для стекла $n \approx 1.5$. Для алмаза $n \approx 2.4$.</p>
+        </div>
+
+        <h2><i data-lucide="corner-down-right"></i> 3. Закон преломления (Закон Снеллиуса)</h2>
+        <div class="card">
+            <p>Когда свет переходит из одной прозрачной среды в другую, его скорость меняется, из-за чего луч "ломается" (меняет направление).</p>
+            
+            <div class="formula-box" style="border-color: var(--brand-blue);">
+                $$n_1 \sin\alpha = n_2 \sin\beta$$
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>$n_1$ и $n_2$ — показатели преломления первой и второй среды.</li>
+                <li>$\alpha$ — <b>Угол падения</b> (от перпендикуляра).</li>
+                <li>$\beta$ — <b>Угол преломления</b> (от перпендикуляра в другой среде).</li>
+            </ul>
+
+            <div class="alert-box alert-info" style="margin-top: 20px;">
+                <div>
+                    <strong style="color: var(--info-text);">Как работает "поворот"?</strong><br>
+                    <span style="color: var(--text-muted);">Если свет идет из воздуха ($n \approx 1$) в стекло ($n \approx 1.5$), он попадает в более плотную среду. Ему там "теснее", и луч <b>прижимается</b> к перпендикуляру ($\beta < \alpha$). Если свет выходит из стекла в воздух, он "вырывается на свободу" и <b>отклоняется</b> от перпендикуляра ($\beta > \alpha$).</span>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="shield-alert"></i> 4. Полное внутреннее отражение (ПВО)</h2>
+        <div class="card">
+            <p>Этот эффект возникает <b>ТОЛЬКО</b> когда свет выходит из оптически более плотной среды в менее плотную (например, из воды в воздух, $n_1 > n_2$).</p>
+            <p style="color: var(--text-muted);">Поскольку $\beta > \alpha$, при увеличении угла падения $\alpha$, угол преломления $\beta$ растет еще быстрее. В какой-то момент $\beta$ достигает $90^\circ$ (луч скользит прямо по границе воды и воздуха). Если увеличить угол $\alpha$ еще хоть на градус, свету будет некуда выйти — он <b>полностью отразится обратно в воду</b>!</p>
+            
+            <div class="formula-box" style="border-color: var(--brand-orange);">
+                <div style="font-size: 0.9rem; color: var(--brand-orange); margin-bottom: 5px;">Предельный угол ПВО</div>
+                $$\sin\alpha_{пр} = \frac{n_2}{n_1}$$
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 10px;"><i>Именно благодаря ПВО работают оптоволоконные кабели: свет запускают внутрь стеклянной нити под большим углом, и он не может из нее вырваться, бесконечно отражаясь от стенок и доставляя нам интернет.</i></p>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 5. Лаборатория: Лазер и граница сред</h2>
+        <p style="color: var(--text-muted);">Управляйте оптическими свойствами верхней и нижней сред, а также углом лазера. Обратите внимание: все углы отсчитываются от белого перпендикуляра (нормали)! Попробуйте сделать верхнюю среду плотнее нижней ($n_1 > n_2$) и найдите угол Полного Внутреннего Отражения.</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);"><span>Угол падения ($\alpha$):</span> <span id="val-alpha">45°</span></label>
+                    <input type="range" id="sim-alpha" min="1" max="89" value="45" step="1" style="accent-color: var(--brand-red);">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Среда 1 (сверху) $n_1$:</span> <span id="val-n1">1.0</span></label>
+                    <input type="range" id="sim-n1" min="1.0" max="2.5" value="1.0" step="0.1" style="accent-color: #aaa;">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);"><span>Среда 2 (снизу) $n_2$:</span> <span id="val-n2">1.5</span></label>
+                    <input type="range" id="sim-n2" min="1.0" max="2.5" value="1.5" step="0.1" style="accent-color: var(--brand-blue);">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Угол падения ($\alpha$)</div>
+                    <div class="dashboard-value" id="dash-alpha" style="color: var(--brand-red);">45.0°</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Угол отражения ($\gamma$)</div>
+                    <div class="dashboard-value" id="dash-gamma" style="color: var(--accent);">45.0°</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--brand-blue); background: rgba(59, 130, 246, 0.1);">
+                    <div class="dashboard-label">Угол преломления ($\beta$)</div>
+                    <div class="dashboard-value" id="dash-beta" style="color: var(--brand-blue);">28.1°</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-refraction" width="600" height="400" style="background: #111; border-radius: 8px; border: 1px solid #333; touch-action: none;"></canvas>
+            </div>
+            
+            <p id="tir-warning" style="display: none; text-align: center; color: var(--brand-orange); font-size: 1rem; font-weight: bold; margin-top: 15px; animation: pulse 1.5s infinite;">
+                <i data-lucide="shield-alert" style="width: 18px; vertical-align: middle;"></i> Полное внутреннее отражение! Луч не переходит во вторую среду.
+            </p>
+            <style>
+                @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+            </style>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Обратимость световых лучей:</strong> Если пустить свет из воды в воздух точно по линии преломленного луча, он выйдет из воды точно по линии падающего! Траектория от направления не зависит.</li>
+                    <li><strong>Частота неизменна:</strong> При переходе из одной среды в другую скорость света $v$ и длина волны $\lambda$ меняются, но <b>частота $\nu$ остается постоянной!</b> Цвет света не меняется при переходе под воду.</li>
+                    <li><strong>"Глубина" водоема:</strong> Из-за преломления дно реки или бассейна всегда кажется нам ближе (мельче), чем оно есть на самом деле.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Главная ловушка ЕГЭ (Угол):</strong> В задаче сказано "Луч падает на зеркало под углом $30^\circ$ к <i>поверхности</i>". Школьник пишет $\alpha = 30^\circ$. Это ОШИБКА! Угол падения измеряется от перпендикуляра. Правильно: $\alpha = 90^\circ - 30^\circ = 60^\circ$.</li>
+                    <li><strong>Закон Снеллиуса "на глаз":</strong> Пытаются запомнить "синус альфа на синус бета равно эн", забывая, где какое $n$. Пиши в строку: $n_1 \sin\alpha = n_2 \sin\beta$, тогда никогда не перепутаешь.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Угол преломления</h3>
+            <p>Световой луч падает из воздуха ($n_1 = 1$) на поверхность стекла ($n_2 = 1.5$). Угол между падающим лучом и <b>поверхностью</b> стекла составляет $30^\circ$. Найдите угол отражения ($\gamma$) и синус угла преломления ($\sin\beta$).</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Осторожно с углом! $30^\circ$ — это угол к поверхности. Сначала найдите истинный угол падения $\alpha$ (от перпендикуляра). Затем примените закон отражения ($\alpha = \gamma$) и закон Снеллиуса ($1 \cdot \sin\alpha = 1.5 \cdot \sin\beta$).
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Найдем истинный угол падения $\alpha$ (отсчитывается от перпендикуляра к поверхности): <br>
+                $$\alpha = 90^\circ - 30^\circ = 60^\circ$$</p>
+                
+                <p>2. По закону отражения угол отражения равен углу падения:<br>
+                $$\gamma = \alpha = 60^\circ$$</p>
+                
+                <p>3. Запишем закон преломления Снеллиуса:<br>
+                $$n_1 \sin\alpha = n_2 \sin\beta$$</p>
+
+                <p>4. Выразим $\sin\beta$ и подставим значения ($n_1=1$, $n_2=1.5$, $\sin 60^\circ = \frac{\sqrt{3}}{2} \approx 0.866$):<br>
+                $$\sin\beta = \frac{n_1 \sin\alpha}{n_2} = \frac{1 \cdot \sin 60^\circ}{1.5} = \frac{0.866}{1.5} \approx 0.577$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: $\gamma = 60^\circ$, $\sin\beta \approx 0.577$</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР ОТРАЖЕНИЯ И ПРЕЛОМЛЕНИЯ
+           ========================================== */
+        const canvas = document.getElementById('canvas-refraction');
+        const ctx = canvas.getContext('2d');
+        
+        // Inputs
+        const inAlpha = document.getElementById('sim-alpha');
+        const inN1 = document.getElementById('sim-n1');
+        const inN2 = document.getElementById('sim-n2');
+        
+        // Labels
+        const valAlpha = document.getElementById('val-alpha');
+        const valN1 = document.getElementById('val-n1');
+        const valN2 = document.getElementById('val-n2');
+        
+        // Dashboards & Warnings
+        const dashAlpha = document.getElementById('dash-alpha');
+        const dashGamma = document.getElementById('dash-gamma');
+        const dashBeta = document.getElementById('dash-beta');
+        const warningTIR = document.getElementById('tir-warning');
+
+        // Color mapping for media (n=1.0 -> dark, n=2.5 -> bright blue/cyan)
+        function getMediaColor(n) {
+            // Map n (1.0 to 2.5) to a color.
+            // 1.0 (Air) -> Almost black #111
+            // 1.33 (Water) -> Dark blue
+            // 1.5 (Glass) -> Purpleish
+            // 2.4 (Diamond) -> Cyanish
+            let ratio = (n - 1.0) / 1.5; // 0 to 1
+            let r = Math.floor(20 + 20 * ratio);
+            let g = Math.floor(20 + 100 * ratio);
+            let b = Math.floor(30 + 150 * ratio);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Draw arrow helper
+        function drawArrowLine(ctx, fromX, fromY, toX, toY, color, width=3, isDashed=false) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            if (isDashed) ctx.setLineDash([5, 5]);
+            else ctx.setLineDash([]);
+            
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Arrow head in the middle
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            const headlen = 10;
+            
+            let midX = fromX + dx * 0.6;
+            let midY = fromY + dy * 0.6;
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(midX, midY);
+            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 6), midY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+        }
+
+        // Draw Arc Helper
+        function drawAngleArc(ctx, cx, cy, radius, startAngle, endAngle, color, label) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, startAngle, endAngle, startAngle > endAngle); // Handles direction
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Label
+            const midAngle = (startAngle + endAngle) / 2;
+            ctx.fillStyle = color;
+            ctx.font = '16px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, cx + (radius + 15) * Math.cos(midAngle), cy + (radius + 15) * Math.sin(midAngle));
+        }
+
+        function updatePhysics() {
+            const alphaDeg = parseFloat(inAlpha.value);
+            const n1 = parseFloat(inN1.value);
+            const n2 = parseFloat(inN2.value);
+
+            // Update UI Labels
+            valAlpha.textContent = alphaDeg + '°';
+            
+            let n1Label = n1.toFixed(1);
+            if (n1 === 1.0) n1Label += " (Воздух)";
+            else if (n1 === 1.3) n1Label += " (Вода)";
+            else if (n1 === 1.5) n1Label += " (Стекло)";
+            else if (n1 === 2.4) n1Label += " (Алмаз)";
+            valN1.textContent = n1Label;
+
+            let n2Label = n2.toFixed(1);
+            if (n2 === 1.0) n2Label += " (Воздух)";
+            else if (n2 === 1.3) n2Label += " (Вода)";
+            else if (n2 === 1.5) n2Label += " (Стекло)";
+            else if (n2 === 2.4) n2Label += " (Алмаз)";
+            valN2.textContent = n2Label;
+
+            // Physics Math
+            const alphaRad = alphaDeg * Math.PI / 180;
+            const gammaDeg = alphaDeg; // Law of reflection
+            
+            let sinBeta = (n1 / n2) * Math.sin(alphaRad);
+            let isTIR = false;
+            let betaDeg = 0;
+            let betaRad = 0;
+
+            if (sinBeta >= 1) {
+                isTIR = true;
+                dashBeta.textContent = '—';
+                dashBeta.style.color = 'var(--text-muted)';
+                warningTIR.style.display = 'block';
+                dashBeta.parentElement.style.borderColor = "var(--error-text)";
+                dashBeta.parentElement.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+            } else {
+                isTIR = false;
+                betaRad = Math.asin(sinBeta);
+                betaDeg = betaRad * 180 / Math.PI;
+                
+                dashBeta.textContent = betaDeg.toFixed(1) + '°';
+                dashBeta.style.color = 'var(--brand-blue)';
+                warningTIR.style.display = 'none';
+                dashBeta.parentElement.style.borderColor = "var(--brand-blue)";
+                dashBeta.parentElement.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+            }
+
+            dashAlpha.textContent = alphaDeg.toFixed(1) + '°';
+            dashGamma.textContent = gammaDeg.toFixed(1) + '°';
+
+            // Drawing on Canvas
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            ctx.clearRect(0, 0, w, h);
+
+            // 1. Draw Media Backgrounds
+            ctx.fillStyle = getMediaColor(n1);
+            ctx.fillRect(0, 0, w, cy);
+            
+            ctx.fillStyle = getMediaColor(n2);
+            ctx.fillRect(0, cy, w, cy);
+
+            // 2. Draw Boundary Line
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, cy);
+            ctx.lineTo(w, cy);
+            ctx.stroke();
+
+            // 3. Draw Normal (Perpendicular)
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.moveTo(cx, 20);
+            ctx.lineTo(cx, h - 20);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw 90 deg square
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(cx, cy - 15, 15, 15);
+
+            // 4. Calculate Ray Vectors
+            const rayLength = 300;
+            
+            // Incident Ray (comes from top left typically, angle is from Y axis)
+            // In canvas, top Y is 0. Normal is straight up (0, -1). 
+            // So incident angle alpha means the ray direction is (sin(alpha), cos(alpha)) towards the center
+            const incDirX = Math.sin(alphaRad);
+            const incDirY = Math.cos(alphaRad); // Positive Y is down
+            
+            // Reflected Ray (goes top right)
+            const refDirX = Math.sin(alphaRad);
+            const refDirY = -Math.cos(alphaRad); // Negative Y is up
+            
+            // Refracted Ray (goes bottom right)
+            const refracDirX = Math.sin(betaRad);
+            const refracDirY = Math.cos(betaRad); // Positive Y is down
+
+            // 5. Draw Rays
+            const laserColor = '#EF4444'; // Red laser
+            const reflectionColor = isTIR ? '#EF4444' : 'rgba(239, 68, 68, 0.4)'; // Fainter if not TIR
+            const refractionColor = '#3B82F6'; // Blueish for refracted
+
+            // Incident
+            drawArrowLine(ctx, cx - incDirX * rayLength, cy - incDirY * rayLength, cx, cy, laserColor, 4);
+            
+            // Reflected
+            drawArrowLine(ctx, cx, cy, cx + refDirX * rayLength, cy + refDirY * rayLength, reflectionColor, isTIR ? 4 : 2);
+
+            // Refracted
+            if (!isTIR) {
+                drawArrowLine(ctx, cx, cy, cx + refracDirX * rayLength, cy + refracDirY * rayLength, refractionColor, 4);
+            }
+
+            // 6. Draw Angles (Arcs)
+            // Mathematical angles for arc drawing (Canvas 0 is right, PI/2 is down)
+            // Normal UP is -PI/2. Normal DOWN is PI/2.
+            const normUpAngle = -Math.PI / 2;
+            const normDownAngle = Math.PI / 2;
+            
+            const incAngleCanvas = normUpAngle - alphaRad;
+            const refAngleCanvas = normUpAngle + alphaRad;
+            const refracAngleCanvas = normDownAngle - betaRad; // Wait, ray goes bottom right, so angle is PI/2 - beta? No, normal is down (PI/2). Ray is to the right of normal. So PI/2 - beta.
+
+            drawAngleArc(ctx, cx, cy, 50, incAngleCanvas, normUpAngle, laserColor, 'α');
+            drawAngleArc(ctx, cx, cy, 60, normUpAngle, refAngleCanvas, reflectionColor, 'γ');
+            
+            if (!isTIR) {
+                drawAngleArc(ctx, cx, cy, 50, normDownAngle - betaRad, normDownAngle, refractionColor, 'β');
+            }
+        }
+
+        // Attach listeners
+        inAlpha.addEventListener('input', updatePhysics);
+        inN1.addEventListener('input', updatePhysics);
+        inN2.addEventListener('input', updatePhysics);
+
+        // Init
+        updatePhysics();
+
+    </script>
+</body>
+</html>
