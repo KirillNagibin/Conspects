@@ -256,9 +256,9 @@
                     <label style="color: var(--brand-toxic);"><span>Период полураспада ($T$):</span> <span id="val-halflife" style="font-weight: bold;">5 сек</span></label>
                     <input type="range" id="sim-halflife" min="1" max="30" value="5" step="1" style="accent-color: var(--brand-toxic);">
                 </div>
-                <div class="control-group" style="flex-direction: row; gap: 10px; justify-content: flex-end; align-items: flex-end;">
-                    <button class="btn btn-toxic" id="btn-decay" onclick="toggleDecaySim()" style="flex: 1;"><i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать</span></button>
-                    <button class="btn btn-outline" id="btn-restart" onclick="restartSim()" style="flex: 1; border-color: var(--brand-toxic); color: var(--brand-toxic);"><i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт</button>
+                <div class="control-group" style="justify-content: flex-end; flex-direction: row; gap: 10px;">
+                    <button class="btn btn-toxic" id="btn-decay" onclick="toggleDecaySim()" style="flex: 1;"><i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Старт</span></button>
+                    <button class="btn btn-outline" id="btn-restart" onclick="restartDecaySim()" style="flex: 1; border-color: var(--brand-toxic); color: var(--brand-toxic);"><i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт</button>
                 </div>
             </div>
 
@@ -399,16 +399,6 @@
         let lastTimestamp = 0;
         let reqId;
 
-        function restartSim() {
-            isSimulating = false;
-            cancelAnimationFrame(reqId);
-            btnDecay.innerHTML = '<i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать</span>';
-            btnDecay.classList.replace('btn-outline', 'btn-toxic');
-            btnDecay.disabled = false;
-            initAtoms();
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }
-
         // Инициализация сетки атомов
         function initAtoms() {
             atoms = [];
@@ -446,8 +436,7 @@
                 // Если все распались, перезапускаем с нуля
                 let activeCount = atoms.filter(a => !a.decayed).length;
                 if (activeCount === 0) {
-                    restartSim();
-                    isSimulating = true;
+                    initAtoms();
                 }
                 
                 btnDecay.innerHTML = '<i data-lucide="pause" style="width: 16px;"></i> Пауза';
@@ -459,6 +448,15 @@
                 btnDecay.classList.replace('btn-outline', 'btn-toxic');
                 cancelAnimationFrame(reqId);
             }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function restartDecaySim() {
+            isSimulating = false;
+            cancelAnimationFrame(reqId);
+            btnDecay.innerHTML = '<i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Старт</span>';
+            btnDecay.classList.replace('btn-outline', 'btn-toxic');
+            initAtoms();
             if(typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -506,9 +504,8 @@
             } else {
                 // Все распались
                 isSimulating = false;
-                btnDecay.innerHTML = '<i data-lucide="check" style="width: 16px;"></i> Готово';
+                btnDecay.innerHTML = '<i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт';
                 btnDecay.classList.replace('btn-outline', 'btn-toxic');
-                btnDecay.disabled = true;
                 if(typeof lucide !== 'undefined') lucide.createIcons();
             }
         }
@@ -560,14 +557,15 @@
             const maxTime = Math.max(simTime, parseFloat(inHalfLife.value) * 4); // График минимум на 4 периода
             const maxN = N_0;
 
-            // Рисуем оси (зеленым)
-            ctxG.strokeStyle = 'rgba(57, 255, 20, 0.5)';
+            // Рисуем оси (зеленые)
+            ctxG.strokeStyle = 'rgba(57, 255, 20, 0.4)';
             ctxG.lineWidth = 2;
             ctxG.beginPath();
             ctxG.moveTo(padL, padT); ctxG.lineTo(padL, h - padB); // Ось Y
             ctxG.lineTo(w - padR, h - padB); // Ось X
             ctxG.stroke();
 
+            // Текст осей (зеленый)
             ctxG.fillStyle = 'rgba(57, 255, 20, 0.8)';
             ctxG.font = '10px sans-serif';
             ctxG.textAlign = 'right';
@@ -578,9 +576,9 @@
             ctxG.textAlign = 'center';
             ctxG.fillText('Время t (с)', w/2, h - 10);
 
-            // Пунктирные линии полураспадов
+            // Пунктирные линии полураспадов (бледно-зеленые)
             const T_half = parseFloat(inHalfLife.value);
-            ctxG.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctxG.strokeStyle = 'rgba(57, 255, 20, 0.15)';
             ctxG.lineWidth = 1;
             ctxG.setLineDash([5, 5]);
             
@@ -593,17 +591,19 @@
                 let tx = padL + (i*T_half / maxTime) * (w - padL - padR);
                 if (tx <= w - padR) {
                     ctxG.beginPath(); ctxG.moveTo(tx, padT); ctxG.lineTo(tx, h - padB); ctxG.stroke();
-                    ctxG.fillStyle = 'var(--brand-toxic)';
+                    ctxG.fillStyle = 'rgba(57, 255, 20, 0.8)';
                     ctxG.fillText(`${i}T`, tx, h - padB + 15);
                 }
             }
             ctxG.setLineDash([]);
 
-            // Отрисовка самой кривой распада
+            // Отрисовка самой кривой распада (Ярко-зеленая со свечением)
             if (graphData.length > 0) {
-                ctxG.strokeStyle = 'var(--brand-toxic)';
+                ctxG.strokeStyle = '#39FF14'; 
                 ctxG.lineWidth = 3;
                 ctxG.lineJoin = 'round';
+                ctxG.shadowBlur = 10;
+                ctxG.shadowColor = '#39FF14';
                 ctxG.beginPath();
                 
                 // Начальная точка
@@ -616,6 +616,7 @@
                     ctxG.lineTo(px, py);
                 }
                 ctxG.stroke();
+                ctxG.shadowBlur = 0; // сброс тени
             }
         }
 
