@@ -221,7 +221,7 @@
 
         <h2><i data-lucide="orbit"></i> 5. Лаборатория: Движение заряда по окружности</h2>
         <p style="color: var(--text-muted);">Если заряд влетает перпендикулярно линиям поля ($\alpha = 90^\circ$), сила Лоренца заставляет его двигаться по окружности, играя роль центростремительной силы: $qvB = \frac{mv^2}{R}$.<br>
-        В симуляторе поле направлено <b>от нас $\otimes$</b>. Задайте массу, заряд и скорость частицы. Проверьте правило левой руки!</p>
+        В симуляторе можно менять направление поля (от нас $\otimes$ или к нам $\odot$). Задайте массу, заряд и скорость частицы. Проверьте правило левой руки!</p>
 
         <div class="simulator">
             <div class="sim-controls">
@@ -240,6 +240,13 @@
                 <div class="control-group">
                     <label style="color: var(--text-muted);"><span>Поле ($B$):</span> <span id="val-b">0.5 Тл</span></label>
                     <input type="range" id="sim-b" min="0.1" max="2.0" value="0.5" step="0.1" style="accent-color: var(--text-muted);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--text-muted);"><span>Направление:</span></label>
+                    <select id="sim-b-dir" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid #555; border-radius: 4px; padding: 4px; font-family: inherit; font-size: 0.9rem; cursor: pointer; outline: none; margin-top: 2px;">
+                        <option value="in">От нас (⊗)</option>
+                        <option value="out">К нам (⊙)</option>
+                    </select>
                 </div>
             </div>
 
@@ -263,7 +270,7 @@
             </div>
             
             <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">
-                <i>* Векторы: <span style="color: var(--accent);">Зеленый — скорость $\vec{v}$</span>, <span style="color: var(--brand-orange);">Оранжевый — сила Лоренца $\vec{F}_Л$</span>. Крестики $\times$ — поле $\vec{B}$ от нас.</i>
+                <i>* Векторы: <span style="color: var(--accent);">Зеленый — скорость $\vec{v}$</span>, <span style="color: var(--brand-orange);">Оранжевый — сила Лоренца $\vec{F}_Л$</span>. Крестики $\times$ — поле $\vec{B}$ от нас, точки $\odot$ — поле к нам.</i>
             </p>
         </div>
 
@@ -364,6 +371,7 @@
         const inCharge = document.getElementById('sim-charge');
         const inVel = document.getElementById('sim-vel');
         const inB = document.getElementById('sim-b');
+        const inBDir = document.getElementById('sim-b-dir');
         
         // Лейблы значений
         const valMass = document.getElementById('val-mass');
@@ -394,6 +402,7 @@
             const chargeBase = parseFloat(inCharge.value);
             const velBase = parseFloat(inVel.value);
             const B_field = parseFloat(inB.value);
+            const isBIntoPage = inBDir.value === 'in';
 
             valMass.textContent = massBase.toFixed(1);
             valCharge.textContent = (chargeBase > 0 ? '+' : '') + chargeBase.toFixed(1);
@@ -454,10 +463,9 @@
             // Если заряд 0, частица летит по прямой. 
             // Для симуляции кругового движения считаем только q != 0
             if (q !== 0) {
-                // Направление вращения по правилу левой руки (B направлено "от нас").
-                // Для +q: v вверх, B от нас -> F влево. Значит вращение против часовой (-omega)
-                // Для -q: вращение по часовой (+omega)
-                const dir = q > 0 ? -1 : 1;
+                // Направление вращения по правилу левой руки.
+                // С учетом направления поля:
+                const dir = (q > 0 ? -1 : 1) * (isBIntoPage ? 1 : -1);
                 // Замедляем анимацию для наглядности (делим на 10^7)
                 angle += dir * (omega * 1e-7) * dt; 
             } else {
@@ -468,14 +476,26 @@
             // Отрисовка
             ctx.clearRect(0, 0, w, h);
 
-            // А. Рисуем фон магнитного поля (Крестики)
+            // А. Рисуем фон магнитного поля (Крестики или точки)
             ctx.fillStyle = 'rgba(160, 160, 160, 0.2)';
+            ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)';
+            ctx.lineWidth = 1.5;
             ctx.font = '14px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            
             for(let ix = 20; ix < w; ix += 40) {
                 for(let iy = 20; iy < h; iy += 40) {
-                    ctx.fillText('×', ix, iy);
+                    if (isBIntoPage) {
+                        ctx.fillText('×', ix, iy);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(ix, iy, 1.5, 0, Math.PI*2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ix, iy, 5, 0, Math.PI*2);
+                        ctx.stroke();
+                    }
                 }
             }
 
@@ -519,7 +539,7 @@
             // Вектор скорости (по касательной)
             // Производная координат: dx/dt = -sin, dy/dt = cos. 
             // С учетом направления вращения (dir):
-            const dir = q > 0 ? -1 : 1;
+            const dir = (q > 0 ? -1 : 1) * (isBIntoPage ? 1 : -1);
             const vx = -Math.sin(angle) * dir * vLen;
             const vy = Math.cos(angle) * dir * vLen;
             drawArrowCanvas(ctx, px, py, px + vx, py + vy, 'var(--accent)', 'v');
