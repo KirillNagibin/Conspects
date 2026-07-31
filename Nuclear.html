@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Ядерная физика</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+            --brand-cyan: #06B6D4;
+            --brand-orange: #F97316;
+            --brand-toxic: #39FF14;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        /* Таблицы */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; vertical-align: top;}
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        /* Формулы */
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        /* Симулятор */
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;}
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; gap: 15px; width: 100%; overflow: hidden; position: relative; flex-wrap: wrap;}
+        canvas { background: #0a0a0a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; touch-action: none; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; transition: color 0.3s;}
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+        .btn-toxic { background-color: rgba(57, 255, 20, 0.1); color: var(--brand-toxic); border: 1px solid var(--brand-toxic); }
+        .btn-toxic:hover { background-color: rgba(57, 255, 20, 0.2); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        .decay-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+        .decay-alpha { background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid #EF4444; }
+        .decay-beta { background: rgba(59, 130, 246, 0.2); color: #3B82F6; border: 1px solid #3B82F6; }
+        .decay-gamma { background: rgba(168, 85, 247, 0.2); color: #A855F7; border: 1px solid #A855F7; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+            .sim-controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Ядерная физика</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="atom" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">О чем этот раздел?</strong><br>
+                <span style="color: var(--text-muted);">Здесь мы заглянем в самое сердце атома — его ядро. В отличие от химии, которая работает с электронными оболочками, ядерная физика изучает процессы, в которых **один химический элемент превращается в другой**! Огромные энергии, распады и дефект массы — всё это здесь.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="layers"></i> 1. Строение ядра и Изотопы</h2>
+        <div class="card">
+            <p>Ядро атома состоит из <b>нуклонов</b>: протонов и нейтронов. Любой химический элемент обозначается как:</p>
+            
+            <div class="formula-box" style="border-color: var(--accent);">
+                $$_{Z}^{A}\text{X}$$
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li><strong style="color: var(--brand-red);">$Z$ — Зарядовое число</strong> (порядковый номер в таблице Менделеева). Это количество <b>протонов</b>. Оно же равно количеству электронов в нейтральном атоме.</li>
+                <li><strong style="color: var(--brand-blue);">$A$ — Массовое число</strong>. Это сумма всех нуклонов (протонов + нейтронов). Округляется до целого.</li>
+                <li><strong style="color: var(--text-main);">$N = A - Z$</strong> — количество <b>нейтронов</b>.</li>
+            </ul>
+
+            <h3 style="margin-top: 25px;">Изотопы</h3>
+            <p style="color: var(--text-muted);">Это "братья-близнецы". Элемент тот же (протонов $Z$ одинаково), а вот "жирка" у них разное количество (нейтронов $N$ разное, поэтому и масса $A$ разная). Они обладают одинаковыми химическими свойствами, но разными ядерными (одни стабильны, другие радиоактивны). <br><i>Пример: $^1_1H$ (Протий), $^2_1H$ (Дейтерий), $^3_1H$ (Тритий).</i></p>
+        </div>
+
+        <h2><i data-lucide="scale"></i> 2. Дефект массы и Энергия связи</h2>
+        <div class="card">
+            <p>Удивительный факт: если взять протоны и нейтроны по отдельности, взвесить их, а потом "слепить" из них ядро, то масса готового ядра окажется <b>меньше</b>, чем сумма масс его деталей!</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-orange);">
+                    <div style="font-size: 0.9rem; color: var(--brand-orange); margin-bottom: 5px;">Дефект массы ($\Delta m$)</div>
+                    $$\Delta m = Zm_p + Nm_n - M_{ядра}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-toxic);">
+                    <div style="font-size: 0.9rem; color: var(--brand-toxic); margin-bottom: 5px;">Энергия связи ($E_{св}$)</div>
+                    $$E_{св} = \Delta m \cdot c^2$$
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning" style="margin-bottom: 0;">
+                <div class="icon-box"><i data-lucide="zap" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">Лайфхак с а.е.м. и МэВ:</strong><br>
+                    <span style="color: var(--text-muted);">В задачах массу дают не в килограммах, а в атомных единицах массы (а.е.м.). Не нужно умножать на $c^2$ и переводить в Джоули! <br>Используй магическое число: <b>$1 \text{ а.е.м.} \approx 931.5 \text{ МэВ}$</b>. Просто умножь дефект массы на $931.5$, и получишь энергию связи сразу в Мегаэлектронвольтах!</span>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="radioactive"></i> 3. Радиоактивность: Виды распадов</h2>
+        <div class="card table-container">
+            <p style="margin-top: 0;">В ядерных реакциях всегда выполняются два закона сохранения: <b>сумма верхних индексов ($A$) сохраняется</b> и <b>сумма нижних индексов ($Z$) сохраняется</b>.</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Тип распада</th>
+                        <th>Что вылетает?</th>
+                        <th>Правило смещения (Что стало с ядром)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="decay-badge decay-alpha">$\alpha$-распад</span></td>
+                        <td>Ядро гелия ($^4_2He$)</td>
+                        <td>Масса падает на 4, заряд падает на 2. Элемент смещается <b>на 2 клетки назад</b> в таблице Менделеева.<br>$$_{Z}^{A}\text{X} \rightarrow _{Z-2}^{A-4}\text{Y} + _{2}^{4}\text{He}$$</td>
+                    </tr>
+                    <tr>
+                        <td><span class="decay-badge decay-beta">$\beta^-$-распад</span></td>
+                        <td>Электрон ($^{\ \ 0}_{-1}e$)</td>
+                        <td>Масса не меняется, заряд <b>растет на 1</b>. Элемент смещается <b>на 1 клетку вперед</b>.<br>$$_{Z}^{A}\text{X} \rightarrow _{Z+1}^{A}\text{Y} + _{-1}^{\ \ 0}\text{e}$$</td>
+                    </tr>
+                    <tr>
+                        <td><span class="decay-badge decay-beta" style="border-color:#06B6D4; color:#06B6D4;">$\beta^+$-распад</span></td>
+                        <td>Позитрон ($^{\ \ 0}_{+1}e$)</td>
+                        <td>Масса не меняется, заряд <b>падает на 1</b>. Элемент смещается <b>на 1 клетку назад</b>.<br>$$_{Z}^{A}\text{X} \rightarrow _{Z-1}^{A}\text{Y} + _{+1}^{\ \ 0}\text{e}$$</td>
+                    </tr>
+                    <tr>
+                        <td><span class="decay-badge decay-gamma">$\gamma$-излучение</span></td>
+                        <td>Фотон ($^{\ 0}_{0}\gamma$)</td>
+                        <td>Ни масса, ни заряд не меняются. Ядро просто сбрасывает "лишнюю" энергию, переходя в спокойное состояние.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: var(--error-text); font-size: 0.9rem; margin-bottom: 0; margin-top: 15px;"><b>Супер-Ловушка $\beta^-$-распада:</b> Откуда в ядре берется электрон, если там только протоны и нейтроны? В момент распада один <b>нейтрон</b> внутри ядра "лопается", превращаясь в <b>протон</b> (он остается в ядре, поэтому $Z$ растет на 1) и <b>электрон</b> (он вылетает наружу)!</p>
+        </div>
+
+        <h2><i data-lucide="timer"></i> 4. Закон радиоактивного распада</h2>
+        <div class="card">
+            <p>Предсказать, когда распадется конкретное ядро — невозможно (это чистая квантовая вероятность). Но для миллиардов ядер статистика работает идеально.</p>
+            
+            <div class="formula-box" style="border-color: var(--brand-toxic);">
+                $$N = N_0 \cdot 2^{-\frac{t}{T}}$$
+                <span style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-top: 10px;">Эта же формула работает и для массы: $m = m_0 \cdot 2^{-\frac{t}{T}}$</span>
+            </div>
+            
+            <ul style="color: var(--text-muted); margin-top: 15px;">
+                <li>$N_0$ — начальное количество нераспавшихся ядер.</li>
+                <li>$N$ — количество <b>ОСТАВШИХСЯ (НЕРАСПАВШИХСЯ)</b> ядер. <span style="color: var(--warn-text);">*Внимание: в задачах часто просят найти количество распавшихся, это $\Delta N = N_0 - N$!</span></li>
+                <li>$T$ — период полураспада. Это время, за которое распадается ровно половина ядер.</li>
+                <li>$t$ — прошедшее время.</li>
+            </ul>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 5. Лаборатория: Период полураспада</h2>
+        <p style="color: var(--text-muted);">Задай период полураспада ($T$) и запусти время. Посмотри, как из 400 ядер постепенно остаются единицы. Обрати внимание на график: это идеальная экспонента. За каждый период $T$ количество зеленых (нераспавшихся) ядер падает ровно в 2 раза.</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-toxic);"><span>Период полураспада ($T$):</span> <span id="val-halflife" style="font-weight: bold;">5 сек</span></label>
+                    <input type="range" id="sim-halflife" min="1" max="10" value="5" step="1" style="accent-color: var(--brand-toxic);">
+                </div>
+                <div class="control-group" style="justify-content: flex-end;">
+                    <button class="btn btn-toxic" id="btn-decay" onclick="toggleDecaySim()" style="width: 100%;"><i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать распад</span></button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Прошло времени ($t$)</div>
+                    <div class="dashboard-value" id="dash-time" style="color: #fff;">0.0 с</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--brand-toxic); background: rgba(57, 255, 20, 0.05);">
+                    <div class="dashboard-label">Осталось активных ($N$)</div>
+                    <div class="dashboard-value" id="dash-active" style="color: var(--brand-toxic);">400</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--border);">
+                    <div class="dashboard-label">Уже распалось ($\Delta N$)</div>
+                    <div class="dashboard-value" id="dash-decayed" style="color: var(--text-muted);">0</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <!-- Окно с атомами -->
+                <canvas id="canvas-atoms" width="300" height="250" style="border: 1px solid #333; border-radius: 8px; flex: 1; min-width: 250px;"></canvas>
+                <!-- График -->
+                <canvas id="canvas-graph" width="400" height="250" style="border: 1px solid #333; border-radius: 8px; flex: 1.5; min-width: 300px;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 6. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Альфа-частица:</strong> В задачах могут написать "происходит испускание ядра атома гелия". Не пугайся, это просто умное название для $\alpha$-частицы ($^4_2He$).</li>
+                    <li><strong>Устный счет полураспадов:</strong> Не обязательно всегда использовать сложную формулу. Если прошло время $t = 3T$ (три периода), значит масса уполовинилась 3 раза: $1 \rightarrow \frac{1}{2} \rightarrow \frac{1}{4} \rightarrow \frac{1}{8}$. Осталась одна восьмая часть!</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>"Распалось" vs "Осталось":</strong> В задаче дают $m_0 = 100$ г, $T = 2$ дня. Спрашивают: "Сколько граммов <i>распалось</i> за 6 дней?". Ученик считает: 3 периода, останется $100 / 8 = 12.5$ г. И пишет 12.5 в ответ! ОШИБКА! Распалось: $100 - 12.5 = 87.5$ г.</li>
+                    <li><strong>Нейтроны в реакциях:</strong> Забывают, что нейтрон обозначается как $^1_0n$ (масса 1, заряд 0), а протон как $^1_1p$. При расчете верхних и нижних индексов это критично.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Цепочка распадов</h3>
+            <p>Ядро изотопа урана $^{238}_{\ 92}\text{U}$ претерпело три $\alpha$-распада и два $\beta^-$-распада. Определите зарядовое ($Z$) и массовое ($A$) числа получившегося в результате этих реакций ядра.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Распиши закон сохранения массового и зарядового чисел в виде уравнения. <br>
+                Каждый $\alpha$-распад ($^4_2He$) забирает 4 у верхнего числа и 2 у нижнего.<br>
+                Каждый $\beta^-$-распад ($^{\ \ 0}_{-1}e$) забирает 0 у верхнего числа и <b>прибавляет 1</b> к нижнему числу!
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Составим уравнение ядерной реакции: <br>
+                $$^{238}_{\ 92}\text{U} \rightarrow 3 \cdot ^{4}_{2}\text{He} + 2 \cdot ^{\ \ 0}_{-1}\text{e} + ^{A}_{Z}\text{X}$$</p>
+                
+                <p>2. Запишем закон сохранения для массового числа (верхний индекс):<br>
+                $$238 = 3 \cdot 4 + 2 \cdot 0 + A$$
+                $$238 = 12 + A \quad \Rightarrow \quad A = 238 - 12 = 226$$</p>
+
+                <p>3. Запишем закон сохранения для зарядового числа (нижний индекс):<br>
+                $$92 = 3 \cdot 2 + 2 \cdot (-1) + Z$$
+                $$92 = 6 - 2 + Z$$
+                $$92 = 4 + Z \quad \Rightarrow \quad Z = 92 - 4 = 88$$</p>
+                
+                <p style="color: var(--text-muted); font-size: 0.9rem;"><i>Справочно: элемент с зарядовым числом 88 — это Радий (Ra).</i></p>
+
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: A = 226, Z = 88</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР РАДИОАКТИВНОГО РАСПАДА
+           ========================================== */
+        const canvasAtoms = document.getElementById('canvas-atoms');
+        const ctxA = canvasAtoms.getContext('2d');
+        const canvasGraph = document.getElementById('canvas-graph');
+        const ctxG = canvasGraph.getContext('2d');
+        
+        const inHalfLife = document.getElementById('sim-halflife');
+        const valHalfLife = document.getElementById('val-halflife');
+        const btnDecay = document.getElementById('btn-decay');
+        const btnDecayText = document.getElementById('btn-decay-text');
+        
+        const dashTime = document.getElementById('dash-time');
+        const dashActive = document.getElementById('dash-active');
+        const dashDecayed = document.getElementById('dash-decayed');
+
+        const N_0 = 400; // Стартовое количество ядер
+        let atoms = [];
+        let graphData = [];
+        let isSimulating = false;
+        let simTime = 0;
+        let lastTimestamp = 0;
+        let reqId;
+
+        // Инициализация сетки атомов
+        function initAtoms() {
+            atoms = [];
+            graphData = [];
+            simTime = 0;
+            const cols = 20;
+            const rows = 20;
+            const w = canvasAtoms.width;
+            const h = canvasAtoms.height;
+            const padding = 10;
+            const cellW = (w - padding*2) / cols;
+            const cellH = (h - padding*2) / rows;
+
+            for(let r=0; r<rows; r++){
+                for(let c=0; c<cols; c++){
+                    // Немного джиггера (randomness) для естественности
+                    let dx = (Math.random() - 0.5) * cellW * 0.5;
+                    let dy = (Math.random() - 0.5) * cellH * 0.5;
+                    atoms.push({
+                        x: padding + c * cellW + cellW/2 + dx,
+                        y: padding + r * cellH + cellH/2 + dy,
+                        decayed: false,
+                        decayAnim: 0 // Для эффекта вспышки
+                    });
+                }
+            }
+            drawAtoms();
+            drawGraph();
+            updateDashboards();
+        }
+
+        function toggleDecaySim() {
+            isSimulating = !isSimulating;
+            if (isSimulating) {
+                // Если все распались, перезапускаем с нуля
+                let activeCount = atoms.filter(a => !a.decayed).length;
+                if (activeCount === 0) {
+                    initAtoms();
+                }
+                
+                btnDecay.innerHTML = '<i data-lucide="pause" style="width: 16px;"></i> Пауза';
+                btnDecay.classList.replace('btn-toxic', 'btn-outline');
+                lastTimestamp = performance.now();
+                reqId = requestAnimationFrame(simulateStep);
+            } else {
+                btnDecay.innerHTML = '<i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Продолжить</span>';
+                btnDecay.classList.replace('btn-outline', 'btn-toxic');
+                cancelAnimationFrame(reqId);
+            }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function simulateStep(timestamp) {
+            if (!isSimulating) return;
+            
+            const dt = (timestamp - lastTimestamp) / 1000; // в секундах
+            lastTimestamp = timestamp;
+            simTime += dt;
+
+            const T_half = parseFloat(inHalfLife.value);
+            // Постоянная распада: lambda = ln(2) / T
+            const lambda = Math.LN2 / T_half;
+            // Вероятность распада одного ядра за время dt: P = 1 - e^(-lambda * dt)
+            const decayProb = 1 - Math.exp(-lambda * dt);
+
+            let activeCount = 0;
+            atoms.forEach(a => {
+                if (!a.decayed) {
+                    if (Math.random() < decayProb) {
+                        a.decayed = true;
+                        a.decayAnim = 1.0; // Запуск анимации вспышки
+                    } else {
+                        activeCount++;
+                    }
+                } else {
+                    if (a.decayAnim > 0) {
+                        a.decayAnim -= dt * 2; // Угасание вспышки
+                        if(a.decayAnim < 0) a.decayAnim = 0;
+                    }
+                }
+            });
+
+            // Запись данных для графика (примерно 5 точек в секунду)
+            if (graphData.length === 0 || simTime - graphData[graphData.length-1].t >= 0.2) {
+                graphData.push({ t: simTime, N: activeCount });
+            }
+
+            updateDashboards(activeCount);
+            drawAtoms();
+            drawGraph();
+
+            if (activeCount > 0) {
+                reqId = requestAnimationFrame(simulateStep);
+            } else {
+                // Все распались
+                isSimulating = false;
+                btnDecay.innerHTML = '<i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт';
+                btnDecay.classList.replace('btn-outline', 'btn-toxic');
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        }
+
+        function updateDashboards(activeCount = N_0) {
+            dashTime.textContent = simTime.toFixed(1) + ' с';
+            dashActive.textContent = activeCount;
+            dashDecayed.textContent = N_0 - activeCount;
+        }
+
+        function drawAtoms() {
+            ctxA.clearRect(0, 0, canvasAtoms.width, canvasAtoms.height);
+            
+            atoms.forEach(a => {
+                ctxA.beginPath();
+                ctxA.arc(a.x, a.y, 4, 0, Math.PI*2);
+                
+                if (!a.decayed) {
+                    // Активное ядро (Токсично зеленое)
+                    ctxA.fillStyle = 'rgba(57, 255, 20, 0.8)';
+                    ctxA.shadowBlur = 5;
+                    ctxA.shadowColor = 'var(--brand-toxic)';
+                } else {
+                    // Распавшееся ядро (Серый, с возможной вспышкой красным)
+                    if (a.decayAnim > 0) {
+                        ctxA.fillStyle = `rgba(239, 68, 68, ${a.decayAnim})`; // Красная вспышка
+                        ctxA.shadowBlur = 10 * a.decayAnim;
+                        ctxA.shadowColor = '#EF4444';
+                    } else {
+                        ctxA.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                        ctxA.shadowBlur = 0;
+                    }
+                }
+                ctxA.fill();
+                ctxA.shadowBlur = 0; // сброс
+            });
+        }
+
+        function drawGraph() {
+            ctxG.clearRect(0, 0, canvasGraph.width, canvasGraph.height);
+            
+            const w = canvasGraph.width;
+            const h = canvasGraph.height;
+            const padL = 40;
+            const padB = 30;
+            const padT = 20;
+            const padR = 20;
+
+            const maxTime = Math.max(simTime, parseFloat(inHalfLife.value) * 4); // График минимум на 4 периода
+            const maxN = N_0;
+
+            // Рисуем оси
+            ctxG.strokeStyle = '#555';
+            ctxG.lineWidth = 2;
+            ctxG.beginPath();
+            ctxG.moveTo(padL, padT); ctxG.lineTo(padL, h - padB); // Ось Y
+            ctxG.lineTo(w - padR, h - padB); // Ось X
+            ctxG.stroke();
+
+            ctxG.fillStyle = '#888';
+            ctxG.font = '10px sans-serif';
+            ctxG.textAlign = 'right';
+            ctxG.fillText(maxN, padL - 5, padT + 5);
+            ctxG.fillText(maxN/2, padL - 5, padT + (h-padT-padB)/2 + 5);
+            ctxG.fillText('0', padL - 5, h - padB);
+            
+            ctxG.textAlign = 'center';
+            ctxG.fillText('Время t (с)', w/2, h - 10);
+
+            // Пунктирные линии полураспадов
+            const T_half = parseFloat(inHalfLife.value);
+            ctxG.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctxG.lineWidth = 1;
+            ctxG.setLineDash([5, 5]);
+            
+            // Линия N_0 / 2
+            const halfY = padT + (h-padT-padB)/2;
+            ctxG.beginPath(); ctxG.moveTo(padL, halfY); ctxG.lineTo(w - padR, halfY); ctxG.stroke();
+
+            // Линии периодов T, 2T, 3T
+            for(let i=1; i<=4; i++) {
+                let tx = padL + (i*T_half / maxTime) * (w - padL - padR);
+                if (tx <= w - padR) {
+                    ctxG.beginPath(); ctxG.moveTo(tx, padT); ctxG.lineTo(tx, h - padB); ctxG.stroke();
+                    ctxG.fillStyle = 'var(--brand-toxic)';
+                    ctxG.fillText(`${i}T`, tx, h - padB + 15);
+                }
+            }
+            ctxG.setLineDash([]);
+
+            // Отрисовка самой кривой распада
+            if (graphData.length > 0) {
+                ctxG.strokeStyle = 'var(--brand-toxic)';
+                ctxG.lineWidth = 3;
+                ctxG.lineJoin = 'round';
+                ctxG.beginPath();
+                
+                // Начальная точка
+                ctxG.moveTo(padL, padT);
+                
+                for(let i=0; i<graphData.length; i++) {
+                    let d = graphData[i];
+                    let px = padL + (d.t / maxTime) * (w - padL - padR);
+                    let py = h - padB - (d.N / maxN) * (h - padT - padB);
+                    ctxG.lineTo(px, py);
+                }
+                ctxG.stroke();
+            }
+        }
+
+        // Обработка ползунка
+        inHalfLife.addEventListener('input', () => {
+            valHalfLife.textContent = inHalfLife.value + ' сек';
+            if(!isSimulating && simTime === 0) {
+                drawGraph(); // Перерисовка сетки периодов
+            }
+        });
+
+        // Инициализация
+        initAtoms();
+
+    </script>
+</body>
+</html>
