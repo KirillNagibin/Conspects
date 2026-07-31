@@ -159,7 +159,7 @@
         </div>
 
         <h2><i data-lucide="monitor-play"></i> 2. Лаборатория: Поле постоянного магнита</h2>
-        <p style="color: var(--text-muted);">Перед вами полосовой магнит и множество маленьких компасов (магнитных стрелок). <span style="color: #3B82F6; font-weight: bold;">Синий конец компаса — Северный (N)</span>, <span style="color: #EF4444; font-weight: bold;">красный — Южный (S)</span>. <br>Вращайте магнит и меняйте его силу, чтобы увидеть, как компасы выстраиваются вдоль невидимых магнитных линий. При нулевой силе магнита стрелки реагируют только на фоновое поле Земли (указывают наверх).</p>
+        <p style="color: var(--text-muted);">Перед вами полосовой магнит и множество маленьких компасов (магнитных стрелок). <span style="color: #3B82F6; font-weight: bold;">Синий конец компаса — Северный (N)</span>, <span style="color: #EF4444; font-weight: bold;">красный — Южный (S)</span>. <br>Вращайте магнит и меняйте его индукцию, чтобы увидеть, как компасы выстраиваются вдоль невидимых магнитных линий. При нулевой индукции стрелки реагируют только на фоновое поле Земли (указывают наверх).</p>
 
         <div class="simulator">
             <div class="sim-controls">
@@ -168,8 +168,8 @@
                     <input type="range" id="sim-mag-angle" min="0" max="360" value="0" step="1" style="accent-color: #aaa;">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--accent);"><span>Сила магнита:</span> <span id="val-mag-strength">100%</span></label>
-                    <input type="range" id="sim-mag-strength" min="0" max="200" value="100" step="5" style="accent-color: var(--accent);">
+                    <label style="color: var(--accent);"><span>Индукция ($B$):</span> <span id="val-mag-b">1.0 Тл</span></label>
+                    <input type="range" id="sim-mag-b" min="0" max="2.0" value="1.0" step="0.1" style="accent-color: var(--accent);">
                 </div>
             </div>
 
@@ -590,9 +590,9 @@
         const canvasF = document.getElementById('canvas-filings');
         const ctxF = canvasF.getContext('2d');
         const inMagAngle = document.getElementById('sim-mag-angle');
-        const inMagStrength = document.getElementById('sim-mag-strength');
+        const inMagB = document.getElementById('sim-mag-b');
         const valMagAngle = document.getElementById('val-mag-angle');
-        const valMagStrength = document.getElementById('val-mag-strength');
+        const valMagB = document.getElementById('val-mag-b');
 
         const compasses = [];
         const spacing = 35; 
@@ -609,11 +609,11 @@
             const cy = h / 2;
 
             const angleDeg = parseFloat(inMagAngle.value);
-            const strength = parseFloat(inMagStrength.value);
+            const b_field = parseFloat(inMagB.value);
             const angleRad = angleDeg * Math.PI / 180;
 
             valMagAngle.textContent = angleDeg + '°';
-            valMagStrength.textContent = strength + '%';
+            valMagB.textContent = b_field.toFixed(1) + ' Тл';
 
             ctxF.clearRect(0, 0, w, h);
 
@@ -628,25 +628,31 @@
             const pSy = cy - Math.sin(angleRad) * poleOffset;
 
             // Фоновое поле Земли, направлено на географический север (вверх экрана)
-            const BEarth = 0.5; 
+            // Задаем его константой для визуального баланса
+            const BEarth = 20; 
 
             ctxF.lineWidth = 2;
             compasses.forEach(c => {
                 const dxN = c.x - pNx;
                 const dyN = c.y - pNy;
-                const rN = Math.sqrt(dxN*dxN + dyN*dyN) + 1; 
+                // Добавляем ограничение минимального расстояния, чтобы избежать деления на ноль или огромных значений
+                const rN = Math.max(Math.sqrt(dxN*dxN + dyN*dyN), 20); 
 
                 const dxS = c.x - pSx;
                 const dyS = c.y - pSy;
-                const rS = Math.sqrt(dxS*dxS + dyS*dyS) + 1;
+                const rS = Math.max(Math.sqrt(dxS*dxS + dyS*dyS), 20);
 
-                const k = strength * 50; 
+                // Коэффициент пропорциональности магнита. 
+                // Подогнан так, чтобы при B=1.0 поле уверенно перекрывало Земное по всему холсту
+                const k = b_field * 800000; 
+
                 // Сложение векторов магнитной индукции от N и S полюсов
+                // Поле направлено ОТ N (поэтому +dxN) и К S (поэтому -dxS)
                 const bx = k * (dxN / Math.pow(rN, 3) - dxS / Math.pow(rS, 3));
                 const by = k * (dyN / Math.pow(rN, 3) - dyS / Math.pow(rS, 3));
 
                 const totalBx = bx;
-                const totalBy = by - BEarth * 50; 
+                const totalBy = by - BEarth; // -BEarth потому что координата Y направлена вниз, а Север - вверх
 
                 // Угол отклонения стрелки компаса
                 const theta = Math.atan2(totalBy, totalBx);
@@ -658,7 +664,7 @@
                 ctxF.translate(c.x, c.y);
                 ctxF.rotate(theta);
 
-                // Северный полюс стрелки (Синий) - указывает направление поля
+                // Северный полюс стрелки (Синий) - указывает направление вектора B
                 ctxF.fillStyle = '#3B82F6';
                 ctxF.beginPath();
                 ctxF.moveTo(0, -needleWid);
@@ -682,10 +688,10 @@
             ctxF.translate(cx, cy);
             ctxF.rotate(angleRad);
             
-            // S-полюс
+            // S-полюс (красный) слева
             ctxF.fillStyle = '#EF4444';
             ctxF.fillRect(-magLength/2, -magWidth/2, magLength/2, magWidth);
-            // N-полюс
+            // N-полюс (синий) справа
             ctxF.fillStyle = '#3B82F6';
             ctxF.fillRect(0, -magWidth/2, magLength/2, magWidth);
             
@@ -706,7 +712,7 @@
         }
 
         inMagAngle.addEventListener('input', () => {});
-        inMagStrength.addEventListener('input', () => {});
+        inMagB.addEventListener('input', () => {});
         requestAnimationFrame(drawFilings);
 
     </script>
