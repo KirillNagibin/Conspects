@@ -254,10 +254,11 @@
             <div class="sim-controls">
                 <div class="control-group">
                     <label style="color: var(--brand-toxic);"><span>Период полураспада ($T$):</span> <span id="val-halflife" style="font-weight: bold;">5 сек</span></label>
-                    <input type="range" id="sim-halflife" min="1" max="10" value="5" step="1" style="accent-color: var(--brand-toxic);">
+                    <input type="range" id="sim-halflife" min="1" max="30" value="5" step="1" style="accent-color: var(--brand-toxic);">
                 </div>
-                <div class="control-group" style="justify-content: flex-end;">
-                    <button class="btn btn-toxic" id="btn-decay" onclick="toggleDecaySim()" style="width: 100%;"><i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать распад</span></button>
+                <div class="control-group" style="flex-direction: row; gap: 10px; justify-content: flex-end; align-items: flex-end;">
+                    <button class="btn btn-toxic" id="btn-decay" onclick="toggleDecaySim()" style="flex: 1;"><i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать</span></button>
+                    <button class="btn btn-outline" id="btn-restart" onclick="restartSim()" style="flex: 1; border-color: var(--brand-toxic); color: var(--brand-toxic);"><i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт</button>
                 </div>
             </div>
 
@@ -398,6 +399,16 @@
         let lastTimestamp = 0;
         let reqId;
 
+        function restartSim() {
+            isSimulating = false;
+            cancelAnimationFrame(reqId);
+            btnDecay.innerHTML = '<i data-lucide="play" style="width: 16px;"></i> <span id="btn-decay-text">Начать</span>';
+            btnDecay.classList.replace('btn-outline', 'btn-toxic');
+            btnDecay.disabled = false;
+            initAtoms();
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
         // Инициализация сетки атомов
         function initAtoms() {
             atoms = [];
@@ -435,7 +446,8 @@
                 // Если все распались, перезапускаем с нуля
                 let activeCount = atoms.filter(a => !a.decayed).length;
                 if (activeCount === 0) {
-                    initAtoms();
+                    restartSim();
+                    isSimulating = true;
                 }
                 
                 btnDecay.innerHTML = '<i data-lucide="pause" style="width: 16px;"></i> Пауза';
@@ -494,8 +506,9 @@
             } else {
                 // Все распались
                 isSimulating = false;
-                btnDecay.innerHTML = '<i data-lucide="rotate-ccw" style="width: 16px;"></i> Рестарт';
+                btnDecay.innerHTML = '<i data-lucide="check" style="width: 16px;"></i> Готово';
                 btnDecay.classList.replace('btn-outline', 'btn-toxic');
+                btnDecay.disabled = true;
                 if(typeof lucide !== 'undefined') lucide.createIcons();
             }
         }
@@ -547,15 +560,15 @@
             const maxTime = Math.max(simTime, parseFloat(inHalfLife.value) * 4); // График минимум на 4 периода
             const maxN = N_0;
 
-            // Рисуем оси
-            ctxG.strokeStyle = '#555';
+            // Рисуем оси (зеленым)
+            ctxG.strokeStyle = 'rgba(57, 255, 20, 0.5)';
             ctxG.lineWidth = 2;
             ctxG.beginPath();
             ctxG.moveTo(padL, padT); ctxG.lineTo(padL, h - padB); // Ось Y
             ctxG.lineTo(w - padR, h - padB); // Ось X
             ctxG.stroke();
 
-            ctxG.fillStyle = '#888';
+            ctxG.fillStyle = 'rgba(57, 255, 20, 0.8)';
             ctxG.font = '10px sans-serif';
             ctxG.textAlign = 'right';
             ctxG.fillText(maxN, padL - 5, padT + 5);
