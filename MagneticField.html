@@ -141,7 +141,44 @@
             </div>
         </div>
 
-        <h2><i data-lucide="compass"></i> 1. Источники поля и Правило буравчика (Правой руки)</h2>
+        <h2><i data-lucide="magnet"></i> 1. Постоянные магниты и их поле</h2>
+        <div class="card">
+            <p>Хотя магнитное поле создается движущимися зарядами, в природе существуют <b>постоянные магниты</b> (например, из железа или неодима). Их поле объясняется согласованным вращением электронов внутри атомов (так называемыми микротоками Ампера).</p>
+            <ul>
+                <li>Каждый магнит имеет два полюса: <b>Северный (N — обычно синий)</b> и <b>Южный (S — обычно красный)</b>. Разрезать магнит так, чтобы получить один полюс (монополь), невозможно!</li>
+                <li><b>Магнитные линии</b> всегда выходят из Северного полюса (N) и входят в Южный (S). Внутри магнита они продолжаются, образуя <b>замкнутые</b> кольца.</li>
+                <li>Одноименные полюса отталкиваются, разноименные — притягиваются.</li>
+            </ul>
+            <div class="alert-box alert-warning" style="margin-bottom: 0; margin-top: 15px;">
+                <div class="icon-box"><i data-lucide="globe" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">Магнитное поле Земли</strong><br>
+                    <span style="color: var(--text-muted);">Наша планета — это гигантский магнит. <b>Южный магнитный полюс Земли</b> находится вблизи Северного географического полюса. Именно поэтому синяя стрелка (N) обычного компаса всегда притягивается на Север!</span>
+                </div>
+            </div>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 2. Лаборатория: Поле постоянного магнита</h2>
+        <p style="color: var(--text-muted);">Перед вами полосовой магнит и множество маленьких компасов (магнитных стрелок). <span style="color: #3B82F6; font-weight: bold;">Синий конец компаса — Северный (N)</span>, <span style="color: #EF4444; font-weight: bold;">красный — Южный (S)</span>. <br>Вращайте магнит и меняйте его силу, чтобы увидеть, как компасы выстраиваются вдоль невидимых магнитных линий. При нулевой силе магнита стрелки реагируют только на фоновое поле Земли (указывают наверх).</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Угол поворота ($^\circ$):</span> <span id="val-mag-angle">0</span></label>
+                    <input type="range" id="sim-mag-angle" min="0" max="360" value="0" step="1" style="accent-color: #aaa;">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>Сила магнита:</span> <span id="val-mag-strength">100%</span></label>
+                    <input type="range" id="sim-mag-strength" min="0" max="200" value="100" step="5" style="accent-color: var(--accent);">
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-filings" width="700" height="300" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333; touch-action: none;"></canvas>
+            </div>
+        </div>
+
+        <h2><i data-lucide="compass"></i> 3. Источники поля и Правило буравчика (Правой руки)</h2>
         <div class="card">
             <p>Вектор $\vec{B}$ всегда направлен от <b>Северного</b> полюса (N) к <b>Южному</b> (S). Если поле создает провод с током, то силовые линии будут представлять собой замкнутые кольца вокруг провода.</p>
             
@@ -154,7 +191,7 @@
             </div>
         </div>
 
-        <h2><i data-lucide="zap"></i> 2. Силы Ампера и Лоренца</h2>
+        <h2><i data-lucide="zap"></i> 4. Силы Ампера и Лоренца</h2>
         <div class="card">
             <p>Магнитное поле действует на токи и одиночные заряды. Для расчета модулей этих сил есть две главные формулы:</p>
             
@@ -182,7 +219,7 @@
             </div>
         </div>
 
-        <h2><i data-lucide="orbit"></i> 3. Лаборатория: Движение заряда по окружности</h2>
+        <h2><i data-lucide="orbit"></i> 5. Лаборатория: Движение заряда по окружности</h2>
         <p style="color: var(--text-muted);">Если заряд влетает перпендикулярно линиям поля ($\alpha = 90^\circ$), сила Лоренца заставляет его двигаться по окружности, играя роль центростремительной силы: $qvB = \frac{mv^2}{R}$.<br>
         В симуляторе поле направлено <b>от нас $\otimes$</b>. Задайте массу, заряд и скорость частицы. Проверьте правило левой руки!</p>
 
@@ -230,7 +267,7 @@
             </p>
         </div>
 
-        <h2><i data-lucide="alert-triangle"></i> 4. Секреты и Ловушки</h2>
+        <h2><i data-lucide="alert-triangle"></i> 6. Секреты и Ловушки</h2>
         <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
             
             <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
@@ -255,7 +292,7 @@
             </div>
         </div>
 
-        <h2><i data-lucide="target"></i> 5. Практика</h2>
+        <h2><i data-lucide="target"></i> 7. Практика</h2>
         
         <div class="card">
             <h3 style="color: var(--accent); margin-top:0;">Задача: Радиус орбиты</h3>
@@ -546,6 +583,131 @@
 
         // Запуск
         requestAnimationFrame(drawCyclotron);
+
+        /* ==========================================
+           СИМУЛЯТОР ПОСТОЯННОГО МАГНИТА (КОМПАСЫ)
+           ========================================== */
+        const canvasF = document.getElementById('canvas-filings');
+        const ctxF = canvasF.getContext('2d');
+        const inMagAngle = document.getElementById('sim-mag-angle');
+        const inMagStrength = document.getElementById('sim-mag-strength');
+        const valMagAngle = document.getElementById('val-mag-angle');
+        const valMagStrength = document.getElementById('val-mag-strength');
+
+        const compasses = [];
+        const spacing = 35; 
+        for (let y = spacing/2; y < 300; y += spacing) {
+            for (let x = spacing/2; x < 700; x += spacing) {
+                compasses.push({ x: x, y: y });
+            }
+        }
+
+        function drawFilings() {
+            const w = canvasF.width;
+            const h = canvasF.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const angleDeg = parseFloat(inMagAngle.value);
+            const strength = parseFloat(inMagStrength.value);
+            const angleRad = angleDeg * Math.PI / 180;
+
+            valMagAngle.textContent = angleDeg + '°';
+            valMagStrength.textContent = strength + '%';
+
+            ctxF.clearRect(0, 0, w, h);
+
+            const magLength = 140;
+            const magWidth = 40;
+            
+            // Расчет положения полюсов для создания дипольного поля
+            const poleOffset = magLength / 2 * 0.8;
+            const pNx = cx + Math.cos(angleRad) * poleOffset;
+            const pNy = cy + Math.sin(angleRad) * poleOffset;
+            const pSx = cx - Math.cos(angleRad) * poleOffset;
+            const pSy = cy - Math.sin(angleRad) * poleOffset;
+
+            // Фоновое поле Земли, направлено на географический север (вверх экрана)
+            const BEarth = 0.5; 
+
+            ctxF.lineWidth = 2;
+            compasses.forEach(c => {
+                const dxN = c.x - pNx;
+                const dyN = c.y - pNy;
+                const rN = Math.sqrt(dxN*dxN + dyN*dyN) + 1; 
+
+                const dxS = c.x - pSx;
+                const dyS = c.y - pSy;
+                const rS = Math.sqrt(dxS*dxS + dyS*dyS) + 1;
+
+                const k = strength * 50; 
+                // Сложение векторов магнитной индукции от N и S полюсов
+                const bx = k * (dxN / Math.pow(rN, 3) - dxS / Math.pow(rS, 3));
+                const by = k * (dyN / Math.pow(rN, 3) - dyS / Math.pow(rS, 3));
+
+                const totalBx = bx;
+                const totalBy = by - BEarth * 50; 
+
+                // Угол отклонения стрелки компаса
+                const theta = Math.atan2(totalBy, totalBx);
+
+                const needleLen = 12;
+                const needleWid = 4;
+
+                ctxF.save();
+                ctxF.translate(c.x, c.y);
+                ctxF.rotate(theta);
+
+                // Северный полюс стрелки (Синий) - указывает направление поля
+                ctxF.fillStyle = '#3B82F6';
+                ctxF.beginPath();
+                ctxF.moveTo(0, -needleWid);
+                ctxF.lineTo(needleLen, 0);
+                ctxF.lineTo(0, needleWid);
+                ctxF.fill();
+
+                // Южный полюс стрелки (Красный)
+                ctxF.fillStyle = '#EF4444';
+                ctxF.beginPath();
+                ctxF.moveTo(0, -needleWid);
+                ctxF.lineTo(-needleLen, 0);
+                ctxF.lineTo(0, needleWid);
+                ctxF.fill();
+
+                ctxF.restore();
+            });
+
+            // Отрисовка самого магнита
+            ctxF.save();
+            ctxF.translate(cx, cy);
+            ctxF.rotate(angleRad);
+            
+            // S-полюс
+            ctxF.fillStyle = '#EF4444';
+            ctxF.fillRect(-magLength/2, -magWidth/2, magLength/2, magWidth);
+            // N-полюс
+            ctxF.fillStyle = '#3B82F6';
+            ctxF.fillRect(0, -magWidth/2, magLength/2, magWidth);
+            
+            ctxF.strokeStyle = '#fff';
+            ctxF.lineWidth = 2;
+            ctxF.strokeRect(-magLength/2, -magWidth/2, magLength, magWidth);
+
+            ctxF.fillStyle = '#fff';
+            ctxF.font = 'bold 20px sans-serif';
+            ctxF.textAlign = 'center';
+            ctxF.textBaseline = 'middle';
+            ctxF.fillText('S', -magLength/4, 0);
+            ctxF.fillText('N', magLength/4, 0);
+
+            ctxF.restore();
+            
+            requestAnimationFrame(drawFilings);
+        }
+
+        inMagAngle.addEventListener('input', () => {});
+        inMagStrength.addEventListener('input', () => {});
+        requestAnimationFrame(drawFilings);
 
     </script>
 </body>
