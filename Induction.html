@@ -176,13 +176,20 @@
         </div>
 
         <h2><i data-lucide="monitor-play"></i> 3. Лаборатория: Опыт Фарадея</h2>
-        <p style="color: var(--text-muted);">Двигайте магнит внутрь катушки и обратно. Наблюдайте: ток (и ЭДС) возникает <b>только во время движения</b>! Если магнит просто лежит внутри катушки (даже очень сильный) — тока нет, потому что $\Delta \Phi = 0$. Чем быстрее вы двигаете ползунок, тем больше всплеск ЭДС.</p>
+        <p style="color: var(--text-muted);">Задайте силу магнита и его скорость, затем запустите симуляцию. Наблюдайте: ток (и ЭДС) возникает <b>только во время движения</b> магнита внутри катушки! Чем выше скорость, тем больше всплеск ЭДС. Во время паузы ЭДС равна нулю.</p>
 
         <div class="simulator">
             <div class="sim-controls">
-                <div class="control-group" style="grid-column: 1 / -1;">
-                    <label style="color: var(--text-main);"><span>Двигать магнит (Влево - Вправо):</span> <span id="val-mag-pos">0 м</span></label>
-                    <input type="range" id="sim-mag-pos" min="-10" max="10" value="-6" step="0.1" style="accent-color: var(--brand-red);">
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);"><span>Сила магнита ($B$):</span> <span id="val-mag-b">2.0 Тл</span></label>
+                    <input type="range" id="sim-mag-b" min="0.5" max="5.0" value="2.0" step="0.5" style="accent-color: var(--brand-blue);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>Скорость ($v$):</span> <span id="val-mag-v">5 м/с</span></label>
+                    <input type="range" id="sim-mag-v" min="0" max="20" value="5" step="1" style="accent-color: var(--accent);">
+                </div>
+                <div class="control-group" style="justify-content: flex-end;">
+                    <button class="btn" id="btn-mag-play" onclick="toggleFaraday()" style="width: 100%;"><i data-lucide="play" style="width:16px;"></i> Запустить магнит</button>
                 </div>
             </div>
 
@@ -365,15 +372,33 @@
            ========================================== */
         const canvasF = document.getElementById('canvas-faraday');
         const ctxF = canvasF.getContext('2d');
-        const inMagPos = document.getElementById('sim-mag-pos');
-        const valMagPos = document.getElementById('val-mag-pos');
+        const inMagB = document.getElementById('sim-mag-b');
+        const inMagV = document.getElementById('sim-mag-v');
+        const valMagB = document.getElementById('val-mag-b');
+        const valMagV = document.getElementById('val-mag-v');
         const dashFlux = document.getElementById('dash-flux');
         const dashEmf = document.getElementById('dash-emf');
+        const btnMagPlay = document.getElementById('btn-mag-play');
 
-        let lastPos = parseFloat(inMagPos.value);
+        let isPlayingF = false;
+        let magPos = -8; // Начинаем слева
+        let magDir = 1; // 1 вправо, -1 влево
         let lastTimeF = performance.now();
         let needleAngle = 0; // Для гальванометра
         let targetNeedleAngle = 0;
+
+        // Глобальная функция для кнопки
+        window.toggleFaraday = function() {
+            isPlayingF = !isPlayingF;
+            if (isPlayingF) {
+                btnMagPlay.innerHTML = '<i data-lucide="pause" style="width:16px;"></i> Пауза';
+                btnMagPlay.classList.replace('btn', 'btn-outline');
+            } else {
+                btnMagPlay.innerHTML = '<i data-lucide="play" style="width:16px;"></i> Запустить магнит';
+                btnMagPlay.classList.replace('btn-outline', 'btn');
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
         function drawFaraday() {
             const now = performance.now();
@@ -385,26 +410,28 @@
             const cx = w / 2;
             const cy = h / 2 + 10;
 
-            const currentPos = parseFloat(inMagPos.value);
-            valMagPos.textContent = currentPos.toFixed(1) + ' м';
+            const B_max = parseFloat(inMagB.value);
+            const v_mag = parseFloat(inMagV.value);
+            
+            valMagB.textContent = B_max.toFixed(1) + ' Тл';
+            valMagV.textContent = v_mag.toFixed(0) + ' м/с';
 
-            // Физика: Моделируем поток как колокол (максимум, когда магнит в центре катушки, x=0)
-            const B_max = 2.0; 
+            if (isPlayingF) {
+                // Скорость в симуляции пропорциональна значению ползунка
+                magPos += magDir * (v_mag * 0.6) * dt;
+                // Меняем направление на краях
+                if (magPos > 8) { magPos = 8; magDir = -1; }
+                if (magPos < -8) { magPos = -8; magDir = 1; }
+            }
+
+            // Физика: Моделируем поток как колокол
             const width_factor = 4.0;
-            // Ф = B_max * exp(-(x^2 / width_factor))
-            const currentFlux = B_max * Math.exp(-(currentPos * currentPos) / width_factor);
+            const currentFlux = B_max * Math.exp(-(magPos * magPos) / width_factor);
             
-            // ЭДС = - dФ/dt = - (Ф_current - Ф_last) / dt
-            // Для плавности симуляции считаем скорость: v = dx/dt
-            const v = (currentPos - lastPos) / dt;
-            lastPos = currentPos;
-
-            // dФ/dx = B_max * (-2x / width_factor) * exp(...)
-            const dPhi_dx = B_max * (-2 * currentPos / width_factor) * Math.exp(-(currentPos * currentPos) / width_factor);
-            
-            // Искусственно зануляем микро-ЭДС от шума мыши
-            let emf = - (dPhi_dx * v);
-            if (Math.abs(v) < 0.1) emf = 0;
+            // ЭДС = - dФ/dx * dx/dt
+            const dPhi_dx = B_max * (-2 * magPos / width_factor) * Math.exp(-(magPos * magPos) / width_factor);
+            const actual_v = isPlayingF ? magDir * v_mag : 0;
+            const emf = - (dPhi_dx * actual_v);
 
             // Обновляем дашборды
             dashFlux.textContent = currentFlux.toFixed(2) + ' Вб';
@@ -419,7 +446,7 @@
 
             // Плавное движение стрелки гальванометра
             // Ограничиваем угол отклонения [-pi/4, pi/4]
-            let emfVisual = Math.max(Math.min(emf * 0.3, Math.PI/4), -Math.PI/4);
+            let emfVisual = Math.max(Math.min(emf * 0.15, Math.PI/4), -Math.PI/4);
             targetNeedleAngle = emfVisual;
             needleAngle += (targetNeedleAngle - needleAngle) * 0.2; // Lerp
 
@@ -467,8 +494,8 @@
             }
 
             // 4. Рисуем Магнит
-            // currentPos: -10 to 10 -> -200px to +200px
-            const magVisX = cx + currentPos * 20;
+            // magPos: -10 to 10 -> -200px to +200px
+            const magVisX = cx + magPos * 20;
             const magW = 100;
             const magH = 30;
             
