@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Колебательный контур</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-purple: #8B5CF6;
+            --brand-orange: #F97316;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;}
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #1a1a1a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; touch-action: none; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Колебательный контур</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="radio" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое электромагнитные колебания?</strong><br>
+                <span style="color: var(--text-muted);">Это периодическое изменение заряда, силы тока, напряжения и энергии в электрической цепи. Представь себе качели, но вместо кинетической и потенциальной энергии здесь переливаются друг в друга <b>энергия электрического поля конденсатора</b> и <b>энергия магнитного поля катушки</b>.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="cpu"></i> 1. Устройство и принцип работы</h2>
+        <div class="card">
+            <p>Классический (идеальный) контур состоит из двух элементов, соединенных между собой (без активного сопротивления $R$):</p>
+            <ul>
+                <li><strong style="color: var(--brand-red);">Конденсатор ($C$)</strong> — хранит энергию электрического поля.</li>
+                <li><strong style="color: var(--brand-blue);">Катушка индуктивности ($L$)</strong> — хранит энергию магнитного поля.</li>
+            </ul>
+
+            <h3 style="margin-top: 20px;">Как начинаются колебания:</h3>
+            <ol style="color: var(--text-muted);">
+                <li>Заряжаем конденсатор и замыкаем цепь.</li>
+                <li>Конденсатор начинает разряжаться, в цепи появляется ток.</li>
+                <li>Ток, проходя через катушку, создает магнитное поле (энергия магнитного поля растет).</li>
+                <li>Когда конденсатор полностью разрядился ($q = 0$), ток в катушке максимален! Поле катушки (из-за самоиндукции) не дает току исчезнуть мгновенно.</li>
+                <li>Ток продолжает течь, перезаряжая конденсатор с обратным знаком. Процесс повторяется бесконечно (в идеальном контуре).</li>
+            </ol>
+        </div>
+
+        <h2><i data-lucide="activity"></i> 2. Формула Томсона и Законы колебаний</h2>
+        <div class="card">
+            <p>Самая главная формула для ЕГЭ по этой теме — это формула периода свободных электромагнитных колебаний, выведенная Уильямом Томсоном:</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--accent);">
+                    <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 5px;">Период колебаний ($T$)</div>
+                    $$T = 2\pi\sqrt{LC}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-purple);">
+                    <div style="font-size: 0.9rem; color: var(--brand-purple); margin-bottom: 5px;">Частота ($\nu$) и Цикл. частота ($\omega$)</div>
+                    $$\nu = \frac{1}{T} \quad \omega = \frac{2\pi}{T} = \frac{1}{\sqrt{LC}}$$
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px;">Кинематика контура (Синусы и косинусы)</h3>
+            <p style="color: var(--text-muted);">Если в момент $t=0$ конденсатор был максимально заряжен, то заряд меняется по косинусу, а ток (как производная от заряда $I = q'$) — по синусу:</p>
+            <div class="formula-box">
+                $$q(t) = q_{max} \cos(\omega t)$$
+                $$I(t) = -q_{max} \omega \sin(\omega t) \quad \Rightarrow \quad I_{max} = q_{max} \omega$$
+            </div>
+            <p style="color: var(--brand-orange); font-weight: bold; text-align: center;">Важно: Заряд и ток сдвинуты по фазе на $90^\circ$ ($\frac{\pi}{2}$)! Когда заряд максимален, ток равен нулю. И наоборот.</p>
+        </div>
+
+        <h2><i data-lucide="battery"></i> 3. Закон сохранения энергии</h2>
+        <div class="card">
+            <p>В идеальном колебательном контуре полная электромагнитная энергия сохраняется: $W = \text{const}$. Она периодически переходит из конденсатора в катушку и обратно.</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--brand-red);">
+                    <div style="font-size: 0.9rem; color: var(--brand-red); margin-bottom: 5px;">Энергия Конденсатора (Электрическая)</div>
+                    $$W_E = \frac{q^2}{2C} = \frac{CU^2}{2}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-blue);">
+                    <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Энергия Катушки (Магнитная)</div>
+                    $$W_M = \frac{LI^2}{2}$$
+                </div>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.1rem; margin-top: 20px;">
+                $$W_{полная} = \frac{CU_{max}^2}{2} = \frac{LI_{max}^2}{2} = \frac{cu^2}{2} + \frac{Li^2}{2}$$
+            </p>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 4. Лаборатория: Электромагнитные качели</h2>
+        <p style="color: var(--text-muted);">Запустите симуляцию. Слева — сам контур. Наблюдайте, как меняется заряд на пластинах конденсатора (цвет) и как текут электроны (белые точки) через катушку. Справа — гистограмма, доказывающая закон сохранения энергии.</p>
+
+        <div class="simulator">
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--brand-red);"><span>Ёмкость конденсатора ($C$):</span> <span><span id="val-c">2.0</span> мкФ</span></label>
+                    <input type="range" id="sim-c" min="0.5" max="5.0" value="2.0" step="0.5" style="accent-color: var(--brand-red);">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);"><span>Индуктивность катушки ($L$):</span> <span><span id="val-l">5.0</span> мГн</span></label>
+                    <input type="range" id="sim-l" min="1.0" max="10.0" value="5.0" step="1.0" style="accent-color: var(--brand-blue);">
+                </div>
+                <div class="control-group" style="justify-content: flex-end;">
+                    <button class="btn btn-outline" id="btn-play" onclick="toggleSim()" style="width: 100%;"><i data-lucide="pause" style="width:16px;"></i> Пауза</button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Период ($T$)</div>
+                    <div class="dashboard-value" id="dash-t" style="color: #fff;">0.00 мс</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Заряд ($q$)</div>
+                    <div class="dashboard-value" id="dash-q" style="color: var(--brand-red);">0.00 мкКл</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Сила тока ($I$)</div>
+                    <div class="dashboard-value" id="dash-i" style="color: var(--brand-blue);">0.00 А</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-circuit" width="600" height="300" style="background: #1a1a1a; border-radius: 8px; border: 1px solid #333; touch-action: none;"></canvas>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">
+                <span><b style="color: var(--brand-red);">■</b> Энергия электр. поля ($W_E$)</span>
+                <span><b style="color: var(--brand-blue);">■</b> Энергия магнит. поля ($W_M$)</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 5. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Частота энергий:</strong> Частота колебаний энергии ($W_E$ или $W_M$) в <b>ДВА РАЗА БОЛЬШЕ</b> частоты колебаний заряда или тока! Энергия достигает максимума дважды за один период $T$.</li>
+                    <li><strong>Резонанс:</strong> Если к контуру подключить внешнюю переменную ЭДС, и её частота совпадет с собственной частотой контура ($\nu_{внеш} = \nu_{собств}$), то амплитуда силы тока резко возрастет. Это явление резонанса.</li>
+                    <li><strong>Уменьшение параметров:</strong> Запомните, если увеличить $L$ или $C$, период $T$ увеличится (колебания станут медленнее), а вот частота $\nu$ — уменьшится.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Ошибка в формуле Томсона:</strong> Часто забывают корень и пишут $T = 2\pi LC$, или путают с математическим маятником, засовывая $C$ в знаменатель: $T = 2\pi\sqrt{\frac{L}{C}}$. Обе величины должны быть под корнем в числителе!</li>
+                    <li><strong>Синхронность тока и заряда:</strong> Думают, что когда заряд максимален, ток тоже максимален. На самом деле они "работают в противофазе" (сдвиг $90^\circ$).</li>
+                    <li><strong>Влияние резистора:</strong> Думают, что уменьшение сопротивления $R$ в контуре увеличивает частоту. Нет, частота зависит <b>только</b> от $L$ и $C$. Сопротивление влияет только на то, как быстро колебания <i>затухнут</i>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Максимальный ток</h3>
+            <p>В идеальном колебательном контуре емкость конденсатора $C = 2 \text{ мкФ}$, а индуктивность катушки $L = 50 \text{ мГн}$. Максимальное напряжение на конденсаторе достигает $U_{max} = 100 \text{ В}$. Найдите максимальную силу тока в катушке.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Используйте закон сохранения энергии. Максимальная энергия электрического поля конденсатора полностью переходит в максимальную энергию магнитного поля катушки. Приравняйте их: $W_{E(max)} = W_{M(max)}$.
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Запишем закон сохранения энергии для колебательного контура: <br>
+                $$\frac{CU_{max}^2}{2} = \frac{LI_{max}^2}{2}$$</p>
+                
+                <p>2. Умножим обе части на 2 и выразим $I_{max}^2$:<br>
+                $$I_{max}^2 = \frac{C \cdot U_{max}^2}{L}$$</p>
+                
+                <p>3. Извлечем корень для нахождения максимального тока:<br>
+                $$I_{max} = U_{max} \sqrt{\frac{C}{L}}$$</p>
+
+                <p>4. Переведем единицы измерения в СИ и подставим ($C = 2 \cdot 10^{-6} \text{ Ф}$, $L = 50 \cdot 10^{-3} \text{ Гн}$):<br>
+                $$I_{max} = 100 \cdot \sqrt{\frac{2 \cdot 10^{-6}}{50 \cdot 10^{-3}}} = 100 \cdot \sqrt{\frac{2 \cdot 10^{-6}}{0.05}} = 100 \cdot \sqrt{40 \cdot 10^{-6}} = 100 \cdot \sqrt{4 \cdot 10^{-5}}$$
+                $$I_{max} = 100 \cdot 2 \cdot 10^{-2.5} \approx 100 \cdot 0.00632 \approx 0.63 \text{ А}$$
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;"><i>(Примечание: для простоты счета на экзаменах обычно дают более "удобные" числа, из которых корень извлекается нацело).</i></p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: ≈ 0.63 А</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР КОЛЕБАТЕЛЬНОГО КОНТУРА
+           ========================================== */
+        const canvas = document.getElementById('canvas-circuit');
+        const ctx = canvas.getContext('2d');
+        
+        // Inputs
+        const inC = document.getElementById('sim-c');
+        const inL = document.getElementById('sim-l');
+        const valC = document.getElementById('val-c');
+        const valL = document.getElementById('val-l');
+        
+        // Dashboards
+        const dashT = document.getElementById('dash-t');
+        const dashQ = document.getElementById('dash-q');
+        const dashI = document.getElementById('dash-i');
+        const btnPlay = document.getElementById('btn-play');
+
+        let isPlaying = true;
+        let simTime = 0;
+        let lastTime = performance.now();
+
+        // Geometry constants
+        const c_x1 = 150, c_y1 = 80;
+        const c_x2 = 350, c_y2 = 220;
+        const rectW = c_x2 - c_x1;
+        const rectH = c_y2 - c_y1;
+
+        // Path for electrons (perimeter of the rectangle)
+        const pathLength = 2 * rectW + 2 * rectH;
+        let electrons = [];
+        const numElectrons = 20;
+
+        for (let i = 0; i < numElectrons; i++) {
+            electrons.push({ offset: (i / numElectrons) * pathLength });
+        }
+
+        function toggleSim() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                btnPlay.innerHTML = '<i data-lucide="pause" style="width:16px;"></i> Пауза';
+                btnPlay.classList.replace('btn', 'btn-outline');
+                lastTime = performance.now();
+                requestAnimationFrame(drawCircuit);
+            } else {
+                btnPlay.innerHTML = '<i data-lucide="play" style="width:16px;"></i> Запустить';
+                btnPlay.classList.replace('btn-outline', 'btn');
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // Helper to get X,Y on a rectangle path given a distance 'd'
+        function getPathPos(d) {
+            d = d % pathLength;
+            if (d < 0) d += pathLength;
+
+            if (d <= rectW) {
+                // Top wire (left to right)
+                return { x: c_x1 + d, y: c_y1 };
+            } else if (d <= rectW + rectH) {
+                // Right wire (top to bottom)
+                return { x: c_x2, y: c_y1 + (d - rectW) };
+            } else if (d <= 2 * rectW + rectH) {
+                // Bottom wire (right to left)
+                return { x: c_x2 - (d - rectW - rectH), y: c_y2 };
+            } else {
+                // Left wire (bottom to top)
+                return { x: c_x1, y: c_y2 - (d - 2 * rectW - rectH) };
+            }
+        }
+
+        function drawCircuit() {
+            const now = performance.now();
+            const dt = (now - lastTime) / 1000 || 0.016;
+            lastTime = now;
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 1. Read Inputs
+            const C_micro = parseFloat(inC.value); // microFarads
+            const L_milli = parseFloat(inL.value); // milliHenries
+            valC.textContent = C_micro.toFixed(1);
+            valL.textContent = L_milli.toFixed(1);
+
+            // True SI values
+            const C_si = C_micro * 1e-6;
+            const L_si = L_milli * 1e-3;
+
+            // 2. Calculate Physics
+            // Period T = 2 * pi * sqrt(L * C)
+            const T_si = 2 * Math.PI * Math.sqrt(L_si * C_si); // in seconds (~0.00028 s)
+            const T_ms = T_si * 1000;
+            
+            // To make it visually pleasing, we slow down time significantly.
+            // Let's say 1 second of visual time = 1 millisecond of real time (slow-mo)
+            if (isPlaying) {
+                simTime += dt * 0.001; // Scale time
+            }
+
+            const omega = (2 * Math.PI) / T_si;
+            
+            // Assume initial max charge q_max = 100 microCoulombs
+            const q_max = 100; 
+            const q_current = q_max * Math.cos(omega * simTime); // microCoulombs
+            
+            // I(t) = q'(t) = -q_max * omega * sin(omega t). Scale to Amperes (1e-6 factor for q)
+            const I_current = - (q_max * 1e-6) * omega * Math.sin(omega * simTime); // Amperes
+
+            // Energies
+            const W_E = (q_current * 1e-6)**2 / (2 * C_si);
+            const W_M = (L_si * I_current**2) / 2;
+            const W_max = (q_max * 1e-6)**2 / (2 * C_si); // Total energy is constant
+
+            // Dashboards
+            dashT.textContent = T_ms.toFixed(2) + ' мс';
+            dashQ.textContent = q_current.toFixed(1) + ' мкКл';
+            dashI.textContent = I_current.toFixed(2) + ' А';
+
+            // --- Drawing ---
+            ctx.clearRect(0, 0, w, h);
+
+            // 1. Draw Energy Bars (Right side)
+            const barBaseX = 450;
+            const barBaseY = 250;
+            const barMaxH = 150;
+            const barW = 40;
+            
+            // Background tracks
+            ctx.fillStyle = 'rgba(255,255,255,0.05)';
+            ctx.fillRect(barBaseX, barBaseY - barMaxH, barW, barMaxH);
+            ctx.fillRect(barBaseX + 60, barBaseY - barMaxH, barW, barMaxH);
+            
+            // E bar
+            const hE = (W_E / W_max) * barMaxH;
+            ctx.fillStyle = 'var(--brand-red)';
+            ctx.fillRect(barBaseX, barBaseY - hE, barW, hE);
+            
+            // M bar
+            const hM = (W_M / W_max) * barMaxH;
+            ctx.fillStyle = 'var(--brand-blue)';
+            ctx.fillRect(barBaseX + 60, barBaseY - hM, barW, hM);
+
+            // Labels
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('We', barBaseX + barW/2, barBaseY + 20);
+            ctx.fillText('Wm', barBaseX + 60 + barW/2, barBaseY + 20);
+
+            // 2. Draw Circuit Wires
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.rect(c_x1, c_y1, rectW, rectH);
+            ctx.stroke();
+
+            // Clear sections for components
+            ctx.clearRect(c_x1 - 20, c_y1 + rectH/2 - 30, 40, 60); // Capacitor gap
+            ctx.clearRect(c_x2 - 20, c_y1 + rectH/2 - 40, 40, 80); // Inductor gap
+
+            // 3. Draw Capacitor (Left side, c_x1)
+            const capY = c_y1 + rectH/2;
+            ctx.lineWidth = 4;
+            
+            // Color based on charge (Red = positive top, Blue = negative top)
+            let colorTop = '#fff', colorBot = '#fff';
+            let alpha = Math.min(Math.abs(q_current) / q_max, 1);
+            if (q_current > 0) {
+                colorTop = `rgba(239, 68, 68, ${alpha + 0.2})`;
+                colorBot = `rgba(59, 130, 246, ${alpha + 0.2})`;
+            } else {
+                colorTop = `rgba(59, 130, 246, ${alpha + 0.2})`;
+                colorBot = `rgba(239, 68, 68, ${alpha + 0.2})`;
+            }
+
+            // Top Plate
+            ctx.strokeStyle = colorTop;
+            ctx.beginPath();
+            ctx.moveTo(c_x1 - 20, capY - 10);
+            ctx.lineTo(c_x1 + 20, capY - 10);
+            ctx.stroke();
+            // Plus/Minus indicators
+            ctx.fillStyle = colorTop;
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(q_current > 0 ? '+' : '-', c_x1 - 30, capY - 5);
+
+            // Bottom Plate
+            ctx.strokeStyle = colorBot;
+            ctx.beginPath();
+            ctx.moveTo(c_x1 - 20, capY + 10);
+            ctx.lineTo(c_x1 + 20, capY + 10);
+            ctx.stroke();
+            ctx.fillStyle = colorBot;
+            ctx.fillText(q_current > 0 ? '-' : '+', c_x1 - 30, capY + 15);
+
+            ctx.fillStyle = '#fff';
+            ctx.fillText('C', c_x1 + 40, capY);
+
+            // 4. Draw Inductor (Right side, c_x2)
+            const indYStart = c_y1 + rectH/2 - 30;
+            ctx.strokeStyle = '#F97316'; // Orange-ish coil
+            
+            // Glow intensity based on current
+            const iAlpha = Math.min(Math.abs(I_current) / (q_max*1e-6 * omega), 1);
+            ctx.shadowBlur = iAlpha * 15;
+            ctx.shadowColor = '#F97316';
+            
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for(let i=0; i<=4; i++) {
+                // Drawing loops
+                let yCenter = indYStart + i*15;
+                ctx.arc(c_x2, yCenter, 15, -Math.PI/2, Math.PI/2, false);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0; // reset
+            ctx.fillStyle = '#fff';
+            ctx.fillText('L', c_x2 - 30, c_y1 + rectH/2);
+
+            // 5. Draw Electrons (Flowing dots)
+            // Visually scale current to a reasonable movement speed in pixels
+            // If I is positive, electrons move counter-clockwise (since current is clockwise)
+            // Wait, standard current direction: + to -. 
+            // If top plate is +, I > 0 means current flows right/clockwise. Electrons flow left/counter-clockwise.
+            const visualSpeed = -I_current * 10; 
+            
+            if (isPlaying) {
+                for (let i = 0; i < numElectrons; i++) {
+                    electrons[i].offset += visualSpeed;
+                }
+            }
+
+            ctx.fillStyle = '#A0A0A0';
+            for (let i = 0; i < numElectrons; i++) {
+                const pos = getPathPos(electrons[i].offset);
+                
+                // Don't draw electrons if they are inside the capacitor gap
+                if (pos.x === c_x1 && pos.y > capY - 15 && pos.y < capY + 15) continue;
+                
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            if (isPlaying) {
+                requestAnimationFrame(drawCircuit);
+            }
+        }
+
+        // Run
+        requestAnimationFrame(drawCircuit);
+
+    </script>
+</body>
+</html>
