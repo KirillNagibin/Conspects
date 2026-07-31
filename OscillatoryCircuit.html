@@ -205,12 +205,12 @@
         <div class="simulator">
             <div class="sim-controls">
                 <div class="control-group">
-                    <label style="color: var(--brand-red);"><span>Ёмкость конденсатора ($C$):</span> <span><span id="val-c">2.0</span> мкФ</span></label>
-                    <input type="range" id="sim-c" min="0.5" max="5.0" value="2.0" step="0.5" style="accent-color: var(--brand-red);">
+                    <label style="color: var(--brand-red);"><span>Ёмкость конденсатора ($C$):</span> <span><span id="val-c">10</span> мкФ</span></label>
+                    <input type="range" id="sim-c" min="1" max="50" value="10" step="1" style="accent-color: var(--brand-red);">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-blue);"><span>Индуктивность катушки ($L$):</span> <span><span id="val-l">5.0</span> мГн</span></label>
-                    <input type="range" id="sim-l" min="1.0" max="10.0" value="5.0" step="1.0" style="accent-color: var(--brand-blue);">
+                    <label style="color: var(--brand-blue);"><span>Индуктивность катушки ($L$):</span> <span><span id="val-l">100</span> мГн</span></label>
+                    <input type="range" id="sim-l" min="10" max="500" value="100" step="10" style="accent-color: var(--brand-blue);">
                 </div>
                 <div class="control-group" style="justify-content: flex-end;">
                     <button class="btn btn-outline" id="btn-play" onclick="toggleSim()" style="width: 100%;"><i data-lucide="pause" style="width:16px;"></i> Пауза</button>
@@ -414,8 +414,8 @@
             // 1. Read Inputs
             const C_micro = parseFloat(inC.value); // microFarads
             const L_milli = parseFloat(inL.value); // milliHenries
-            valC.textContent = C_micro.toFixed(1);
-            valL.textContent = L_milli.toFixed(1);
+            valC.textContent = C_micro.toFixed(0);
+            valL.textContent = L_milli.toFixed(0);
 
             // True SI values
             const C_si = C_micro * 1e-6;
@@ -423,13 +423,13 @@
 
             // 2. Calculate Physics
             // Period T = 2 * pi * sqrt(L * C)
-            const T_si = 2 * Math.PI * Math.sqrt(L_si * C_si); // in seconds (~0.00028 s)
+            const T_si = 2 * Math.PI * Math.sqrt(L_si * C_si); // in seconds
             const T_ms = T_si * 1000;
             
             // To make it visually pleasing, we slow down time significantly.
-            // Let's say 1 second of visual time = 1 millisecond of real time (slow-mo)
+            // Adjusting time scale so standard oscillation takes a few seconds visually
             if (isPlaying) {
-                simTime += dt * 0.001; // Scale time
+                simTime += dt * 0.005; // Scale time
             }
 
             const omega = (2 * Math.PI) / T_si;
