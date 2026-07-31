@@ -220,12 +220,12 @@
 
             <div class="sim-controls">
                 <div class="control-group">
-                    <label style="color: var(--text-main);"><span>Расстояние ($d$):</span> <span id="val-d">1.0 у.е.</span></label>
-                    <input type="range" id="sim-d" min="0.5" max="3.0" value="1.0" step="0.1" style="accent-color: #fff;">
+                    <label style="color: var(--text-main);"><span>Расстояние ($d$):</span> <span id="val-d">5.0 мм</span></label>
+                    <input type="range" id="sim-d" min="1.0" max="10.0" value="5.0" step="0.5" style="accent-color: #fff;">
                 </div>
                 <div class="control-group">
-                    <label style="color: var(--brand-cyan);"><span>Площадь ($S$):</span> <span id="val-s">1.0 у.е.</span></label>
-                    <input type="range" id="sim-s" min="0.5" max="2.0" value="1.0" step="0.1" style="accent-color: var(--brand-cyan);">
+                    <label style="color: var(--brand-cyan);"><span>Площадь ($S$):</span> <span id="val-s">0.05 м²</span></label>
+                    <input type="range" id="sim-s" min="0.01" max="0.10" value="0.05" step="0.01" style="accent-color: var(--brand-cyan);">
                 </div>
                 <div class="control-group">
                     <label style="color: var(--brand-purple);"><span>Диэлектрик ($\varepsilon$):</span> <span id="val-eps">1.0 (Воздух)</span></label>
@@ -236,23 +236,23 @@
             <div class="dashboard-grid">
                 <div class="dashboard-item">
                     <div class="dashboard-label">Ёмкость ($C$)</div>
-                    <div class="dashboard-value" id="dash-c" style="color: var(--accent);">1.00 C₀</div>
+                    <div class="dashboard-value" id="dash-c" style="color: var(--accent);">88.5 пФ</div>
                 </div>
                 <div class="dashboard-item" id="dash-container-u">
                     <div class="dashboard-label">Напряжение ($U$)</div>
-                    <div class="dashboard-value" id="dash-u" style="color: var(--brand-blue);">1.00 U₀</div>
+                    <div class="dashboard-value" id="dash-u" style="color: var(--brand-blue);">12.0 В</div>
                 </div>
                 <div class="dashboard-item" id="dash-container-q">
                     <div class="dashboard-label">Заряд ($q$)</div>
-                    <div class="dashboard-value" id="dash-q" style="color: var(--brand-red);">1.00 q₀</div>
+                    <div class="dashboard-value" id="dash-q" style="color: var(--brand-red);">1.06 нКл</div>
                 </div>
                 <div class="dashboard-item">
                     <div class="dashboard-label">Поле ($E$)</div>
-                    <div class="dashboard-value" id="dash-e" style="color: #fff;">1.00 E₀</div>
+                    <div class="dashboard-value" id="dash-e" style="color: #fff;">2.4 кВ/м</div>
                 </div>
                 <div class="dashboard-item">
                     <div class="dashboard-label">Энергия ($W$)</div>
-                    <div class="dashboard-value" id="dash-w" style="color: var(--brand-orange);">1.00 W₀</div>
+                    <div class="dashboard-value" id="dash-w" style="color: var(--brand-orange);">6.37 нДж</div>
                 </div>
             </div>
 
@@ -261,7 +261,7 @@
             </div>
             
             <p id="sim-explanation" style="text-align: center; color: var(--brand-blue); font-size: 0.9rem; margin-top: 15px; font-weight: 500;">
-                Источник поддерживает постоянное напряжение. Заряд может притекать или утекать.
+                Источник поддерживает постоянное напряжение (U = 12 В). Заряд может притекать или утекать.
             </p>
         </div>
 
@@ -423,16 +423,14 @@
         const dashContainerQ = document.getElementById('dash-container-q');
         const simExplanation = document.getElementById('sim-explanation');
 
+        const EPSILON_0 = 8.854e-12;
+        const U_BATTERY = 12; // Вольт
+
         let capState = 'connected'; // 'connected' or 'disconnected'
-        
-        // Значения при фиксации состояния (нужны для расчета относительных изменений)
-        let C_fixed = 1;
-        let d_fixed = 1;
-        let S_fixed = 1;
-        let eps_fixed = 1;
+        let q_fixed = 0;
 
         function setCapacitorState(newState) {
-            capState = newMode = newState;
+            capState = newState;
             
             // UI кнопки
             document.querySelectorAll('.process-btn').forEach(btn => {
@@ -449,7 +447,7 @@
                 dashContainerU.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
                 dashContainerQ.style.border = "none";
                 dashContainerQ.style.backgroundColor = "transparent";
-                simExplanation.textContent = "Источник поддерживает постоянное напряжение (U = const). Заряд может притекать или утекать.";
+                simExplanation.textContent = "Источник поддерживает постоянное напряжение (U = 12 В). Заряд может притекать или утекать.";
                 simExplanation.style.color = "var(--brand-blue)";
             } else {
                 activeBtn.style.borderColor = "var(--brand-red)";
@@ -459,13 +457,14 @@
                 dashContainerU.style.backgroundColor = "transparent";
                 simExplanation.textContent = "Конденсатор отключен от цепи. Зарядам некуда деться (q = const). Напряжение может меняться.";
                 simExplanation.style.color = "var(--brand-red)";
+                
+                // Фиксируем заряд в момент отключения
+                const d_m = parseFloat(inD.value) * 1e-3;
+                const S_m2 = parseFloat(inS.value);
+                const eps = parseFloat(inEps.value);
+                const C_F = (EPSILON_0 * eps * S_m2) / d_m;
+                q_fixed = C_F * U_BATTERY;
             }
-
-            // "Сбрасываем" систему до начального состояния 1.0 (фиксируем момент отключения/подключения)
-            d_fixed = parseFloat(inD.value);
-            S_fixed = parseFloat(inS.value);
-            eps_fixed = parseFloat(inEps.value);
-            C_fixed = (eps_fixed * S_fixed) / d_fixed;
 
             updatePhysics();
         }
@@ -494,13 +493,14 @@
         }
 
         function updatePhysics() {
-            const d = parseFloat(inD.value);
-            const S = parseFloat(inS.value);
+            const d_mm = parseFloat(inD.value);
+            const d_m = d_mm * 1e-3;
+            const S_m2 = parseFloat(inS.value);
             const eps = parseFloat(inEps.value);
 
             // Обновляем лейблы инпутов
-            valD.textContent = d.toFixed(1) + ' у.е.';
-            valS.textContent = S.toFixed(1) + ' у.е.';
+            valD.textContent = d_mm.toFixed(1) + ' мм';
+            valS.textContent = S_m2.toFixed(2) + ' м²';
             let epsLabel = eps.toFixed(1);
             if (eps === 1) epsLabel += " (Воздух)";
             if (eps >= 2 && eps < 3) epsLabel += " (Бумага)";
@@ -508,60 +508,49 @@
             if (eps === 5) epsLabel += " (Слюда)";
             valEps.textContent = epsLabel;
 
-            // РАСЧЕТ ФИЗИКИ (в относительных единицах, базовое = 1.0)
-            const C_current = (eps * S) / d;
-            
-            // Относительная емкость по сравнению с моментом переключения ключа
-            const C_rel = C_current / C_fixed; 
-
-            let U_rel = 1.0;
-            let q_rel = 1.0;
+            // РАСЧЕТ ФИЗИКИ В СИ
+            const C_F = (EPSILON_0 * eps * S_m2) / d_m;
+            let U_V = 0;
+            let q_C = 0;
 
             if (capState === 'connected') {
-                U_rel = 1.0; // U = const
-                q_rel = C_rel * U_rel; // q = CU
+                U_V = U_BATTERY; 
+                q_C = C_F * U_V; 
             } else {
-                q_rel = 1.0; // q = const
-                U_rel = q_rel / C_rel; // U = q/C
+                q_C = q_fixed; 
+                U_V = q_C / C_F; 
             }
 
-            // E = U/d (Относительное расстояние тоже нужно учесть)
-            const E_rel = U_rel / (d / d_fixed);
+            const E_Vm = U_V / d_m;
+            const W_J = (q_C * U_V) / 2;
 
-            // Энергия
-            let W_rel = 1.0;
-            if (capState === 'connected') {
-                W_rel = C_rel * U_rel * U_rel; // W ~ C*U^2 (U=const -> W ~ C)
-            } else {
-                W_rel = (q_rel * q_rel) / C_rel; // W ~ q^2/C (q=const -> W ~ 1/C)
-            }
+            // Форматируем для UI
+            const C_pF = C_F * 1e12; // пикофарады
+            const q_nC = q_C * 1e9;  // нанокулоны
+            const E_kVm = E_Vm * 1e-3; // кВ/м
+            const W_nJ = W_J * 1e9; // наноджоули
 
             // Обновляем дашборды
-            dashC.textContent = C_rel.toFixed(2) + ' C₀';
-            dashU.textContent = U_rel.toFixed(2) + ' U₀';
-            dashQ.textContent = q_rel.toFixed(2) + ' q₀';
-            dashE.textContent = E_rel.toFixed(2) + ' E₀';
-            dashW.textContent = W_rel.toFixed(2) + ' W₀';
-            
-            // Подсветка изменений
-            dashU.style.color = U_rel === 1.0 ? 'var(--brand-blue)' : (U_rel > 1.0 ? 'var(--error-text)' : 'var(--accent)');
-            dashQ.style.color = q_rel === 1.0 ? 'var(--brand-red)' : (q_rel > 1.0 ? 'var(--accent)' : 'var(--error-text)');
+            dashC.textContent = C_pF.toFixed(1) + ' пФ';
+            dashU.textContent = U_V.toFixed(1) + ' В';
+            dashQ.textContent = q_nC.toFixed(2) + ' нКл';
+            dashE.textContent = E_kVm.toFixed(1) + ' кВ/м';
+            dashW.textContent = W_nJ.toFixed(2) + ' нДж';
 
-            drawCanvas(d, S, eps, q_rel, E_rel, U_rel);
+            drawCanvas(d_mm, S_m2, eps, q_nC, E_kVm, U_V);
         }
 
-        function drawCanvas(d, S, eps, q_rel, E_rel, U_rel) {
+        function drawCanvas(d_mm, S_m2, eps, q_nC, E_kVm, U_V) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
             
             // Визуальный маппинг
-            // d: 0.5 - 3.0 -> 30px - 150px
-            const d_px = 30 + ((d - 0.5) / 2.5) * 120;
-            
-            // S: 0.5 - 2.0 -> 80px - 200px
-            const s_px = 80 + ((S - 0.5) / 1.5) * 120;
+            // d_mm: 1.0 - 10.0 -> 30px - 150px
+            const d_px = 30 + ((d_mm - 1.0) / 9.0) * 120;
+            // S_m2: 0.01 - 0.10 -> 80px - 200px
+            const s_px = 80 + ((S_m2 - 0.01) / 0.09) * 120;
 
             const plateWidth = s_px;
             const plateThickness = 12;
@@ -574,20 +563,17 @@
             ctx.beginPath();
             
             if (capState === 'connected') {
-                // Провода к источнику
                 ctx.moveTo(cx, topY); ctx.lineTo(cx, 20); ctx.lineTo(50, 20); ctx.lineTo(50, cy - 20);
                 ctx.moveTo(cx, botY + plateThickness); ctx.lineTo(cx, canvas.height - 20); ctx.lineTo(50, canvas.height - 20); ctx.lineTo(50, cy + 20);
                 ctx.stroke();
 
-                // Рисуем батарейку слева
                 ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText('U', 25, cy);
+                ctx.fillText(U_BATTERY + 'В', 25, cy);
                 ctx.lineWidth = 2; ctx.strokeStyle = '#4CAF50';
                 ctx.beginPath(); ctx.moveTo(35, cy - 20); ctx.lineTo(65, cy - 20); ctx.stroke(); // Плюс
                 ctx.lineWidth = 4; ctx.strokeStyle = '#3B82F6';
                 ctx.beginPath(); ctx.moveTo(40, cy + 20); ctx.lineTo(60, cy + 20); ctx.stroke(); // Минус
             } else {
-                // Оборванные провода
                 ctx.moveTo(cx, topY); ctx.lineTo(cx, topY - 30);
                 ctx.moveTo(cx, botY + plateThickness); ctx.lineTo(cx, botY + plateThickness + 30);
                 ctx.stroke();
@@ -595,12 +581,10 @@
 
             // 2. Отрисовка диэлектрика
             if (eps > 1.0) {
-                // Интенсивность цвета зависит от eps
                 const alpha = Math.min((eps - 1) * 0.15 + 0.1, 0.7);
                 ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
                 ctx.fillRect(cx - plateWidth / 2, cy - d_px / 2, plateWidth, d_px);
                 
-                // Подпись диэлектрика
                 ctx.fillStyle = `rgba(139, 92, 246, 0.8)`;
                 ctx.font = '14px sans-serif';
                 ctx.textAlign = 'center';
@@ -608,29 +592,25 @@
                 ctx.fillText('ε', cx - plateWidth/2 - 15, cy);
             }
 
-            // 3. Линии поля E (количество и густота зависят от E_rel)
-            const numLines = Math.max(3, Math.floor(7 * E_rel));
-            if (E_rel > 0.05 && q_rel > 0) {
+            // 3. Линии поля E (зависит от кВ/м)
+            const numLines = Math.max(3, Math.min(20, Math.floor(Math.abs(E_kVm) / 1.5)));
+            if (E_kVm > 0 && q_nC > 0) {
                 const spacing = plateWidth / (numLines + 1);
                 for (let i = 1; i <= numLines; i++) {
                     const lx = cx - plateWidth / 2 + i * spacing;
-                    // Рисуем стрелочки сверху вниз (от + к -)
                     drawArrow(ctx, lx, cy - d_px / 2 + 5, lx, cy + d_px / 2 - 5, 'rgba(255,255,255,0.3)');
                 }
             }
 
             // 4. Пластины
-            // Верхняя (+)
             ctx.fillStyle = '#EF4444'; // Red for positive
             ctx.fillRect(cx - plateWidth / 2, topY, plateWidth, plateThickness);
             
-            // Нижняя (-)
             ctx.fillStyle = '#3B82F6'; // Blue for negative
             ctx.fillRect(cx - plateWidth / 2, botY, plateWidth, plateThickness);
 
-            // 5. Заряды (плюсики и минусы)
-            // Плотность зарядов зависит от q_rel
-            const numCharges = Math.max(0, Math.min(10, Math.floor(5 * q_rel)));
+            // 5. Заряды (зависит от нКл)
+            const numCharges = Math.max(0, Math.min(15, Math.floor(Math.abs(q_nC) * 3)));
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 12px sans-serif';
             ctx.textAlign = 'center';
@@ -646,7 +626,6 @@
             }
             
             // 6. Подписи D и S
-            // Линейка для D
             const rightX = cx + plateWidth/2 + 20;
             ctx.strokeStyle = '#888';
             ctx.lineWidth = 1;
@@ -657,7 +636,6 @@
             ctx.stroke();
             ctx.fillStyle = '#fff'; ctx.fillText('d', rightX + 15, cy);
 
-            // Линейка для S
             ctx.beginPath();
             const sY = topY - 15;
             ctx.moveTo(cx - plateWidth/2, sY - 5); ctx.lineTo(cx - plateWidth/2, sY + 5);
@@ -670,7 +648,7 @@
             if(capState === 'disconnected') {
                 ctx.fillStyle = 'var(--brand-blue)';
                 ctx.font = 'bold 14px sans-serif';
-                ctx.fillText(`U = ${U_rel.toFixed(1)} U₀`, cx, canvas.height - 15);
+                ctx.fillText(`U = ${U_V.toFixed(1)} В`, cx, canvas.height - 15);
             }
         }
 
