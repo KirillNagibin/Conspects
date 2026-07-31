@@ -357,18 +357,14 @@
         const dashBeta = document.getElementById('dash-beta');
         const warningTIR = document.getElementById('tir-warning');
 
-        // Color mapping for media (n=1.0 -> dark, n=2.5 -> bright blue/cyan)
+        // Color mapping for media
         function getMediaColor(n) {
-            // Map n (1.0 to 2.5) to a color.
-            // 1.0 (Air) -> Almost black #111
-            // 1.33 (Water) -> Dark blue
-            // 1.5 (Glass) -> Purpleish
-            // 2.4 (Diamond) -> Cyanish
-            let ratio = (n - 1.0) / 1.5; // 0 to 1
-            let r = Math.floor(20 + 20 * ratio);
-            let g = Math.floor(20 + 100 * ratio);
-            let b = Math.floor(30 + 150 * ratio);
-            return `rgb(${r}, ${g}, ${b})`;
+            // Оптическая плотность отображается градациями серого
+            // 1.0 (Воздух) -> Почти черный (rgb(17,17,17))
+            // 2.5 (Алмаз) -> Светло-мутный серый (rgb(67,67,67))
+            let ratio = (n - 1.0) / 1.5; // от 0 до 1
+            let v = Math.floor(17 + 50 * ratio);
+            return `rgb(${v}, ${v}, ${v})`;
         }
 
         // Draw arrow helper
