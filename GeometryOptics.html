@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Конспект: Геометрическая оптика. Тонкие линзы</title>
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --border: #333333;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-text: #EF4444;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-text: #3B82F6;
+            --warn-bg: rgba(255, 193, 7, 0.1);
+            --warn-text: #FFC107;
+            --brand-blue: #3B82F6;
+            --brand-red: #EF4444;
+            --brand-orange: #F97316;
+            --brand-purple: #8B5CF6;
+            --brand-cyan: #06B6D4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        h1 { font-size: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; color: var(--accent); margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert-box {
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: flex-start;
+        }
+        .alert-info { background-color: var(--info-bg); border-left: 4px solid var(--info-text); }
+        .alert-warning { background-color: var(--warn-bg); border-left: 4px solid var(--warn-text); }
+        .alert-error { background-color: var(--error-bg); border-left: 4px solid var(--error-text); }
+
+        .icon-box { flex-shrink: 0; margin-top: 2px; }
+
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 500px; }
+        .table-container { overflow-x: auto; }
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; vertical-align: top;}
+        .data-table th { background-color: rgba(255,255,255,0.05); color: var(--text-main); }
+        .data-table td { color: var(--text-muted); }
+
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .formula-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 15px; text-align: center; border-radius: 8px; font-size: 1.2rem;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+        }
+        mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+        mjx-container[jax="SVG"] { color: inherit !important; }
+
+        .simulator { background: #111; border: 1px solid #444; border-radius: 12px; padding: 20px; margin: 20px 0; overflow: hidden; }
+        
+        .process-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .process-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; flex: 1; min-width: 200px; text-align: center; font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .process-btn.active {
+            background: rgba(59, 130, 246, 0.1); border-color: var(--brand-blue); color: var(--brand-blue); font-weight: bold;
+        }
+
+        .sim-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { color: var(--text-muted); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;}
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
+        
+        .canvas-container { display: flex; justify-content: center; width: 100%; overflow: hidden; position: relative; }
+        canvas { background: #0a0a0a; border-radius: 8px; border: 1px solid #333; max-width: 100%; display: block; touch-action: none; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; 
+            margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .dashboard-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .dashboard-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .dashboard-value { font-family: monospace; font-size: 1.1rem; font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(76, 175, 80, 0.1); }
+
+        .step-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--accent); overflow-x: auto; }
+        .step-content.active { display: block; animation: slideDown 0.3s ease; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Геометрическая оптика. Тонкие линзы</h1>
+        
+        <div class="alert-box alert-info">
+            <div class="icon-box"><i data-lucide="eye" color="var(--info-text)"></i></div>
+            <div>
+                <strong style="color: var(--info-text);">Что такое линза?</strong><br>
+                <span style="color: var(--text-muted);">Линза – это прозрачное тело (обычно из стекла), ограниченное двумя сферическими поверхностями. Линзы используют свойство <b>преломления света</b> для того, чтобы собирать или рассеивать лучи, создавая увеличенные или уменьшенные изображения предметов. Именно линзы стоят в ваших очках, камерах смартфонов и микроскопах.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="scan-line"></i> 1. Два типа линз</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <div style="background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 8px; border-left: 4px solid var(--brand-blue);">
+                <strong style="color: var(--brand-blue); font-size: 1.1rem;">Собирающая линза (выпуклая)</strong>
+                <ul style="margin-top: 10px;">
+                    <li>Собирает параллельные лучи в одну точку — фокус.</li>
+                    <li>Имеет <b>положительное</b> фокусное расстояние: $\mathbf{F > 0}$.</li>
+                    <li>Может давать как действительные, так и мнимые изображения.</li>
+                </ul>
+            </div>
+            
+            <div style="background: rgba(239, 68, 68, 0.05); padding: 15px; border-radius: 8px; border-left: 4px solid var(--brand-red);">
+                <strong style="color: var(--brand-red); font-size: 1.1rem;">Рассеивающая линза (вогнутая)</strong>
+                <ul style="margin-top: 10px;">
+                    <li>«Раздвигает» параллельные лучи.</li>
+                    <li>Фокус мнимый (находится перед линзой).</li>
+                    <li>Имеет <b>отрицательное</b> фокусное расстояние: $\mathbf{F < 0}$.</li>
+                    <li>Всегда дает только мнимые и уменьшенные изображения.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="pencil-ruler"></i> 2. Основные лучи для построений</h2>
+        <div class="card">
+            <p>Чтобы построить изображение любой точки в тонкой линзе, достаточно использовать всего два из трех "удобных" лучей:</p>
+            <ol style="color: var(--text-muted);">
+                <li><strong style="color: var(--text-main);">Луч, параллельный главной оптической оси</strong> — после преломления в линзе проходит через фокус $F$ (или его продолжение проходит через фокус для рассеивающей линзы).</li>
+                <li><strong style="color: var(--text-main);">Луч, проходящий через оптический центр линзы</strong> — проходит насквозь, вообще <b>не преломляясь</b> (не меняя направления).</li>
+                <li><strong style="color: var(--text-main);">Луч, проходящий через фокус</strong> — после преломления в линзе идет параллельно главной оптической оси.</li>
+            </ol>
+        </div>
+
+        <h2><i data-lucide="calculator"></i> 3. Формулы и правила знаков</h2>
+        <div class="card">
+            <p style="color: var(--text-muted); margin-top: 0;">Вся геометрическая оптика линз строится на одном главном уравнении и правиле знаков к нему.</p>
+            
+            <div class="formula-grid">
+                <div class="formula-box" style="border-color: var(--accent);">
+                    <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 5px;">Формула тонкой линзы</div>
+                    $$\pm \frac{1}{F} = \frac{1}{d} \pm \frac{1}{f}$$
+                </div>
+                <div class="formula-box" style="border-color: var(--brand-orange);">
+                    <div style="font-size: 0.9rem; color: var(--brand-orange); margin-bottom: 5px;">Оптическая сила ($D$)</div>
+                    $$D = \frac{1}{F}$$
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">$D$ в Диоптриях (дптр), $F$ строго в метрах!</span>
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning" style="margin-bottom: 0;">
+                <div class="icon-box"><i data-lucide="alert-circle" color="var(--warn-text)"></i></div>
+                <div>
+                    <strong style="color: var(--warn-text);">Жесткое правило знаков:</strong><br>
+                    <ul style="margin: 5px 0 0 0; padding-left: 15px;">
+                        <li>Для собирающей линзы перед $1/F$ ставим <b>плюс</b>. Для рассеивающей — <b>минус</b>.</li>
+                        <li>Расстояние от предмета до линзы $d$ <b>всегда с плюсом</b>.</li>
+                        <li>Если изображение <b>действительное</b> (с другой стороны от линзы), перед $1/f$ ставим <b>плюс</b>.</li>
+                        <li>Если изображение <b>мнимое</b> (с той же стороны, что и предмет), перед $1/f$ ставим <b>минус</b>.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="formula-box" style="border-color: var(--brand-blue); margin-top: 20px;">
+                <div style="font-size: 0.9rem; color: var(--brand-blue); margin-bottom: 5px;">Линейное увеличение ($\Gamma$)</div>
+                $$\Gamma = \frac{H}{h} = \frac{|f|}{d}$$
+                <span style="font-size: 0.8rem; color: var(--text-muted);">$H$ — высота изображения, $h$ — высота предмета. Если $\Gamma > 1$ — увеличенное.</span>
+            </div>
+        </div>
+
+        <h2><i data-lucide="monitor-play"></i> 4. Лаборатория: Оптическая скамья</h2>
+        <p style="color: var(--text-muted);">Выбирайте тип линзы и перемещайте предмет (зеленая стрелка). Наблюдайте, как строятся лучи и где формируется изображение (оранжевая стрелка). Симулятор автоматически применяет все правила знаков и рассчитывает формулы!</p>
+
+        <div class="simulator">
+            <div class="process-selector">
+                <div class="process-btn active" id="btn-lens-convex" onclick="setLensType('convex')">
+                    Собирающая линза ($F > 0$)
+                </div>
+                <div class="process-btn" id="btn-lens-concave" onclick="setLensType('concave')">
+                    Рассеивающая линза ($F < 0$)
+                </div>
+            </div>
+
+            <div class="sim-controls">
+                <div class="control-group">
+                    <label style="color: var(--accent);"><span>Расстояние до предмета ($d$):</span> <span id="val-d">30 см</span></label>
+                    <input type="range" id="sim-d" min="5" max="60" value="30" step="1">
+                </div>
+                <div class="control-group">
+                    <label style="color: var(--brand-blue);"><span>Фокусное расстояние ($|F|$):</span> <span id="val-focal">20 см</span></label>
+                    <input type="range" id="sim-focal" min="10" max="40" value="20" step="1" style="accent-color: var(--brand-blue);">
+                </div>
+                <div class="control-group">
+                    <label style="color: #fff;"><span>Высота предмета ($h$):</span> <span id="val-h">15 см</span></label>
+                    <input type="range" id="sim-h" min="5" max="25" value="15" step="1" style="accent-color: #aaa;">
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Расстояние до изо. ($f$)</div>
+                    <div class="dashboard-value" id="dash-f" style="color: var(--brand-orange);">60.0 см</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Оптическая сила ($D$)</div>
+                    <div class="dashboard-value" id="dash-d" style="color: var(--brand-cyan);">+5.0 дптр</div>
+                </div>
+                <div class="dashboard-item">
+                    <div class="dashboard-label">Увеличение ($\Gamma$)</div>
+                    <div class="dashboard-value" id="dash-mag" style="color: #fff;">2.00x</div>
+                </div>
+                <div class="dashboard-item" style="border: 1px solid var(--accent); background: rgba(76, 175, 80, 0.1); grid-column: span 3; padding: 5px;">
+                    <div class="dashboard-label" style="margin-bottom: 2px;">Характеристика изображения</div>
+                    <div class="dashboard-value" id="dash-desc" style="color: var(--accent); font-size: 1rem;">Действительное, перевернутое, увеличенное</div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="background: transparent; border: none; padding: 0;">
+                <canvas id="canvas-optics" width="700" height="350" style="background: #111; border-radius: 8px; border: 1px solid #333; touch-action: none;"></canvas>
+            </div>
+            
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">
+                <i>* Сплошные линии — реальные лучи. Пунктирные линии — их мнимые продолжения.</i>
+            </p>
+        </div>
+
+        <h2><i data-lucide="alert-triangle"></i> 5. Секреты и Ловушки</h2>
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="alert-box alert-warning" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--warn-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="zap" style="width: 18px;"></i> Полезные фишки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Узнаем лупу:</strong> Если предмет поставить между фокусом ($F$) и собирающей линзой, изображение станет мнимым, прямым и увеличенным. Это и есть принцип работы лупы!</li>
+                    <li><strong>Рассеивающая — это просто:</strong> Рассеивающая линза <b>всегда</b> (где бы ни стоял предмет) дает мнимое, уменьшенное, прямое изображение.</li>
+                    <li><strong>Если просят увеличение:</strong> Если в задаче дали $d$ и $f$, и просят найти высоту изображения, не ищите сложных путей! Используйте $\Gamma = \frac{f}{d} = \frac{H}{h}$.</li>
+                </ul>
+            </div>
+
+            <div class="alert-box alert-error" style="margin: 0; flex-direction: column;">
+                <strong style="color: var(--error-text); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="x-circle" style="width: 18px;"></i> Типичные ошибки
+                </strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 15px;">
+                    <li><strong>Диоптрии и сантиметры:</strong> Формула $D = 1/F$ работает <b>ТОЛЬКО в метрах</b>. Если фокус равен $20\text{ см}$, то $D = 1/0.2 = 5\text{ дптр}$. Нельзя делить $1/20$!</li>
+                    <li><strong>Потеря минусов:</strong> Забывают ставить минус перед $1/F$ для рассеивающей линзы, или перед $1/f$ для мнимого изображения. В итоге получают абсурдные ответы.</li>
+                    <li><strong>Рисование "на глаз":</strong> На экзамене лучи нужно строить строго по линейке: луч через центр <b>никогда не ломается</b>!</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><i data-lucide="target"></i> 6. Практика</h2>
+        
+        <div class="card">
+            <h3 style="color: var(--accent); margin-top:0;">Задача: Поиск изображения</h3>
+            <p>Предмет находится на расстоянии $30\text{ см}$ от собирающей линзы с фокусным расстоянием $20\text{ см}$. Найдите расстояние от линзы до изображения ($f$), оптическую силу линзы ($D$) и линейное увеличение ($\Gamma$).</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="hint-btn-1" onclick="showStep('hint1', 'hint-btn-1')"><i data-lucide="help-circle" style="width: 16px;"></i> Подсказка</button>
+                <button class="btn" onclick="showStep('sol1', 'hint-btn-1')"><i data-lucide="check-circle" style="width: 16px;"></i> Показать решение</button>
+            </div>
+            
+            <div class="step-content" id="hint1">
+                <strong>💡 Подсказка:</strong> Линза собирающая, значит перед $1/F$ будет плюс. Предмет находится дальше фокуса ($d=30$, $F=20$), значит изображение будет действительным (перед $1/f$ тоже плюс). Используйте классическую формулу $\frac{1}{F} = \frac{1}{d} + \frac{1}{f}$ и выразите оттуда $\frac{1}{f}$. Для расчета $D$ обязательно переведите $F$ в метры!
+            </div>
+
+            <div class="step-content" id="sol1">
+                <p><strong>Решение:</strong></p>
+                <p>1. Оптическая сила линзы (переводим $F=20\text{ см}$ в метры: $0.2\text{ м}$): <br>
+                $$D = \frac{1}{F} = \frac{1}{0.2} = 5\text{ дптр}$$</p>
+                
+                <p>2. Формула тонкой линзы для действительного изображения в собирающей линзе:<br>
+                $$\frac{1}{F} = \frac{1}{d} + \frac{1}{f}$$</p>
+                
+                <p>3. Выразим $\frac{1}{f}$ и подставим значения в сантиметрах:<br>
+                $$\frac{1}{f} = \frac{1}{F} - \frac{1}{d} = \frac{1}{20} - \frac{1}{30}$$</p>
+
+                <p>4. Приведем к общему знаменателю (60):<br>
+                $$\frac{1}{f} = \frac{3}{60} - \frac{2}{60} = \frac{1}{60} \quad \Rightarrow \quad f = 60\text{ см}$$</p>
+                
+                <p>5. Найдем увеличение:<br>
+                $$\Gamma = \frac{|f|}{d} = \frac{60}{30} = 2$$</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px 15px; border-radius: 6px; display: inline-block; color: var(--accent); font-weight: bold; margin-top: 10px;">Ответ: f = 60 см, D = 5 дптр, Г = 2. Изображение увеличено в 2 раза.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function forceMathJaxRender() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(err => console.error(err));
+            } else {
+                window.setTimeout(forceMathJaxRender, 200);
+            }
+        }
+        window.setTimeout(forceMathJaxRender, 100);
+
+        function showStep(stepId, btnId) {
+            const el = document.getElementById(stepId);
+            el.classList.add('active');
+            if (btnId) {
+                const btn = document.getElementById(btnId);
+                if(btn) btn.style.display = 'none';
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([el]).catch(err => console.error(err));
+            }
+        }
+
+        /* ==========================================
+           СИМУЛЯТОР ОПТИЧЕСКОЙ СКАМЬИ
+           ========================================== */
+        const canvas = document.getElementById('canvas-optics');
+        const ctx = canvas.getContext('2d');
+        
+        // Inputs
+        const inD = document.getElementById('sim-d');
+        const inF = document.getElementById('sim-focal');
+        const inH = document.getElementById('sim-h');
+        
+        // Labels
+        const valD = document.getElementById('val-d');
+        const valF = document.getElementById('val-focal');
+        const valH = document.getElementById('val-h');
+        
+        // Dashboards
+        const dashF = document.getElementById('dash-f');
+        const dashD = document.getElementById('dash-d');
+        const dashMag = document.getElementById('dash-mag');
+        const dashDesc = document.getElementById('dash-desc');
+
+        let lensType = 'convex'; // 'convex' or 'concave'
+
+        function setLensType(type) {
+            lensType = type;
+            document.querySelectorAll('.process-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderColor = "var(--border)";
+            });
+            
+            const activeBtn = document.getElementById(`btn-lens-${type}`);
+            activeBtn.classList.add('active');
+            
+            if (type === 'convex') {
+                activeBtn.style.borderColor = "var(--brand-blue)";
+            } else {
+                activeBtn.style.borderColor = "var(--brand-red)";
+                activeBtn.style.color = "var(--brand-red)";
+                activeBtn.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+                document.getElementById('btn-lens-convex').style.color = "var(--text-muted)";
+                document.getElementById('btn-lens-convex').style.backgroundColor = "var(--bg-card)";
+            }
+            
+            updateOptics();
+        }
+
+        function updateOptics() {
+            // 1. Читаем инпуты
+            const d_cm = parseFloat(inD.value);
+            let F_cm = parseFloat(inF.value);
+            const h_cm = parseFloat(inH.value);
+
+            // Знаки для физики
+            if (lensType === 'concave') {
+                F_cm = -Math.abs(F_cm);
+            }
+
+            // 2. Обновляем лейблы UI
+            valD.textContent = d_cm + ' см';
+            valF.textContent = Math.abs(F_cm) + ' см';
+            valH.textContent = h_cm + ' см';
+
+            // 3. Считаем физику
+            // 1/f = 1/F - 1/d
+            let f_cm = 0;
+            let isInfinity = false;
+            
+            if (d_cm === F_cm) {
+                isInfinity = true;
+            } else {
+                const one_over_f = (1 / F_cm) - (1 / d_cm);
+                f_cm = 1 / one_over_f;
+            }
+
+            // Оптическая сила D = 1/F_meters
+            const D_diopters = 1 / (F_cm / 100);
+
+            // Увеличение Gamma = |f| / d
+            let gamma = 0;
+            if (!isInfinity) {
+                gamma = Math.abs(f_cm) / d_cm;
+            }
+            
+            const H_cm = h_cm * gamma;
+
+            // 4. Обновляем дашборды
+            if (isInfinity) {
+                dashF.textContent = '∞';
+                dashMag.textContent = '—';
+                dashDesc.textContent = 'Изображения нет (лучи параллельны)';
+                dashDesc.style.color = "var(--text-muted)";
+                dashDesc.parentElement.style.borderColor = "#555";
+                dashDesc.parentElement.style.backgroundColor = "rgba(255,255,255,0.05)";
+            } else {
+                dashF.textContent = f_cm.toFixed(1) + ' см';
+                dashMag.textContent = gamma.toFixed(2) + 'x';
+                
+                // Формируем текстовое описание
+                let desc = [];
+                if (f_cm > 0) {
+                    desc.push("Действительное");
+                    desc.push("перевернутое");
+                    dashDesc.parentElement.style.borderColor = "var(--accent)";
+                    dashDesc.parentElement.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
+                    dashDesc.style.color = "var(--accent)";
+                } else {
+                    desc.push("Мнимое");
+                    desc.push("прямое");
+                    dashDesc.parentElement.style.borderColor = "var(--brand-purple)";
+                    dashDesc.parentElement.style.backgroundColor = "rgba(139, 92, 246, 0.1)";
+                    dashDesc.style.color = "var(--brand-purple)";
+                }
+                
+                if (gamma > 1.05) desc.push("увеличенное");
+                else if (gamma < 0.95) desc.push("уменьшенное");
+                else desc.push("равное");
+
+                dashDesc.textContent = desc.join(', ');
+            }
+            
+            dashD.textContent = (D_diopters > 0 ? '+' : '') + D_diopters.toFixed(1) + ' дптр';
+
+            // 5. Отрисовка на Canvas
+            drawCanvas(d_cm, F_cm, h_cm, f_cm, H_cm, isInfinity);
+        }
+
+        function drawArrowLine(ctx, fromX, fromY, toX, toY, color, isDashed=false, arrowAtEnd=false) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            if (isDashed) ctx.setLineDash([5, 5]);
+            else ctx.setLineDash([]);
+            
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (arrowAtEnd) {
+                // Рисуем стрелочку направления луча
+                const dx = toX - fromX;
+                const dy = toY - fromY;
+                const angle = Math.atan2(dy, dx);
+                const headlen = 8;
+                
+                // Сместим стрелочку немного от конца, если линия длинная
+                const len = Math.sqrt(dx*dx + dy*dy);
+                let midX = fromX + dx * 0.7;
+                let midY = fromY + dy * 0.7;
+                if (len < 50) { midX = toX; midY = toY; }
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
+                ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 6), midY - headlen * Math.sin(angle + Math.PI / 6));
+                ctx.fill();
+            }
+        }
+
+        function drawObjectArrow(ctx, x, yBase, height, color) {
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 4;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, yBase);
+            ctx.lineTo(x, yBase - height);
+            ctx.stroke();
+            
+            // Наконечник стрелки
+            const headH = height > 0 ? 10 : -10;
+            ctx.beginPath();
+            ctx.moveTo(x, yBase - height);
+            ctx.lineTo(x - 6, yBase - height + headH);
+            ctx.lineTo(x + 6, yBase - height + headH);
+            ctx.fill();
+        }
+
+        function drawCanvas(d, F, h, f, H, isInfinity) {
+            const w = canvas.width;
+            const h_canv = canvas.height;
+            const cx = w / 2;
+            const cy = h_canv / 2;
+            
+            ctx.clearRect(0, 0, w, h_canv);
+
+            // Визуальный масштаб: чтобы всё влезало. 
+            // d до 60, f может быть до 120. Размах X от -100 до +150.
+            // Пусть 1 см = 2.5 пикселя.
+            const scale = 2.5;
+
+            const F_px = Math.abs(F) * scale;
+            const d_px = d * scale;
+            const h_px = h * scale;
+            const f_px = Math.abs(f) * scale;
+            const H_px = H * scale;
+
+            // 1. Главная оптическая ось
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, cy);
+            ctx.lineTo(w, cy);
+            ctx.stroke();
+
+            // 2. Линза (по центру)
+            ctx.strokeStyle = lensType === 'convex' ? '#3B82F6' : '#EF4444';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, 20);
+            ctx.lineTo(cx, h_canv - 20);
+            ctx.stroke();
+
+            // Стрелочки на концах линзы
+            ctx.beginPath();
+            if (lensType === 'convex') {
+                // Сходятся
+                ctx.moveTo(cx - 5, 30); ctx.lineTo(cx, 20); ctx.lineTo(cx + 5, 30);
+                ctx.moveTo(cx - 5, h_canv - 30); ctx.lineTo(cx, h_canv - 20); ctx.lineTo(cx + 5, h_canv - 30);
+            } else {
+                // Расходятся
+                ctx.moveTo(cx - 5, 20); ctx.lineTo(cx, 30); ctx.lineTo(cx + 5, 20);
+                ctx.moveTo(cx - 5, h_canv - 20); ctx.lineTo(cx, h_canv - 30); ctx.lineTo(cx + 5, h_canv - 20);
+            }
+            ctx.stroke();
+
+            // 3. Фокусы
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            // Передний фокус
+            ctx.beginPath(); ctx.arc(cx - F_px, cy, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillText('F', cx - F_px, cy + 15);
+            // Задний фокус
+            ctx.beginPath(); ctx.arc(cx + F_px, cy, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillText('F', cx + F_px, cy + 15);
+
+            // Двойные фокусы
+            ctx.beginPath(); ctx.arc(cx - 2*F_px, cy, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillText('2F', cx - 2*F_px, cy + 15);
+            ctx.beginPath(); ctx.arc(cx + 2*F_px, cy, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillText('2F', cx + 2*F_px, cy + 15);
+
+            // Оптический центр
+            ctx.fillText('O', cx + 10, cy + 15);
+
+            // 4. Предмет (зеленая стрелка слева)
+            const objX = cx - d_px;
+            drawObjectArrow(ctx, objX, cy, h_px, '#4CAF50');
+
+            // 5. Лучи (желтоватые)
+            const rayColor = 'rgba(255, 193, 7, 0.7)';
+            
+            // Луч 1: Параллельно оси
+            drawArrowLine(ctx, objX, cy - h_px, cx, cy - h_px, rayColor, false, true); // До линзы
+            
+            if (lensType === 'convex') {
+                // Преломляется через задний фокус (cx + F_px, cy)
+                const slope1 = (cy - (cy - h_px)) / (cx + F_px - cx); // dy/dx
+                // Рисуем реальный луч вправо до края экрана
+                const endX = w;
+                const endY = cy - h_px + slope1 * (endX - cx);
+                drawArrowLine(ctx, cx, cy - h_px, endX, endY, rayColor, false, true);
+                
+                // Если мнимое, рисуем продолжение влево
+                if (f < 0 && !isInfinity) {
+                    const backX = 0;
+                    const backY = cy - h_px + slope1 * (backX - cx);
+                    drawArrowLine(ctx, cx, cy - h_px, backX, backY, rayColor, true);
+                }
+            } else {
+                // Рассеивающая. Отклоняется так, будто выходит из переднего фокуса (cx - F_px)
+                const slope1 = (cy - h_px - cy) / (cx - (cx - F_px)); // dy/dx from Focus to hit point
+                // Реальный луч вправо
+                const endX = w;
+                const endY = cy - h_px + slope1 * (endX - cx);
+                drawArrowLine(ctx, cx, cy - h_px, endX, endY, rayColor, false, true);
+                
+                // Мнимое продолжение влево (через фокус)
+                drawArrowLine(ctx, cx, cy - h_px, cx - F_px, cy, rayColor, true);
+            }
+
+            // Луч 2: Через оптический центр
+            const slope2 = (cy - (cy - h_px)) / (cx - objX);
+            // Вправо
+            const endX2 = w;
+            const endY2 = cy - h_px + slope2 * (endX2 - objX);
+            drawArrowLine(ctx, objX, cy - h_px, endX2, endY2, 'rgba(6, 182, 212, 0.7)', false, true);
+            
+            // Влево (мнимое продолжение, если надо)
+            if (f < 0 && !isInfinity) {
+                const backX2 = 0;
+                const backY2 = cy - h_px + slope2 * (backX2 - objX);
+                drawArrowLine(ctx, objX, cy - h_px, backX2, backY2, 'rgba(6, 182, 212, 0.7)', true);
+            }
+
+            // 6. Изображение (оранжевая стрелка)
+            if (!isInfinity) {
+                let imgX, imgH;
+                if (f > 0) {
+                    // Действительное (справа, перевернутое)
+                    imgX = cx + f_px;
+                    imgH = -H_px; // вниз
+                } else {
+                    // Мнимое (слева, прямое)
+                    imgX = cx - f_px;
+                    imgH = H_px; // вверх
+                }
+                drawObjectArrow(ctx, imgX, cy, imgH, '#F97316');
+            }
+        }
+
+        // Attach listeners
+        inD.addEventListener('input', updateOptics);
+        inF.addEventListener('input', updateOptics);
+        inH.addEventListener('input', updateOptics);
+
+        // Init
+        setLensType('convex');
+
+    </script>
+</body>
+</html>
